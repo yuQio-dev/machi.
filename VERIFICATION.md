@@ -21,6 +21,15 @@
 - 地図アプリを一般公開に変更。認証情報なしのHTTPリクエストが200で地図アプリを返し、ログイン画面を経由しないことを確認。
 - 公開URLのブラウザでOSM背景地図、21件のスポット、「シート接続中」を確認。
 
+## GitHub Pagesへの移行
+
+- 公開リポジトリ [yuQio-dev/ushiku-map](https://github.com/yuQio-dev/ushiku-map) に、地図・API・テスト・公開設定の20ファイルを保存。
+- mainへの更新を契機に、GitHub Actionsで8テストとブラウザJavaScriptの構文チェックを実行し、distだけを公開。初回の[自動公開](https://github.com/yuQio-dev/ushiku-map/actions/runs/38560345494)は成功。
+- 公開先は https://yuqio-dev.github.io/ushiku-map/ 。認証情報なしでHTML・CSS・JavaScript・設定・同梱データの6ファイルがHTTP 200を返し、ローカルのソースと一致。
+- 新しい公開先のブラウザで「シート接続中」「スプレッドシートから取得」と21件の表示を確認。名称「南部」で1件に絞り込み、南部珈琲の詳細を表示。
+- dist/config.js、apps-script/Code.gs、apps-script/appsscript.jsonは移行前と差分なし。既存APIのURL・公開範囲・読み取り専用権限を継続。
+- ローカルのmainをGitHubのorigin/mainへ接続。旧Sites側の履歴はローカルのsites-sourceブランチに保存。
+
 ## 未確認
 
 - 元シートへの意図的なテスト書き込みは行っていない。確認データとの差分（カテゴリ表記）が実APIの結果に反映されることは確認済み。

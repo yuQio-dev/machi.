@@ -6,7 +6,7 @@ Googleスプレッドシート「PoIリスト」の観光スポットを、Leafl
 ## 作成したURL
 
 - [GitHubリポジトリ](https://github.com/yuQio-dev/ushiku-map): 地図アプリとAPIのソースを管理します。
-- GitHub Pagesの公開URLは、このリポジトリの[Pages設定](https://github.com/yuQio-dev/ushiku-map/settings/pages)と[Actions](https://github.com/yuQio-dev/ushiku-map/actions)で確認できます。
+- [公開地図（GitHub Pages）](https://yuqio-dev.github.io/ushiku-map/): ChatGPTやGitHubへのログインなしで閲覧できます。
 - [読み取り専用API](https://script.google.com/macros/s/AKfycbx787is7b-vhsc7wTEKyIgmdN1xBbNEyWb2uuQSvGZRd-V7dmzEjYrMXKFJBTixXEKt/exec): 公開JSON。観光スポット情報を返します。
 - [Apps Scriptの編集画面](https://script.google.com/home/projects/1x8zyuZEEzfK8VXCNSUAvO9VRYmzBcb4xUUEzIHJ16fLvg6nQpwPWQpCH/edit): APIのソースとデプロイ管理。
 
