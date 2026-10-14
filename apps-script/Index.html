@@ -1,0 +1,295 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="theme-color" content="#faf9f6">
+  <title>うしくスポットマップ</title>
+  <meta name="description" content="牛久周辺のスポットを地図で探す。名称検索、カテゴリ絞り込み、スポット詳細。">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+  <style>:root{font-family:"Noto Sans JP","Yu Gothic UI",Meiryo,sans-serif;color:#24343b;background:#faf9f6;font-synthesis:none;--accent:#b74b27;--line:#e7e6df;--muted:#69757a;--paper:#faf9f6;--shadow:0 8px 30px #19303915}
+*{box-sizing:border-box}body{margin:0}button,input,select{font:inherit}button,a,input,select{touch-action:manipulation}button{cursor:pointer}button:disabled{cursor:wait;opacity:.55}button:focus-visible,input:focus-visible,select:focus-visible,a:focus-visible{outline:3px solid #267b8a;outline-offset:3px}button{color:inherit}a{color:var(--accent)}[hidden]{display:none!important}.icon-defs{position:absolute;width:0;height:0;overflow:hidden}.icon{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}.topbar{height:80px;display:flex;justify-content:space-between;align-items:center;padding:0 30px;border-bottom:1px solid var(--line);background:var(--paper);gap:12px}.brand{display:flex;gap:13px;align-items:center}.brand-mark{width:41px;height:46px;display:grid;place-items:center;background:#eae7dc;border-radius:14px;color:#7d5839}.brand-mark .icon{width:25px;height:25px}h1{font-size:18px;letter-spacing:.05em;margin:0;font-weight:700}.brand p{font-size:9px;letter-spacing:.22em;margin:5px 0 0;color:var(--muted)}.top-actions{display:flex;align-items:center;gap:10px}.source-state{font-size:11px;border:1px solid #deddd4;border-radius:20px;padding:7px 12px;color:#656d62}.icon-button{background:transparent;border:0;border-radius:8px;width:36px;height:36px;display:grid;place-items:center}.icon-button:hover{background:#edece6}.workspace{display:flex;height:calc(100dvh - 80px);min-height:440px}.sidebar{width:362px;flex:0 0 362px;background:var(--paper);border-right:1px solid var(--line);display:flex;flex-direction:column;z-index:500}.search-section{padding:26px 23px 18px}.section-heading{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:20px}h2{font-size:15px;margin:0}.small-label{font-size:10px;color:var(--muted)}.search-box{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid #dadfdc;border-radius:9px;padding:12px 11px;color:#728084}.search-box input{border:0;outline:0;width:100%;min-width:0;font-size:12px;background:none;color:#24343b}.search-box:focus-within{border-color:#267b8a;box-shadow:0 0 0 2px #267b8a25}.group-filters{display:flex;gap:6px;margin-top:17px}.group{flex:1;font-size:11px;white-space:nowrap;padding:9px 3px;border:1px solid transparent;background:#efeee8;border-radius:6px}.group:hover{background:#e5e4de}.group.active{background:#243f40;color:#fff}.filter-row{display:flex;align-items:center;margin-top:16px;gap:12px}.category-label{font-size:11px;color:var(--muted);white-space:nowrap}select{width:100%;padding:9px 28px 9px 10px;border:1px solid #dcded8;border-radius:6px;background:#fff;font-size:12px;color:#354247}.viewport-filter{display:flex;align-items:center;gap:7px;margin-top:14px;font-size:11px;color:#5b686c;cursor:pointer}.viewport-filter input{accent-color:#294f51;width:14px;height:14px;margin:0}.result-heading{padding:15px 23px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;font-size:11px}.result-heading strong{font-size:20px;font-weight:600;margin-right:3px}.text-button{border:0;background:transparent;font-size:10px;color:var(--accent);padding:5px 0;white-space:nowrap}.text-button:hover{text-decoration:underline}.results{flex:1;overflow:auto;overscroll-behavior:contain;padding:0 13px;scrollbar-width:thin}.spot-row{width:100%;border:0;border-bottom:1px solid #e9e8e2;background:transparent;text-align:left;display:flex;gap:12px;padding:18px 10px;align-items:center;position:relative;border-radius:6px}.spot-row:hover{background:#eeeee7}.spot-row.selected{background:#f2e9df}.spot-symbol{width:35px;height:35px;display:grid;place-items:center;border-radius:10px;flex-shrink:0;background:#e9efe8;color:#4b7059}.spot-symbol.food{background:#f7e9df;color:#ae5634}.spot-symbol.shop{background:#eee7f1;color:#856595}.spot-symbol.transport{background:#e3edf1;color:#4f7a8f}.spot-copy{min-width:0;flex:1}.spot-topline{display:flex;align-items:center;gap:7px;margin-bottom:7px}.spot-category{font-size:9px;color:var(--muted)}.warning-badge{font-size:9px;color:#956522;background:#faf0d9;padding:2px 5px;border-radius:3px}.spot-name{font-size:13px;line-height:1.5;display:block;margin-bottom:4px;overflow-wrap:anywhere}.spot-address{display:block;font-size:10px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.spot-arrow{width:13px;color:#939b98}.sidebar-footer{padding:15px 22px;border-top:1px solid var(--line);display:flex;gap:9px;align-items:center;font-size:10px;background:#f2f1eb}.status-dot,.live-dot{display:block;width:6px;height:6px;border-radius:50%;background:#a18b55;flex-shrink:0}.status-dot.live{background:#467b59}.sidebar-footer small{display:block;color:#77817d;margin-top:4px;font-size:9px}.map-section{flex:1;position:relative;min-width:0;overflow:hidden;background:#e9edde}#map{width:100%;height:100%;z-index:0;background:#e8eddf}.leaflet-container{font-family:inherit}.map-caption{position:absolute;left:24px;top:24px;background:#ffffffed;border:1px solid #ffffff;box-shadow:var(--shadow);padding:12px 17px;display:flex;gap:10px;align-items:center;font-size:11px;border-radius:9px;z-index:450;pointer-events:none}.live-dot{background:#54796e}.caption-divider{height:12px;width:1px;background:#d7ddd9}.map-caption #map-count{font-size:10px;color:#6c7776}.map-tools{position:absolute;top:24px;right:22px;display:flex;flex-direction:column;gap:8px;z-index:450}.map-button{display:grid;place-items:center;width:42px;height:42px;border:1px solid #e2e4db;border-radius:9px;background:#fff;box-shadow:0 3px 12px #24343b10;color:#3f5454}.map-button:hover{background:#f1f4ed}.leaflet-control-zoom{border:1px solid #e2e4db!important;border-radius:9px!important;overflow:hidden;box-shadow:0 3px 12px #24343b10!important}.leaflet-top.leaflet-right{top:127px;right:12px}.leaflet-control-zoom a{width:40px!important;height:39px!important;line-height:39px!important;color:#3f5454!important;font-size:20px!important}.leaflet-control-attribution{font-size:9px!important;max-width:calc(100% - 5px);line-height:1.7!important}.map-pin{border:0;background:none}.pin-inner{width:31px;height:31px;background:#64816b;color:white;border:3px solid white;display:grid;place-items:center;border-radius:50% 50% 50% 4px;transform:rotate(-45deg);box-shadow:0 3px 9px #173a353d}.pin-inner .icon{width:14px;height:14px;transform:rotate(45deg)}.map-pin.food .pin-inner{background:#c2714e}.map-pin.shop .pin-inner{background:#957c9d}.map-pin.transport .pin-inner{background:#608ea0}.map-pin.selected .pin-inner{background:#243f40;width:36px;height:36px;box-shadow:0 0 0 5px #ffffff80,0 4px 12px #16362d50}.map-pin.warn .pin-inner{border-color:#f8da95}.detail-card{position:absolute;right:22px;bottom:39px;width:310px;max-height:calc(100% - 228px);overflow:auto;background:var(--paper);border:1px solid #e1e3d8;border-radius:13px;box-shadow:0 12px 45px #24343b26;z-index:460;padding:26px 23px}.close-detail{position:absolute;right:10px;top:10px}.detail-category{font-size:10px;color:var(--accent);letter-spacing:.04em;margin-bottom:14px}.detail-title{font-size:21px;line-height:1.65;margin:0 22px 16px 0;letter-spacing:.02em}.detail-address{display:flex;gap:8px;font-size:11px;color:#667574;line-height:1.8}.detail-address .icon{width:15px;height:15px;margin-top:3px}.detail-description{font-size:12px;line-height:2;margin:18px 0;color:#586768;white-space:pre-line}.detail-facts{padding:14px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin:0;display:grid;grid-template-columns:65px 1fr;gap:10px;font-size:11px;line-height:1.8}.detail-facts dt{color:#7b8580}.detail-facts dd{margin:0;overflow-wrap:anywhere}.detail-link{display:flex;justify-content:space-between;align-items:center;color:#435c56;font-size:11px;text-decoration:none;padding:13px 0;border-bottom:1px solid var(--line)}.detail-link:hover{color:var(--accent)}.detail-warning{background:#f6ecd6;color:#856224;padding:10px;margin-top:14px;font-size:10px;line-height:1.8}.detail-image{width:100%;max-height:180px;object-fit:cover;border-radius:7px;margin:0 0 14px}.coordinate-note{position:absolute;left:24px;bottom:49px;z-index:451;background:#fffdf5;box-shadow:var(--shadow);border:1px solid #e6dcc0;border-radius:8px;display:flex;align-items:center;gap:13px;padding:7px 8px 7px 13px;max-width:calc(100% - 48px);font-size:10px;color:#80653b}.map-message{position:absolute;top:87px;left:24px;z-index:455;background:#fffdf6;border:1px solid #ddd7c4;border-radius:7px;box-shadow:var(--shadow);padding:12px 17px;max-width:calc(100% - 100px);font-size:12px;line-height:1.8}.empty-state{padding:42px 18px;text-align:center;font-size:12px;color:#667574;line-height:2}.empty-state strong{display:block;font-size:14px;color:#35484b;margin-bottom:8px}.mobile-list-toggle{display:none}dialog{border:1px solid #dadfd7;border-radius:14px;background:var(--paper);color:#24343b;width:480px;max-width:calc(100% - 32px);padding:25px;box-shadow:0 20px 80px #1c303638}dialog::backdrop{background:#20333165}.dialog-heading{display:flex;justify-content:space-between;align-items:center;gap:12px}.dialog-heading h2{font-size:17px}dialog p{font-size:12px;line-height:1.9;color:#67716a}.field-label{display:block;font-size:11px;font-weight:600;margin-top:20px}#api-url{width:100%;border:1px solid #d3dad4;border-radius:7px;padding:12px;margin-top:8px;background:#fff;color:#24343b;font-size:12px}.field-hint{font-size:10px!important}.field-error{color:#a3392c!important}.dialog-actions{display:flex;justify-content:flex-end;gap:9px;margin-top:23px}.primary-button,.secondary-button{border:1px solid #d5dad2;border-radius:7px;padding:11px 13px;font-size:11px}.primary-button{background:#294b47;color:white;border-color:#294b47}.secondary-button{background:#fff}.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+@media(min-width:1500px){.sidebar{width:390px;flex-basis:390px}.search-section{padding:30px 27px 20px}}
+@media(max-width:1000px){.sidebar{width:318px;flex-basis:318px}.search-section{padding:23px 17px 16px}.section-heading{display:block}.small-label{display:block;margin-top:6px}.detail-card{width:282px;right:16px}.coordinate-note{gap:8px;left:15px;font-size:9px}}
+@media(max-width:700px){.topbar{height:69px;padding:0 15px}h1{font-size:14px}.brand{gap:9px}.brand-mark{width:32px;height:38px;border-radius:11px}.brand p{font-size:8px;letter-spacing:.13em}.brand-mark .icon{width:22px}.top-actions{gap:2px}.source-state{display:none}.workspace{height:calc(100dvh - 69px);min-height:350px}.sidebar{display:none;position:absolute;bottom:0;left:0;right:0;width:100%;height:57dvh;border-radius:18px 18px 0 0;border:1px solid #d9ded4;box-shadow:0 -8px 30px #21373320;z-index:700}.sidebar.open{display:flex}.search-section{padding:17px 19px 12px}.section-heading{display:flex;margin-bottom:12px}.small-label{margin:0}.search-box{padding:10px}.group-filters{margin-top:12px}.filter-row{margin-top:10px}.viewport-filter{margin-top:10px}.result-heading{padding:10px 19px}.spot-row{padding:13px 8px}.sidebar-footer{padding:9px 20px}.map-caption{top:16px;left:15px;padding:11px 13px;font-size:10px;gap:7px}.map-tools{top:16px;right:15px}.leaflet-top.leaflet-right{top:119px;right:5px}.detail-card{left:15px;right:15px;bottom:69px;width:auto;max-height:52%;padding:23px}.detail-title{font-size:19px;margin-bottom:12px}.detail-description{margin:12px 0}.detail-category{margin-bottom:8px}.mobile-list-toggle{display:flex;gap:8px;align-items:center;position:absolute;left:50%;transform:translateX(-50%);bottom:38px;border:1px solid #e0e5dc;border-radius:20px;background:#243f40;color:white;padding:10px 17px;z-index:800;font-size:11px;box-shadow:var(--shadow)}.sidebar.open~.map-section .mobile-list-toggle{bottom:calc(57dvh + 10px)}.coordinate-note{left:15px;bottom:91px;max-width:calc(100% - 80px);padding:5px 5px 5px 10px;gap:7px}.coordinate-note .icon-button{width:25px;height:30px}.map-message{left:15px;top:77px;font-size:11px;max-width:calc(100% - 82px)}.map-section:has(.detail-card:not([hidden])) .coordinate-note{display:none}.dialog-actions{flex-wrap:wrap}.leaflet-control-scale{margin-bottom:8px!important}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+</style>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  
+  
+  
+</head>
+<body>
+  <svg class="icon-defs" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <symbol id="i-pin" viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></symbol>
+    <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/><path d="M12 2v4m0 12v4M2 12h4m12 0h4"/></symbol>
+    <symbol id="i-fit" viewBox="0 0 24 24"><path d="M9 4H4v5m11-5h5v5M4 15v5h5m11-5v5h-5"/><path d="M9 9h6v6H9z"/></symbol>
+    <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M20 8a8 8 0 1 0 1 6M20 3v5h-5"/></symbol>
+    <symbol id="i-sliders" viewBox="0 0 24 24"><path d="M4 7h6m4 0h6M4 17h10m4 0h2"/><circle cx="12" cy="7" r="2"/><circle cx="16" cy="17" r="2"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="m9 5 7 7-7 7"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+    <symbol id="i-link" viewBox="0 0 24 24"><path d="M14 4h6v6m0-6L10 14M10 4H4v16h16v-6"/></symbol>
+    <symbol id="i-list" viewBox="0 0 24 24"><path d="M9 6h12M9 12h12M9 18h12M3 6h1m-1 6h1m-1 6h1"/></symbol>
+    <symbol id="i-coffee" viewBox="0 0 24 24"><path d="M4 8h12v7a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5V8Zm12 0h2a3 3 0 0 1 0 6h-2M7 2v2m4-2v2"/></symbol>
+    <symbol id="i-landmark" viewBox="0 0 24 24"><path d="m3 8 9-5 9 5H3Zm2 3v8m7-8v8m7-8v8M3 21h18"/></symbol>
+    <symbol id="i-shop" viewBox="0 0 24 24"><path d="M5 10v10h14V10M3 10l2-6h14l2 6H3Zm6 10v-6h6v6"/></symbol>
+    <symbol id="i-train" viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="15" rx="3"/><path d="M5 10h14m-7-7v7m-4 7h1m6 0h1M8 18l-2 4m10-4 2 4"/></symbol>
+  </svg>
+  <header class="topbar">
+    <div class="brand"><span class="brand-mark"><svg class="icon"><use href="#i-pin"/></svg></span><div><h1>うしくスポットマップ</h1><p>USHIKU / SPOT MAP</p></div></div>
+    <div class="top-actions"><span class="source-state" id="source-state">データを読み込み中</span><button class="icon-button" id="reload" aria-label="スポット情報を更新" title="スポット情報を更新"><svg class="icon"><use href="#i-refresh"/></svg></button><button class="icon-button" id="settings" aria-label="データ接続設定" title="データ接続設定"><svg class="icon"><use href="#i-sliders"/></svg></button></div>
+  </header>
+  <main class="workspace">
+    <aside class="sidebar" id="sidebar" aria-label="スポット検索と一覧">
+      <div class="search-section"><div class="section-heading"><h2>スポットを探す</h2><span class="small-label">牛久とその周辺</span></div>
+        <label class="search-box"><svg class="icon"><use href="#i-search"/></svg><input id="search" type="search" placeholder="スポット名・住所・キーワード" autocomplete="off" aria-label="スポットを検索"></label>
+        <div class="group-filters" role="group" aria-label="ジャンルで絞り込む"><button class="group active" data-group="all" aria-pressed="true">すべて</button><button class="group" data-group="food" aria-pressed="false">食べる</button><button class="group" data-group="visit" aria-pressed="false">訪れる</button><button class="group" data-group="shop" aria-pressed="false">買う</button><button class="group" data-group="transport" aria-pressed="false">交通</button></div>
+        <div class="filter-row"><label class="category-label" for="category">カテゴリ</label><select id="category" aria-label="カテゴリで絞り込む"><option value="">すべてのカテゴリ</option></select></div>
+        <label class="viewport-filter"><input id="viewport-only" type="checkbox"><span>表示中の地図範囲で絞る</span></label>
+      </div>
+      <div class="result-heading"><span><strong id="result-count">—</strong> 件のスポット</span><button class="text-button" id="reset">条件をリセット</button></div>
+      <div id="results" class="results" aria-label="検索結果"></div>
+      <footer class="sidebar-footer"><span class="status-dot" id="status-dot"></span><div><span id="data-status">接続を確認しています</span><small id="data-time"></small></div></footer>
+    </aside>
+    <section class="map-section" aria-label="スポット地図">
+      <div id="map" aria-label="OpenStreetMapの地図"></div>
+      <div class="map-caption"><span class="live-dot"></span><span>牛久エリア</span><span class="caption-divider"></span><span id="map-count">スポットを準備中</span></div>
+      <div class="map-tools"><button id="fit" class="map-button" title="絞り込み中の全地点を表示" aria-label="絞り込み中の全地点を表示"><svg class="icon"><use href="#i-fit"/></svg></button><button id="locate" class="map-button" title="現在地を表示" aria-label="現在地を表示"><svg class="icon"><use href="#i-target"/></svg></button></div>
+      <div class="map-message" id="map-message" role="status" hidden></div>
+      <div class="coordinate-note" id="coordinate-note" hidden><span id="coordinate-note-text"></span><button id="show-warning" class="text-button">地点を確認</button><button id="dismiss-warning" class="icon-button" aria-label="座標確認のお知らせを閉じる"><svg class="icon"><use href="#i-close"/></svg></button></div>
+      <article class="detail-card" id="detail" aria-label="選択したスポットの詳細" hidden><button id="close-detail" class="icon-button close-detail" aria-label="詳細を閉じる"><svg class="icon"><use href="#i-close"/></svg></button><div id="detail-content"></div></article>
+      <button class="mobile-list-toggle" id="list-toggle" aria-controls="sidebar" aria-expanded="false"><svg class="icon"><use href="#i-list"/></svg><span>スポット一覧</span></button>
+    </section>
+  </main>
+  <div id="announcement" class="sr-only" role="status" aria-live="polite"></div>
+  <dialog id="connection-dialog" aria-labelledby="connection-title"><form id="connection-form"><div class="dialog-heading"><h2 id="connection-title">スプレッドシートに接続</h2><button type="button" id="close-settings" class="icon-button" aria-label="設定を閉じる"><svg class="icon"><use href="#i-close"/></svg></button></div><p>読み取り専用APIを接続すると、シートの最新情報を地図に反映できます。</p><label class="field-label" for="api-url">Apps ScriptのWebアプリURL</label><input id="api-url" type="url" placeholder="https://script.google.com/macros/s/…/exec" autocomplete="off"><p class="field-hint">公開した観光情報のAPIを指定してください。URLはこのブラウザに保存されます。</p><p id="connection-error" class="field-error" role="alert" hidden></p><div class="dialog-actions"><button type="button" id="use-snapshot" class="secondary-button">確認時点のデータを使う</button><button type="submit" class="primary-button">接続して更新</button></div></form></dialog>
+<script>
+window.MAP_CONFIG = Object.freeze({
+  // 公開APIのデプロイ後に /exec URL を設定できます。ブラウザ設定も利用できます。
+  apiUrl: 'https://script.google.com/macros/s/AKfycbx787is7b-vhsc7wTEKyIgmdN1xBbNEyWb2uuQSvGZRd-V7dmzEjYrMXKFJBTixXEKt/exec',
+  tileUrl: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+  initialCenter: [35.979, 140.162],
+  initialZoom: 13
+});
+
+</script>
+<script>
+(function (root) {
+  'use strict';
+  const groups = {
+    food: ['カフェ', '飲食店', '居酒屋', 'スイーツ', 'グルメ'],
+    visit: ['観光名所', 'ワイン醸造所', '寺院', '神社', 'ゴルフ場'],
+    shop: ['お土産やさん', 'お土産屋さん', '酒屋', '老舗和菓子店'],
+    transport: ['交通']
+  };
+  function groupOf(category) {
+    return Object.keys(groups).find(key => groups[key].includes(category)) || 'other';
+  }
+  function normalize(text) { return String(text ?? '').normalize('NFKC').toLocaleLowerCase('ja').trim(); }
+  function validCoordinates(lat, lon) {
+    return lat !== '' && lat != null && lon !== '' && lon != null &&
+      Number.isFinite(Number(lat)) && Number.isFinite(Number(lon)) &&
+      Math.abs(Number(lat)) <= 90 && Math.abs(Number(lon)) <= 180;
+  }
+  function safeUrl(value) {
+    try { const url = new URL(value); return /^https?:$/.test(url.protocol) ? url.href : ''; }
+    catch { return ''; }
+  }
+  function sanitizePayload(payload) {
+    if (!payload || payload.ok !== true || !Array.isArray(payload.items)) {
+      throw new Error(payload?.error?.message || 'APIの応答形式を確認してください。');
+    }
+    const items = payload.items.filter(item => item && String(item.name || '').trim() && validCoordinates(item.lat, item.lon)).map((item, index) => ({
+      id: String(item.id || `spot-${index}`), row: Number(item.row) || 0,
+      name: String(item.name).trim(), location: String(item.location || '').trim(),
+      lat: Number(item.lat), lon: Number(item.lon), description: String(item.description || '').trim(),
+      time: String(item.time || '').trim(), closed: String(item.closed || '').trim(),
+      category: String(item.category || '未分類').trim(), image: safeUrl(item.image),
+      sourceUrl: safeUrl(item.sourceUrl), coordinateWarning: String(item.coordinateWarning || '')
+    }));
+    return { ...payload, items, rejectedItems: payload.items.length - items.length };
+  }
+  function filterItems(items, { query = '', group = 'all', category = '', bounds = null } = {}) {
+    const words = normalize(query).split(/\s+/).filter(Boolean);
+    return items.filter(item => (group === 'all' || groupOf(item.category) === group) &&
+      (!category || item.category === category) &&
+      words.every(word => normalize([item.name, item.location, item.description, item.category].join(' ')).includes(word)) &&
+      (!bounds || bounds.contains([item.lat, item.lon])));
+  }
+  root.MapModel = { groupOf, normalize, validCoordinates, safeUrl, sanitizePayload, filterItems };
+})(globalThis);
+
+</script>
+<script>
+/* global L, MapModel, MAP_CONFIG, google */
+(function () {
+  'use strict';
+  const $ = id => document.getElementById(id);
+  const iconNames = { food: 'coffee', visit: 'landmark', shop: 'shop', transport: 'train', other: 'pin' };
+  const icon = name => `<svg class="icon" aria-hidden="true"><use href="#i-${name}"/></svg>`;
+  const state = { items: [], group: 'all', selected: null, markers: new Map(), ready: false, loading: false, mode: '', userMarker: null, userCircle: null };
+  const storedApi = () => { try { return localStorage.getItem('ushiku-map-api') || ''; } catch { return ''; } };
+  const storeApi = value => { try { value ? localStorage.setItem('ushiku-map-api', value) : localStorage.removeItem('ushiku-map-api'); } catch {} };
+  const isGas = typeof google !== 'undefined' && google.script && google.script.run;
+  let map;
+  function announce(text) { $('announcement').textContent = text; }
+  function message(text) { $('map-message').textContent = text; $('map-message').hidden = !text; }
+  function create(tag, className, text) { const el = document.createElement(tag); if (className) el.className = className; if (text != null) el.textContent = text; return el; }
+  function validateApi(value) {
+    const url = new URL(value);
+    if (url.protocol !== 'https:' || url.hostname !== 'script.google.com' || !/^\/macros\/s\/[A-Za-z0-9_-]+\/exec$/.test(url.pathname) || url.username || url.password) throw new Error('Apps Scriptの /exec で終わるWebアプリURLを指定してください。');
+    url.search = ''; url.hash = ''; return url.href;
+  }
+  function loadJsonp(api) {
+    return new Promise((resolve, reject) => {
+      const callback = '__ushiku_cb_' + Date.now() + Math.floor(Math.random() * 100000);
+      const script = document.createElement('script');
+      const url = new URL(validateApi(api)); url.searchParams.set('action', 'pois'); url.searchParams.set('callback', callback);
+      const cleanup = () => { clearTimeout(timer); script.remove(); delete window[callback]; };
+      const timer = setTimeout(() => { cleanup(); reject(new Error('APIの応答がありません。公開範囲と /exec URLを確認してください。')); }, 20000);
+      window[callback] = data => { cleanup(); resolve(data); };
+      script.onerror = () => { cleanup(); reject(new Error('APIに接続できません。デプロイと公開設定を確認してください。')); };
+      script.src = url.href; document.head.append(script);
+    });
+  }
+  function loadGas() {
+    return new Promise((resolve, reject) => google.script.run.withSuccessHandler(resolve).withFailureHandler(error => reject(new Error(error.message || 'シートを読み取れませんでした。'))).getMapData());
+  }
+  async function load(apiOverride) {
+    if (state.loading) return;
+    state.loading = true; $('reload').disabled = true; $('settings').disabled = true; $('source-state').textContent = '読み込み中'; message('');
+    try {
+      const configuredApi = storedApi() || MAP_CONFIG.apiUrl;
+      const api = apiOverride !== undefined ? apiOverride : (configuredApi === 'snapshot' ? '' : configuredApi);
+      let raw;
+      if (isGas) raw = await loadGas();
+      else if (api) raw = await loadJsonp(api);
+      else { const response = await fetch('data.snapshot.json'); if (!response.ok) throw new Error('確認時点のデータを読み込めませんでした。'); raw = await response.json(); }
+      const payload = MapModel.sanitizePayload(raw);
+      state.items = payload.items; state.mode = isGas || api ? 'live' : 'snapshot'; state.ready = true;
+      $('source-state').textContent = state.mode === 'live' ? 'シート接続中' : '確認時点のデータ';
+      $('data-status').textContent = state.mode === 'live' ? 'スプレッドシートから取得' : `API未接続・確認時点の${state.items.length}件`;
+      $('status-dot').classList.toggle('live', state.mode === 'live');
+      const date = new Date(payload.fetchedAt);
+      $('data-time').textContent = Number.isFinite(date.getTime()) ? '取得: ' + date.toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo', month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '';
+      const selectedCategory = $('category').value;
+      $('category').replaceChildren(new Option('すべてのカテゴリ', ''));
+      [...new Set(state.items.map(item => item.category))].sort((a,b) => a.localeCompare(b, 'ja')).forEach(category => $('category').add(new Option(category, category)));
+      if ([...$('category').options].some(option => option.value === selectedCategory)) $('category').value = selectedCategory;
+      const warnings = state.items.filter(item => item.coordinateWarning);
+      $('coordinate-note-text').textContent = warnings.length + '件の座標は確認が必要です';
+      $('coordinate-note').hidden = warnings.length === 0;
+      const skipped = Number(payload.skippedRows) + payload.rejectedItems;
+      if (skipped > 0) message(`座標・名称が未入力または不正な${skipped}件は表示していません。`);
+      if (!map) message('地図ライブラリを読み込めませんでした。インターネット接続を確認し、ページを再読み込みしてください。');
+      render(true);
+      if (state.selected) {
+        if (state.items.some(item => item.id === state.selected)) selectSpot(state.selected, false);
+        else closeDetail();
+      }
+      announce(`${state.items.length}件のスポットを読み込みました。${state.mode === 'snapshot' ? 'APIは未接続です。' : ''}`);
+    } catch (error) {
+      $('source-state').textContent = '取得に失敗'; $('data-status').textContent = state.ready ? '更新失敗・前回のデータを表示中' : 'データを取得できません'; $('status-dot').classList.remove('live');
+      message(error.message); announce(error.message);
+      if (!state.ready) { $('results').replaceChildren(create('div', 'empty-state', 'データを取得できませんでした。接続設定を確認して、更新してください。')); $('result-count').textContent = '0'; }
+    } finally { state.loading = false; $('reload').disabled = false; $('settings').disabled = false; }
+  }
+  function filtered(withBounds = true) {
+    return MapModel.filterItems(state.items, { query: $('search').value, group: state.group, category: $('category').value, bounds: withBounds && $('viewport-only').checked && map ? map.getBounds() : null });
+  }
+  function renderList(items) {
+    const fragment = document.createDocumentFragment();
+    if (!items.length) {
+      const empty = create('div', 'empty-state'); empty.append(create('strong', '', 'スポットが見つかりません'), create('span', '', 'キーワードやカテゴリを変えてください。')); fragment.append(empty);
+    }
+    items.forEach(item => {
+      const group = MapModel.groupOf(item.category);
+      const button = create('button', 'spot-row' + (state.selected === item.id ? ' selected' : '')); button.type = 'button'; button.dataset.id = item.id; button.setAttribute('aria-label', item.name + 'を地図で表示'); button.setAttribute('aria-pressed', String(state.selected === item.id));
+      const symbol = create('span', 'spot-symbol ' + group); symbol.innerHTML = icon(iconNames[group]);
+      const copy = create('span', 'spot-copy'); const top = create('span', 'spot-topline'); top.append(create('span', 'spot-category', item.category)); if (item.coordinateWarning) top.append(create('span', 'warning-badge', '座標要確認'));
+      copy.append(top, create('strong', 'spot-name', item.name), create('span', 'spot-address', item.location || '住所未入力'));
+      const arrow = create('span', 'spot-arrow'); arrow.innerHTML = icon('arrow'); button.append(symbol, copy, arrow); button.addEventListener('click', () => selectSpot(item.id)); fragment.append(button);
+    });
+    $('results').replaceChildren(fragment); $('result-count').textContent = items.length;
+  }
+  function markerIcon(item) {
+    const group = MapModel.groupOf(item.category);
+    return L.divIcon({ className: `map-pin ${group}${state.selected === item.id ? ' selected' : ''}${item.coordinateWarning ? ' warn' : ''}`, html: '<span class="pin-inner">' + icon(iconNames[group]) + '</span>', iconSize: [34, 39], iconAnchor: [16, 38], tooltipAnchor: [0, -34] });
+  }
+  function render(rebuild = false) {
+    const items = filtered(); renderList(items);
+    if (!map) return;
+    // 地図を動かすたびにマーカーを作り直さず、フィルタ対象だけ同期します。
+    const onMap = new Set(filtered(false).map(item => item.id));
+    if (rebuild) { state.markers.forEach(marker => marker.remove()); state.markers.clear(); }
+    state.items.forEach(item => {
+      let marker = state.markers.get(item.id);
+      if (!onMap.has(item.id)) { if (marker) { marker.remove(); state.markers.delete(item.id); } return; }
+      if (!marker) {
+        marker = L.marker([item.lat, item.lon], { icon: markerIcon(item), title: item.name, alt: item.name, riseOnHover: true });
+        marker.bindTooltip(create('span', '', item.name), { direction: 'top' }); marker.on('click', () => selectSpot(item.id)); marker.addTo(map); state.markers.set(item.id, marker);
+      } else marker.setIcon(markerIcon(item));
+      marker.setZIndexOffset(state.selected === item.id ? 1000 : 0);
+    });
+    $('map-count').textContent = `${filtered(false).length} スポット`;
+    if (state.selected && !onMap.has(state.selected)) closeDetail();
+  }
+  function selectSpot(id, pan = true) {
+    const item = state.items.find(spot => spot.id === id); if (!item) return;
+    state.selected = id; $('detail-content').replaceChildren();
+    const content = $('detail-content');
+    content.append(create('div', 'detail-category', item.category), create('h2', 'detail-title', item.name));
+    if (item.image) { const image = create('img', 'detail-image'); image.src = item.image; image.alt = item.name; image.loading = 'lazy'; image.addEventListener('error', () => image.remove()); content.append(image); }
+    const address = create('div', 'detail-address'); const symbol = create('span'); symbol.innerHTML = icon('pin'); address.append(symbol, create('span', '', item.location || '住所未入力')); content.append(address);
+    if (item.description) content.append(create('p', 'detail-description', item.description));
+    const facts = create('dl', 'detail-facts'); [['営業時間', item.time || '情報なし'], ['定休日', item.closed || '情報なし']].forEach(([label, value]) => facts.append(create('dt', '', label), create('dd', '', value))); content.append(facts);
+    if (item.sourceUrl) appendLink(content, '参考サイトを見る', item.sourceUrl);
+    appendLink(content, 'OpenStreetMapで見る', `https://www.openstreetmap.org/?mlat=${item.lat}&mlon=${item.lon}#map=17/${item.lat}/${item.lon}`);
+    if (item.coordinateWarning) content.append(create('p', 'detail-warning', item.coordinateWarning + '。シートに記載された座標をそのまま表示しています。'));
+    $('detail').hidden = false; $('sidebar').classList.remove('open'); $('list-toggle').setAttribute('aria-expanded', 'false'); $('list-toggle').querySelector('span').textContent = 'スポット一覧';
+    if (map && pan) map.setView([item.lat, item.lon], Math.max(map.getZoom(), 15), { animate: !matchMedia('(prefers-reduced-motion: reduce)').matches });
+    render(); announce(item.name + 'の詳細を表示しました');
+  }
+  function appendLink(container, label, url) { const a = create('a', 'detail-link'); a.href = url; a.target = '_blank'; a.rel = 'noopener noreferrer'; a.append(create('span', '', label)); const symbol = create('span'); symbol.innerHTML = icon('link'); a.append(symbol); container.append(a); }
+  function closeDetail() { state.selected = null; $('detail').hidden = true; state.markers.forEach((marker, id) => { const item = state.items.find(spot => spot.id === id); if (item) { marker.setIcon(markerIcon(item)); marker.setZIndexOffset(0); } }); document.querySelectorAll('.spot-row.selected').forEach(row => { row.classList.remove('selected'); row.setAttribute('aria-pressed', 'false'); }); }
+  function fit() {
+    const items = filtered(false); if (!map || !items.length) { message('表示できる地点がありません。絞り込み条件を確認してください。'); return; }
+    message(''); map.fitBounds(L.latLngBounds(items.map(item => [item.lat, item.lon])), { padding: [55, 60], maxZoom: 15 });
+  }
+  function locate() {
+    if (!navigator.geolocation) { message('このブラウザでは現在地を利用できません。'); return; }
+    $('locate').disabled = true; message('現在地を確認しています。ブラウザの位置情報へのアクセスを許可してください。');
+    navigator.geolocation.getCurrentPosition(position => {
+      $('locate').disabled = false;
+      if (!map) return;
+      const latlng = [position.coords.latitude, position.coords.longitude]; state.userMarker?.remove(); state.userCircle?.remove();
+      state.userMarker = L.circleMarker(latlng, { radius: 7, color: '#fff', weight: 3, fillColor: '#327eb5', fillOpacity: 1 }).addTo(map).bindTooltip('現在地');
+      state.userCircle = L.circle(latlng, { radius: position.coords.accuracy, color: '#327eb5', weight: 1, fillOpacity: .08 }).addTo(map); map.setView(latlng, 15); message('現在地を表示しました。位置情報は保存しません。');
+    }, error => { $('locate').disabled = false; message(error.code === 1 ? '位置情報の許可がありません。ブラウザの設定から変更できます。' : '現在地を取得できませんでした。しばらくしてから再度お試しください。'); }, { enableHighAccuracy: false, timeout: 12000, maximumAge: 60000 });
+  }
+  if (typeof L !== 'undefined') {
+    map = L.map('map', { zoomControl: false, center: MAP_CONFIG.initialCenter, zoom: MAP_CONFIG.initialZoom });
+    let tileFailures = 0;
+    L.tileLayer(MAP_CONFIG.tileUrl, { maxZoom: 19, keepBuffer: 1, attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors' }).on('tileerror', () => { if (++tileFailures === 4) message('背景地図を読み込めません。インターネット接続をご確認ください。'); }).addTo(map);
+    L.control.zoom({ position: 'topright' }).addTo(map); L.control.scale({ position: 'bottomleft', imperial: false }).addTo(map); map.on('moveend', () => { if (state.ready && $('viewport-only').checked) renderList(filtered()); });
+  } else { message('地図ライブラリを読み込めませんでした。インターネット接続を確認し、ページを再読み込みしてください。'); $('fit').disabled = true; $('locate').disabled = true; }
+  $('search').addEventListener('input', () => render()); $('category').addEventListener('change', () => render()); $('viewport-only').addEventListener('change', () => render());
+  document.querySelectorAll('[data-group]').forEach(button => button.addEventListener('click', () => { state.group = button.dataset.group; document.querySelectorAll('[data-group]').forEach(el => { const active = el === button; el.classList.toggle('active', active); el.setAttribute('aria-pressed', String(active)); }); $('category').value = ''; render(); }));
+  $('reset').addEventListener('click', () => { $('search').value = ''; $('category').value = ''; $('viewport-only').checked = false; document.querySelector('[data-group="all"]').click(); });
+  $('close-detail').addEventListener('click', closeDetail); $('fit').addEventListener('click', fit); $('locate').addEventListener('click', locate); $('reload').addEventListener('click', () => load());
+  $('dismiss-warning').addEventListener('click', () => { $('coordinate-note').hidden = true; }); $('show-warning').addEventListener('click', () => { const item = state.items.find(spot => spot.coordinateWarning); if (item) { $('reset').click(); selectSpot(item.id); } });
+  $('list-toggle').addEventListener('click', () => { const open = $('sidebar').classList.toggle('open'); $('list-toggle').setAttribute('aria-expanded', String(open)); $('list-toggle').querySelector('span').textContent = open ? '地図に戻る' : 'スポット一覧'; });
+  $('settings').addEventListener('click', () => { $('api-url').value = (storedApi() === 'snapshot' ? '' : storedApi()) || MAP_CONFIG.apiUrl; $('connection-error').hidden = true; $('connection-dialog').showModal(); });
+  $('close-settings').addEventListener('click', () => $('connection-dialog').close());
+  $('connection-form').addEventListener('submit', event => { event.preventDefault(); try { const api = validateApi($('api-url').value.trim()); storeApi(api); $('connection-dialog').close(); load(api); } catch (error) { $('connection-error').textContent = error.message; $('connection-error').hidden = false; } });
+  $('use-snapshot').addEventListener('click', () => { storeApi('snapshot'); $('connection-dialog').close(); load(''); });
+  if (isGas) { $('settings').hidden = true; }
+  load();
+})();
+
+</script>
+</body>
+</html>
