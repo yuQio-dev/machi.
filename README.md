@@ -1,0 +1,2 @@
+# ushiku-map
+牛久周辺のスポットをOpenStreetMapで探す地図アプリ。Googleスプレッドシートの読み取り専用APIと接続。
