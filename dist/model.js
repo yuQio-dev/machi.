@@ -40,5 +40,9 @@
       words.every(word => normalize([item.name, item.location, item.description, item.category].join(' ')).includes(word)) &&
       (!bounds || bounds.contains([item.lat, item.lon])));
   }
-  root.MapModel = { groupOf, normalize, validCoordinates, safeUrl, sanitizePayload, filterItems };
+  function categoriesFor(items, group = 'all') {
+    return [...new Set(items.filter(item => group === 'all' || groupOf(item.category) === group).map(item => item.category))]
+      .sort((a, b) => a.localeCompare(b, 'ja'));
+  }
+  root.MapModel = { groupOf, normalize, validCoordinates, safeUrl, sanitizePayload, filterItems, categoriesFor };
 })(globalThis);

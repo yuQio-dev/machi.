@@ -18,3 +18,14 @@ test('URL・座標・不正なAPI応答を検査する', () => {
   const clean = M.sanitizePayload({ ok: true, items: [{ name: '有効', lat: '0', lon: '0' }, { name: '無効', lat: '', lon: 140 }] });
   assert.equal(clean.items.length, 1); assert.equal(clean.rejectedItems, 1);
 });
+
+test('大分類を変えると詳細カテゴリも連動し、矛盾した組合せを提示しない', () => {
+  const food = M.categoriesFor(data.items, 'food');
+  assert.ok(food.includes('カフェ'));
+  assert.ok(!food.includes('寺院'));
+  assert.deepEqual(M.categoriesFor(data.items, 'transport'), ['交通']);
+  assert.equal(M.categoriesFor(data.items).length, new Set(data.items.map(item => item.category)).size);
+  for (const category of food) {
+    assert.ok(M.filterItems(data.items, { group: 'food', category }).length > 0);
+  }
+});

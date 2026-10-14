@@ -8,8 +8,10 @@
   <title>うしくスポットマップ</title>
   <meta name="description" content="牛久周辺のスポットを地図で探す。名称検索、カテゴリ絞り込み、スポット詳細。">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css">
   <link rel="stylesheet" href="styles.css">
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="" defer></script>
+  <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js" defer></script>
   <script src="config.js" defer></script>
   <script src="model.js" defer></script>
   <script src="app.js" defer></script>
@@ -33,24 +35,26 @@
     <symbol id="i-train" viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="15" rx="3"/><path d="M5 10h14m-7-7v7m-4 7h1m6 0h1M8 18l-2 4m10-4 2 4"/></symbol>
   </svg>
   <header class="topbar">
-    <div class="brand"><span class="brand-mark"><svg class="icon"><use href="#i-pin"/></svg></span><div><h1>うしくスポットマップ</h1><p>USHIKU / SPOT MAP</p></div></div>
-    <div class="top-actions"><span class="source-state" id="source-state">データを読み込み中</span><button class="icon-button" id="reload" aria-label="スポット情報を更新" title="スポット情報を更新"><svg class="icon"><use href="#i-refresh"/></svg></button><button class="icon-button" id="settings" aria-label="データ接続設定" title="データ接続設定"><svg class="icon"><use href="#i-sliders"/></svg></button></div>
+    <div class="brand"><span class="brand-mark"><svg class="icon"><use href="#i-pin"/></svg></span><div><h1>うしくスポットマップ</h1><p>牛久とその周辺を、地図から探す</p></div></div>
+    <div class="top-actions"><button class="header-button" id="reload" aria-label="スポット情報を更新" title="スポット情報を更新"><svg class="icon"><use href="#i-refresh"/></svg><span>更新</span></button><button class="header-button" id="settings" aria-label="データ接続設定" title="データ接続設定"><svg class="icon"><use href="#i-sliders"/></svg><span>接続設定</span></button></div>
   </header>
   <main class="workspace">
     <aside class="sidebar" id="sidebar" aria-label="スポット検索と一覧">
-      <div class="search-section"><div class="section-heading"><h2>スポットを探す</h2><span class="small-label">牛久とその周辺</span></div>
-        <label class="search-box"><svg class="icon"><use href="#i-search"/></svg><input id="search" type="search" placeholder="スポット名・住所・キーワード" autocomplete="off" aria-label="スポットを検索"></label>
-        <div class="group-filters" role="group" aria-label="ジャンルで絞り込む"><button class="group active" data-group="all" aria-pressed="true">すべて</button><button class="group" data-group="food" aria-pressed="false">食べる</button><button class="group" data-group="visit" aria-pressed="false">訪れる</button><button class="group" data-group="shop" aria-pressed="false">買う</button><button class="group" data-group="transport" aria-pressed="false">交通</button></div>
-        <div class="filter-row"><label class="category-label" for="category">カテゴリ</label><select id="category" aria-label="カテゴリで絞り込む"><option value="">すべてのカテゴリ</option></select></div>
-        <label class="viewport-filter"><input id="viewport-only" type="checkbox"><span>表示中の地図範囲で絞る</span></label>
+      <div class="search-section"><div class="section-heading"><h2>スポットを探す</h2></div>
+        <label class="search-box"><svg class="icon"><use href="#i-search"/></svg><input id="search" type="search" placeholder="名前・住所・キーワードで検索" autocomplete="off" aria-label="スポットを検索"></label>
+        <div class="group-filters" role="group" aria-label="大分類で絞り込む"><button class="group active" data-group="all" aria-pressed="true"><span>すべて</span></button><button class="group food" data-group="food" aria-pressed="false"><span class="group-dot"></span><span>食事</span></button><button class="group visit" data-group="visit" aria-pressed="false"><span class="group-dot"></span><span>観光</span></button><button class="group shop" data-group="shop" aria-pressed="false"><span class="group-dot"></span><span>買い物</span></button><button class="group transport" data-group="transport" aria-pressed="false"><span class="group-dot"></span><span>交通</span></button></div>
+        <details class="refine" id="refine"><summary><svg class="icon"><use href="#i-sliders"/></svg><span>絞り込み</span><span id="filter-count" class="filter-count" hidden></span><span class="refine-hint">カテゴリ・地図範囲</span><svg class="icon refine-arrow"><use href="#i-arrow"/></svg></summary><div class="advanced-filters">
+          <div class="filter-row"><label class="category-label" for="category">詳細カテゴリ</label><select id="category" aria-label="詳細カテゴリで絞り込む"><option value="">すべてのカテゴリ</option></select></div>
+          <label class="viewport-filter"><input id="viewport-only" type="checkbox"><span>表示中の地図範囲に絞る</span></label>
+        </div></details>
       </div>
-      <div class="result-heading"><span><strong id="result-count">—</strong> 件のスポット</span><button class="text-button" id="reset">条件をリセット</button></div>
-      <div id="results" class="results" aria-label="検索結果"></div>
-      <footer class="sidebar-footer"><span class="status-dot" id="status-dot"></span><div><span id="data-status">接続を確認しています</span><small id="data-time"></small></div></footer>
+      <div class="result-heading"><span><strong id="result-count">—</strong> 件のスポット</span><button class="text-button" id="reset" hidden>条件をクリア</button></div>
+      <div id="results" class="results" aria-label="検索結果"><div class="empty-state">スポットを読み込んでいます…</div></div>
+      <footer class="sidebar-footer"><span class="status-dot" id="status-dot"></span><span id="data-status">読み込み中</span><span id="data-time"></span></footer>
     </aside>
     <section class="map-section" aria-label="スポット地図">
       <div id="map" aria-label="OpenStreetMapの地図"></div>
-      <div class="map-caption"><span class="live-dot"></span><span>牛久エリア</span><span class="caption-divider"></span><span id="map-count">スポットを準備中</span></div>
+      <div class="map-caption"><svg class="icon"><use href="#i-pin"/></svg><div><strong>牛久とその周辺</strong><span>数字を押すと、周辺のスポットを表示</span></div></div>
       <div class="map-tools"><button id="fit" class="map-button" title="絞り込み中の全地点を表示" aria-label="絞り込み中の全地点を表示"><svg class="icon"><use href="#i-fit"/></svg></button><button id="locate" class="map-button" title="現在地を表示" aria-label="現在地を表示"><svg class="icon"><use href="#i-target"/></svg></button></div>
       <div class="map-message" id="map-message" role="status" hidden></div>
       <div class="coordinate-note" id="coordinate-note" hidden><span id="coordinate-note-text"></span><button id="show-warning" class="text-button">地点を確認</button><button id="dismiss-warning" class="icon-button" aria-label="座標確認のお知らせを閉じる"><svg class="icon"><use href="#i-close"/></svg></button></div>
@@ -59,6 +63,6 @@
     </section>
   </main>
   <div id="announcement" class="sr-only" role="status" aria-live="polite"></div>
-  <dialog id="connection-dialog" aria-labelledby="connection-title"><form id="connection-form"><div class="dialog-heading"><h2 id="connection-title">スプレッドシートに接続</h2><button type="button" id="close-settings" class="icon-button" aria-label="設定を閉じる"><svg class="icon"><use href="#i-close"/></svg></button></div><p>読み取り専用APIを接続すると、シートの最新情報を地図に反映できます。</p><label class="field-label" for="api-url">Apps ScriptのWebアプリURL</label><input id="api-url" type="url" placeholder="https://script.google.com/macros/s/…/exec" autocomplete="off"><p class="field-hint">公開した観光情報のAPIを指定してください。URLはこのブラウザに保存されます。</p><p id="connection-error" class="field-error" role="alert" hidden></p><div class="dialog-actions"><button type="button" id="use-snapshot" class="secondary-button">確認時点のデータを使う</button><button type="submit" class="primary-button">接続して更新</button></div></form></dialog>
+  <dialog id="connection-dialog" aria-labelledby="connection-title"><form id="connection-form"><div class="dialog-heading"><h2 id="connection-title">データ接続設定</h2><button type="button" id="close-settings" class="icon-button" aria-label="設定を閉じる"><svg class="icon"><use href="#i-close"/></svg></button></div><p>読み取り専用APIを接続すると、シートの最新情報を地図に反映できます。</p><span class="source-state" id="source-state">データを読み込み中</span><label class="field-label" for="api-url">Apps ScriptのWebアプリURL</label><input id="api-url" type="url" placeholder="https://script.google.com/macros/s/…/exec" autocomplete="off"><p class="field-hint">公開した観光情報のAPIを指定してください。URLはこのブラウザに保存されます。</p><p id="connection-error" class="field-error" role="alert" hidden></p><div class="dialog-actions"><button type="button" id="use-snapshot" class="secondary-button">確認時点のデータを使う</button><button type="submit" class="primary-button">接続して更新</button></div></form></dialog>
 </body>
 </html>
