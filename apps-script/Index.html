@@ -191,6 +191,7 @@ window.MAP_CONFIG = Object.freeze({
   const mobileScreen = matchMedia('(max-width: 700px)');
   let desktopSidebarOpen = true;
   let pendingPin = null;
+  let closingDetail = null;
   const storedApi = () => { try { return localStorage.getItem('ushiku-map-api') || ''; } catch { return ''; } };
   const storeApi = value => { try { value ? localStorage.setItem('ushiku-map-api', value) : localStorage.removeItem('ushiku-map-api'); } catch {} };
   const isGas = typeof google !== 'undefined' && google.script && google.script.run;
@@ -203,22 +204,26 @@ window.MAP_CONFIG = Object.freeze({
       if (!element || animation.effect?.target === element) animation.cancel();
     }
   }
-  function playMotion(element, keyframes, duration, name) {
+  function playMotion(element, keyframes, duration, name, options = {}) {
     if (!element) return;
     cancelMotion(element);
     element.dataset.motion = name;
     element.dataset.motionDuration = String(duration);
     if (reducedMotion.matches || typeof element.animate !== 'function') { element.dataset.motionState = 'skipped'; return; }
-    const animation = element.animate(keyframes, { duration, easing: 'cubic-bezier(.33, 1, .68, 1)' });
+    const animation = element.animate(keyframes, { duration, easing: 'cubic-bezier(.33, 1, .68, 1)', ...options });
     motionByElement.set(element, animation);
     element.dataset.motionState = 'running';
     activeMotions.add(animation);
     const cleanup = event => {
       activeMotions.delete(animation);
-      if (motionByElement.get(element) === animation) element.dataset.motionState = event.type === 'finish' ? 'finished' : 'cancelled';
+      if (motionByElement.get(element) === animation) {
+        element.dataset.motionState = event.type === 'finish' ? 'finished' : 'cancelled';
+        motionByElement.delete(element);
+      }
     };
     animation.addEventListener('finish', cleanup, { once: true });
     animation.addEventListener('cancel', cleanup, { once: true });
+    return animation;
   }
   function emphasizePin(id) {
     if (state.selected !== id) return;
@@ -371,7 +376,10 @@ window.MAP_CONFIG = Object.freeze({
     const fromList = $('results').contains(document.activeElement);
     const revealDetail = pan && ($('detail').hidden || state.selected !== id);
     // 前の出現中のtransformを解除し、スマホの空き領域を最終位置で計算します。
+    // 閉じる途中の再選択では、古い完了処理が新しい詳細を隠さないようにします。
+    closingDetail = null;
     cancelMotion($('detail'));
+    $('detail').inert = false; $('detail').removeAttribute('aria-hidden');
     state.selected = id; $('detail-content').replaceChildren();
     const content = $('detail-content');
     content.append(create('div', 'detail-category', item.category), create('h2', 'detail-title', item.name));
@@ -417,17 +425,40 @@ window.MAP_CONFIG = Object.freeze({
   }
   function appendLink(container, label, url) { const a = create('a', 'detail-link'); a.href = url; a.target = '_blank'; a.rel = 'noopener noreferrer'; a.append(create('span', '', label)); const symbol = create('span'); symbol.innerHTML = icon('link'); a.append(symbol); container.append(a); }
   function closeDetail(refresh = true) {
+    const detail = $('detail');
+    if (detail.hidden || closingDetail) return;
     const previous = state.selected;
-    const fromDetail = $('detail').contains(document.activeElement);
-    cancelMotion($('detail'));
-    pendingPin = null; state.selected = null; $('detail').hidden = true;
+    const fromDetail = detail.contains(document.activeElement);
+    // 出現途中なら現在の見た目から閉じ始め、最終位置への跳ねを防ぎます。
+    const currentStyle = getComputedStyle(detail);
+    const start = { opacity: currentStyle.opacity, transform: currentStyle.transform };
+    cancelMotion(detail);
+    const pin = state.markers.get(previous)?.getElement()?.querySelector('.pin-inner');
+    if (pin) cancelMotion(pin);
+    pendingPin = null; state.selected = null;
     if (refresh) {
-      render();
+      render(false, false);
       if (fromDetail) {
         const target = mobileScreen.matches ? $('list-toggle') : !desktopSidebarOpen ? $('sidebar-toggle') : [...$('results').querySelectorAll('.spot-row')].find(row => row.dataset.id === previous);
         target?.focus({ preventScroll: true });
       }
     }
+    // 消えつつある詳細へフォーカスやクリックを戻さないようにします。
+    detail.inert = true; detail.setAttribute('aria-hidden', 'true');
+    const closing = { animation: null, finish: null };
+    closingDetail = closing;
+    closing.finish = () => {
+      if (closingDetail !== closing) return;
+      closingDetail = null; detail.hidden = true;
+      detail.inert = false; detail.removeAttribute('aria-hidden');
+      closing.animation?.cancel();
+      announce('スポットの詳細を閉じました');
+    };
+    closing.animation = playMotion(detail, [start, { opacity: 0, transform: `translateY(${mobileScreen.matches ? 16 : 12}px)` }], 240, 'detail-dismiss', { easing: 'cubic-bezier(.32, 0, .67, 0)', fill: 'forwards' });
+    if (closing.animation) {
+      closing.animation.addEventListener('finish', closing.finish, { once: true });
+      closing.animation.addEventListener('cancel', closing.finish, { once: true });
+    } else closing.finish();
   }
   function fit() {
     const items = filtered(false); if (!map || !items.length) { message('表示できる地点がありません。絞り込み条件を確認してください。'); return; }
@@ -493,7 +524,7 @@ window.MAP_CONFIG = Object.freeze({
   if (isGas) { $('settings').hidden = true; }
   reducedMotion.addEventListener('change', () => {
     if (map) map.options.zoomAnimation = !reducedMotion.matches;
-    if (reducedMotion.matches) { cancelMotion(); map?.stop(); }
+    if (reducedMotion.matches) { cancelMotion(); closingDetail?.finish(); map?.stop(); }
   });
   load();
 })();
