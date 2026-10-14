@@ -7,6 +7,10 @@
   const state = { items: [], group: 'all', selected: null, markers: new Map(), pinLayer: null, ready: false, loading: false, mode: '', userMarker: null, userCircle: null };
   const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
   const activeMotions = new Set();
+  const motionByElement = new WeakMap();
+  const mobileScreen = matchMedia('(max-width: 700px)');
+  let desktopSidebarOpen = true;
+  let pendingPin = null;
   const storedApi = () => { try { return localStorage.getItem('ushiku-map-api') || ''; } catch { return ''; } };
   const storeApi = value => { try { value ? localStorage.setItem('ushiku-map-api', value) : localStorage.removeItem('ushiku-map-api'); } catch {} };
   const isGas = typeof google !== 'undefined' && google.script && google.script.run;
@@ -19,14 +23,42 @@
       if (!element || animation.effect?.target === element) animation.cancel();
     }
   }
-  function playMotion(element, keyframes, duration) {
-    if (!element || reducedMotion.matches || typeof element.animate !== 'function') return;
+  function playMotion(element, keyframes, duration, name) {
+    if (!element) return;
     cancelMotion(element);
+    element.dataset.motion = name;
+    element.dataset.motionDuration = String(duration);
+    if (reducedMotion.matches || typeof element.animate !== 'function') { element.dataset.motionState = 'skipped'; return; }
     const animation = element.animate(keyframes, { duration, easing: 'cubic-bezier(.33, 1, .68, 1)' });
+    motionByElement.set(element, animation);
+    element.dataset.motionState = 'running';
     activeMotions.add(animation);
-    const cleanup = () => activeMotions.delete(animation);
+    const cleanup = event => {
+      activeMotions.delete(animation);
+      if (motionByElement.get(element) === animation) element.dataset.motionState = event.type === 'finish' ? 'finished' : 'cancelled';
+    };
     animation.addEventListener('finish', cleanup, { once: true });
     animation.addEventListener('cancel', cleanup, { once: true });
+  }
+  function emphasizePin(id) {
+    if (state.selected !== id) return;
+    // 地図の座標を担う外側は動かさず、移動後に内側だけを一度強調します。
+    playMotion(state.markers.get(id)?.getElement()?.querySelector('.pin-inner'), [
+      { transform: 'scale(.84)' }, { transform: 'scale(1.12)', offset: .55 }, { transform: 'scale(1)' }
+    ], 300, 'pin-select');
+  }
+  function syncSidebar() {
+    const mobile = mobileScreen.matches;
+    const open = mobile ? $('sidebar').classList.contains('open') : desktopSidebarOpen;
+    $('workspace').classList.toggle('sidebar-collapsed', !mobile && !desktopSidebarOpen);
+    $('workspace').classList.toggle('mobile-list-open', mobile && open);
+    $('sidebar').inert = !open;
+    $('sidebar').setAttribute('aria-hidden', String(!open));
+    $('sidebar-toggle').setAttribute('aria-expanded', String(desktopSidebarOpen));
+    const label = desktopSidebarOpen ? 'サイドパネルを閉じる' : 'サイドパネルを開く';
+    $('sidebar-toggle').setAttribute('aria-label', label); $('sidebar-toggle').title = label;
+    $('list-toggle').setAttribute('aria-expanded', String(mobile && open));
+    $('list-toggle').querySelector('span').textContent = mobile && open ? '地図に戻る' : 'スポット一覧';
   }
   function validateApi(value) {
     const url = new URL(value);
@@ -120,15 +152,20 @@
   }
   function markerIcon(item) {
     const group = MapModel.groupOf(item.category);
-    return L.divIcon({ className: `map-pin ${group}${state.selected === item.id ? ' selected' : ''}${item.coordinateWarning ? ' warn' : ''}`, html: '<span class="pin-inner">' + icon(iconNames[group]) + '</span>', iconSize: [44, 44], iconAnchor: [22, 22], tooltipAnchor: [0, -18] });
+    return L.divIcon({ className: markerClassName(item), html: '<span class="pin-inner">' + icon(iconNames[group]) + '</span>', iconSize: [44, 44], iconAnchor: [22, 22], tooltipAnchor: [0, -18] });
   }
+  function markerClassName(item) { return `map-pin ${MapModel.groupOf(item.category)}${state.selected === item.id ? ' selected' : ''}${item.coordinateWarning ? ' warn' : ''}`; }
   function removePin(marker) { state.pinLayer.removeLayer(marker); marker.remove(); }
-  function render(rebuild = false) {
+  function render(rebuild = false, updateList = true) {
     syncFilters();
     const items = filtered();
     const onMap = new Set(filtered(false).map(item => item.id));
     if (state.selected && !onMap.has(state.selected)) closeDetail(false);
-    renderList(items);
+    if (updateList) renderList(items);
+    else $('results').querySelectorAll('.spot-row').forEach(row => {
+      const selected = row.dataset.id === state.selected;
+      row.classList.toggle('selected', selected); row.setAttribute('aria-pressed', String(selected));
+    });
     if (!map) return;
     // 地図移動では一覧だけを更新。マーカーとクラスタは絞り込み時に同期します。
     if (rebuild) { state.pinLayer.clearLayers(); state.markers.forEach(marker => marker.remove()); state.markers.clear(); }
@@ -138,10 +175,11 @@
       if (!marker) {
         marker = L.marker([item.lat, item.lon], { icon: markerIcon(item), title: item.name, alt: item.name, riseOnHover: true });
         marker.on('click', () => selectSpot(item.id)); state.markers.set(item.id, marker);
-      } else marker.setIcon(markerIcon(item));
+      } else marker.options.icon.options.className = markerClassName(item);
       const selected = state.selected === item.id;
       if (selected) { state.pinLayer.removeLayer(marker); if (!map.hasLayer(marker)) marker.addTo(map); }
       else { if (!state.pinLayer.hasLayer(marker)) { marker.remove(); state.pinLayer.addLayer(marker); } }
+      marker.getElement()?.classList.toggle('selected', selected);
       if (!marker.getTooltip() || marker.getTooltip().options.permanent !== selected) {
         marker.unbindTooltip(); marker.bindTooltip(create('span', '', item.name), { direction: 'top', permanent: selected, className: 'spot-tooltip' });
       }
@@ -164,7 +202,11 @@
     if (item.sourceUrl) appendLink(content, '参考サイトを見る', item.sourceUrl);
     appendLink(content, 'OpenStreetMapで見る', `https://www.openstreetmap.org/?mlat=${item.lat}&mlon=${item.lon}#map=17/${item.lat}/${item.lon}`);
     if (item.coordinateWarning) content.append(create('p', 'detail-warning', item.coordinateWarning + '。シートに記載された座標をそのまま表示しています。'));
-    $('detail').hidden = false; $('sidebar').classList.remove('open'); $('list-toggle').setAttribute('aria-expanded', 'false'); $('list-toggle').querySelector('span').textContent = 'スポット一覧';
+    $('detail').hidden = false; $('sidebar').classList.remove('open'); syncSidebar();
+    render(false, false);
+    pendingPin = null;
+    map?.stop();
+    let moving = false;
     if (map && pan) {
       const zoom = Math.max(map.getZoom(), 15);
       let center = L.latLng(item.lat, item.lon);
@@ -174,22 +216,21 @@
         const targetY = Math.min(Math.max(110, freeHeight / 2), Math.max(70, freeHeight - 28));
         center = map.unproject(map.project(center, zoom).add([0, map.getSize().y / 2 - targetY]), zoom);
       }
+      moving = map.getZoom() !== zoom || map.getCenter().distanceTo(center) > .5;
+      if (moving) pendingPin = id;
       map.setView(center, zoom, { animate: !reducedMotion.matches });
     }
-    render();
     const selectedRow = [...$('results').querySelectorAll('.spot-row')].find(row => row.dataset.id === id);
     if (selectedRow) { selectedRow.scrollIntoView({ block: 'nearest' }); if (fromList) selectedRow.focus({ preventScroll: true }); }
     if (pan) {
-      playMotion(selectedRow, [{ transform: 'scale(.98)' }, { transform: 'scale(1)' }], 120);
-      // Leafletが座標を設定する外側の要素にはtransformを付けません。
-      const pin = state.markers.get(id)?.getElement()?.querySelector('.pin-inner');
-      playMotion(pin, [{ transform: 'scale(.82)' }, { transform: 'scale(1)' }], 160);
+      playMotion(selectedRow, [{ transform: 'scale(.97)' }, { transform: 'scale(1)' }], 240, 'card-select');
+      if (!moving) emphasizePin(id);
       if (revealDetail) {
         const mobile = matchMedia('(max-width: 700px)').matches;
         playMotion($('detail'), [
-          { opacity: 0, transform: `translateY(${mobile ? 12 : 8}px)` },
+          { opacity: 0, transform: `translateY(${mobile ? 22 : 18}px)` },
           { opacity: 1, transform: 'translateY(0)' }
-        ], mobile ? 200 : 180);
+        ], mobile ? 340 : 320, 'detail-reveal');
       }
     }
     announce(item.name + 'の詳細を表示しました');
@@ -199,11 +240,11 @@
     const previous = state.selected;
     const fromDetail = $('detail').contains(document.activeElement);
     cancelMotion($('detail'));
-    state.selected = null; $('detail').hidden = true;
+    pendingPin = null; state.selected = null; $('detail').hidden = true;
     if (refresh) {
       render();
       if (fromDetail) {
-        const target = matchMedia('(max-width: 700px)').matches ? $('list-toggle') : [...$('results').querySelectorAll('.spot-row')].find(row => row.dataset.id === previous);
+        const target = mobileScreen.matches ? $('list-toggle') : !desktopSidebarOpen ? $('sidebar-toggle') : [...$('results').querySelectorAll('.spot-row')].find(row => row.dataset.id === previous);
         target?.focus({ preventScroll: true });
       }
     }
@@ -239,7 +280,18 @@
     state.pinLayer.addTo(map);
     let tileFailures = 0;
     L.tileLayer(MAP_CONFIG.tileUrl, { maxZoom: 19, keepBuffer: 1, attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors' }).on('tileerror', () => { if (++tileFailures === 4) message('背景地図を読み込めません。インターネット接続をご確認ください。'); }).addTo(map);
-    L.control.zoom({ position: 'topright' }).addTo(map); L.control.scale({ position: 'bottomleft', imperial: false }).addTo(map); map.on('moveend', () => { if (state.ready && $('viewport-only').checked) renderList(filtered()); });
+    L.control.zoom({ position: 'topright' }).addTo(map); L.control.scale({ position: 'bottomleft', imperial: false }).addTo(map);
+    map.on('moveend', () => {
+      if (state.ready && $('viewport-only').checked) renderList(filtered());
+      const id = pendingPin; pendingPin = null;
+      if (id) requestAnimationFrame(() => emphasizePin(id));
+    });
+    // 開閉中も地図の描画サイズを追従させ、閉じた余白までタイルを表示します。
+    let resizeFrame;
+    new ResizeObserver(() => {
+      cancelAnimationFrame(resizeFrame);
+      resizeFrame = requestAnimationFrame(() => map.invalidateSize({ animate: false, debounceMoveend: true }));
+    }).observe($('map'));
   } else { message('地図ライブラリを読み込めませんでした。インターネット接続を確認し、ページを再読み込みしてください。'); $('fit').disabled = true; $('locate').disabled = true; }
   $('search').addEventListener('input', () => render()); $('category').addEventListener('change', () => render()); $('viewport-only').addEventListener('change', () => render());
   document.querySelectorAll('[data-group]').forEach(button => button.addEventListener('click', () => { state.group = button.dataset.group; document.querySelectorAll('[data-group]').forEach(el => { const active = el === button; el.classList.toggle('active', active); el.setAttribute('aria-pressed', String(active)); }); $('category').value = ''; updateCategories(); render(); }));
@@ -247,7 +299,13 @@
   $('close-detail').addEventListener('click', () => closeDetail()); $('fit').addEventListener('click', fit); $('locate').addEventListener('click', locate); $('reload').addEventListener('click', () => load());
   document.addEventListener('keydown', event => { if (event.key === 'Escape' && !$('connection-dialog').open && !$('detail').hidden) closeDetail(); });
   $('dismiss-warning').addEventListener('click', () => { $('coordinate-note').hidden = true; }); $('show-warning').addEventListener('click', () => { const item = state.items.find(spot => spot.coordinateWarning); if (item) { $('reset').click(); selectSpot(item.id); } });
-  $('list-toggle').addEventListener('click', () => { const open = $('sidebar').classList.toggle('open'); $('list-toggle').setAttribute('aria-expanded', String(open)); $('list-toggle').querySelector('span').textContent = open ? '地図に戻る' : 'スポット一覧'; });
+  $('list-toggle').addEventListener('click', () => { $('sidebar').classList.toggle('open'); syncSidebar(); });
+  $('sidebar-toggle').addEventListener('click', () => { desktopSidebarOpen = !desktopSidebarOpen; syncSidebar(); });
+  mobileScreen.addEventListener('change', () => {
+    syncSidebar();
+    if ($('sidebar').inert && $('sidebar').contains(document.activeElement)) (mobileScreen.matches ? $('list-toggle') : $('sidebar-toggle')).focus();
+  });
+  syncSidebar();
   $('settings').addEventListener('click', () => { $('api-url').value = (storedApi() === 'snapshot' ? '' : storedApi()) || MAP_CONFIG.apiUrl; $('connection-error').hidden = true; $('connection-dialog').showModal(); });
   $('close-settings').addEventListener('click', () => $('connection-dialog').close());
   $('connection-form').addEventListener('submit', event => { event.preventDefault(); try { const api = validateApi($('api-url').value.trim()); storeApi(api); $('connection-dialog').close(); load(api); } catch (error) { $('connection-error').textContent = error.message; $('connection-error').hidden = false; } });

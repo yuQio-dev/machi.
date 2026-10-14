@@ -38,7 +38,9 @@
     <div class="brand"><span class="brand-mark"><svg class="icon"><use href="#i-pin"/></svg></span><div><h1>うしくスポットマップ</h1><p>牛久とその周辺を、地図から探す</p></div></div>
     <div class="top-actions"><button class="header-button" id="reload" aria-label="スポット情報を更新" title="スポット情報を更新"><svg class="icon"><use href="#i-refresh"/></svg><span>更新</span></button><button class="header-button" id="settings" aria-label="データ接続設定" title="データ接続設定"><svg class="icon"><use href="#i-sliders"/></svg><span>接続設定</span></button></div>
   </header>
-  <main class="workspace">
+  <main class="workspace" id="workspace">
+    <button type="button" class="sidebar-toggle" id="sidebar-toggle" aria-controls="sidebar" aria-expanded="true" aria-label="サイドパネルを閉じる" title="サイドパネルを閉じる"><svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></button>
+    <div class="sidebar-slot">
     <aside class="sidebar" id="sidebar" aria-label="スポット検索と一覧">
       <div class="search-section"><div class="section-heading"><h2>スポットを探す</h2></div>
         <label class="search-box"><svg class="icon"><use href="#i-search"/></svg><input id="search" type="search" placeholder="名前・住所・キーワードで検索" autocomplete="off" aria-label="スポットを検索"></label>
@@ -52,6 +54,7 @@
       <div id="results" class="results" aria-label="検索結果"><div class="empty-state">スポットを読み込んでいます…</div></div>
       <footer class="sidebar-footer"><span class="status-dot" id="status-dot"></span><span id="data-status">読み込み中</span><span id="data-time"></span></footer>
     </aside>
+    </div>
     <section class="map-section" aria-label="スポット地図">
       <div id="map" aria-label="OpenStreetMapの地図"></div>
       <div class="map-caption"><svg class="icon"><use href="#i-pin"/></svg><div><strong>牛久とその周辺</strong><span>数字を押すと、周辺のスポットを表示</span></div></div>
