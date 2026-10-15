@@ -1,0 +1,94 @@
+{
+  "source": {
+    "spreadsheetId": "1UJGEZiVQQ3OYiweZG2CgyhgOUkIg8FlaE2KtkyxfZ74",
+    "sheetName": "シート1",
+    "range": "'シート1'!A1:J30",
+    "checkedOn": "2026-10-15"
+  },
+  "items": [
+    {
+      "name": "牛久シャトー",
+      "image": "牛久シャトー.jpg"
+    },
+    {
+      "name": "手作処かっぱ本舗",
+      "image": "手作処かっぱ本舗.jpg"
+    },
+    {
+      "name": "牛久大仏",
+      "image": "牛久大仏.png"
+    },
+    {
+      "name": "牛久駅（JR常磐線）",
+      "image": "牛久駅.jpg"
+    },
+    {
+      "name": "牛久ミニゴルフ場",
+      "image": "牛久ミニゴルフ場.jpg"
+    },
+    {
+      "name": "南部珈琲",
+      "image": "南部珈琲.webp"
+    },
+    {
+      "name": "二胡ケ亭",
+      "image": "二胡ケ亭.jpg"
+    },
+    {
+      "name": "天満屋酒店",
+      "image": "天満屋酒店.jpeg"
+    },
+    {
+      "name": "伊勢屋",
+      "image": "伊勢屋.jpg"
+    },
+    {
+      "name": "ふらんす食堂 CHEZ Nakajima",
+      "image": "ふらんす食堂.jpg"
+    },
+    {
+      "name": "タマノ酒屋",
+      "image": "タマノ酒店.jpg"
+    },
+    {
+      "name": "Dining いごこち屋",
+      "image": "いごこち屋.jpg"
+    },
+    {
+      "name": "芋千",
+      "image": ""
+    },
+    {
+      "name": "そば処ふしみ",
+      "image": ""
+    },
+    {
+      "name": "シャンボール",
+      "image": ""
+    },
+    {
+      "name": "DIPIKA",
+      "image": ""
+    },
+    {
+      "name": "観音寺",
+      "image": ""
+    },
+    {
+      "name": "金剛院",
+      "image": ""
+    },
+    {
+      "name": "井岡神社",
+      "image": ""
+    },
+    {
+      "name": "浄妙寺(天台宗)",
+      "image": ""
+    },
+    {
+      "name": "ヤマイチ味噌",
+      "image": ""
+    }
+  ]
+}

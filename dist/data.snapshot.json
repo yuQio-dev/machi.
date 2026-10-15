@@ -5,7 +5,9 @@
   "source": {
     "sheetName": "シート1",
     "headerRow": 2,
-    "mode": "snapshot"
+    "mode": "snapshot",
+    "imageReferences": true,
+    "imageReferencesCheckedOn": "2026-10-15"
   },
   "total": 21,
   "skippedRows": 0,
@@ -21,7 +23,7 @@
       "time": "10:00~16:00",
       "closed": "なし",
       "category": "ワイン醸造所",
-      "image": "",
+      "image": "牛久シャトー.jpg",
       "sourceUrl": "https://www.ushikukankou.com/%E7%89%9B%E4%B9%85%E3%82%B7%E3%83%A3%E3%83%88%E3%83%BC/",
       "coordinateWarning": ""
     },
@@ -36,7 +38,7 @@
       "time": "9:00~17:00",
       "closed": "木、第二第四水",
       "category": "お土産やさん",
-      "image": "",
+      "image": "手作処かっぱ本舗.jpg",
       "sourceUrl": "https://ushikukankou.com/kappahonpo.htm",
       "coordinateWarning": ""
     },
@@ -51,7 +53,7 @@
       "time": "9:30～17:00、9:30～17:30",
       "closed": "なし",
       "category": "観光名所",
-      "image": "",
+      "image": "牛久大仏.png",
       "sourceUrl": "https://www.city.ushiku.lg.jp/city-promotion/tanoshimu/kankochi-shokai/page013838.html",
       "coordinateWarning": "牛久エリアの基準点から25km以上離れています。座標を確認してください"
     },
@@ -66,7 +68,7 @@
       "time": "5:35(始発)~0:34(終電)",
       "closed": "なし",
       "category": "交通",
-      "image": "",
+      "image": "牛久駅.jpg",
       "sourceUrl": "https://escado.jp/ibarakijiman/",
       "coordinateWarning": ""
     },
@@ -81,7 +83,7 @@
       "time": "8:00～17:00",
       "closed": "なし",
       "category": "ゴルフ場",
-      "image": "",
+      "image": "牛久ミニゴルフ場.jpg",
       "sourceUrl": "https://ushikukankou.com/mini_golf.htm",
       "coordinateWarning": ""
     },
@@ -96,7 +98,7 @@
       "time": "10:00～18:00",
       "closed": "水",
       "category": "カフェ",
-      "image": "",
+      "image": "南部珈琲.webp",
       "sourceUrl": "https://www.nanbu-coffee.com/22aboutus/",
       "coordinateWarning": ""
     },
@@ -111,7 +113,7 @@
       "time": "11:30～13:45、17:30～20:30",
       "closed": "月、火",
       "category": "飲食店",
-      "image": "",
+      "image": "二胡ケ亭.jpg",
       "sourceUrl": "https://nikoniko-tei.com/",
       "coordinateWarning": ""
     },
@@ -126,7 +128,7 @@
       "time": "9:00～19:00",
       "closed": "水",
       "category": "酒屋",
-      "image": "",
+      "image": "天満屋酒店.jpeg",
       "sourceUrl": "https://ushikukankou.com/tenmanya.htm",
       "coordinateWarning": ""
     },
@@ -141,7 +143,7 @@
       "time": "9:30~17:00",
       "closed": "水",
       "category": "老舗和菓子店",
-      "image": "",
+      "image": "伊勢屋.jpg",
       "sourceUrl": "https://civicpower.jp/ushiku-gourmetthon/leader-iseya/",
       "coordinateWarning": ""
     },
@@ -171,7 +173,7 @@
       "time": "10:00~20:00",
       "closed": "水",
       "category": "飲食店",
-      "image": "",
+      "image": "タマノ酒店.jpg",
       "sourceUrl": "https://saketama.com/",
       "coordinateWarning": ""
     },
@@ -186,7 +188,7 @@
       "time": "17:00 - 22:00",
       "closed": "日、月",
       "category": "居酒屋",
-      "image": "",
+      "image": "いごこち屋.jpg",
       "sourceUrl": "",
       "coordinateWarning": ""
     },

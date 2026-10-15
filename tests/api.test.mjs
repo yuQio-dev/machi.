@@ -31,7 +31,7 @@ test('2行目の見出し、空行、日本語列、画像ファイル名を処�
   const result = context.getMapData();
   assert.equal(result.ok, true); assert.equal(result.source.headerRow, 2); assert.equal(result.total, 1);
   assert.equal(result.items[0].id, 'sheet-0-row-4'); assert.equal(result.items[0].row, 4); assert.equal(result.items[0].lat, 35.97802056);
-  assert.equal(result.items[0].image, ''); assert.equal(result.items[0].sourceUrl, 'https://example.org/'); assert.equal(result.items[0].coordinateWarning, '');
+  assert.equal(result.items[0].image, '牛久シャトー.jpg'); assert.equal(result.source.imageReferences, true); assert.equal(result.items[0].sourceUrl, 'https://example.org/'); assert.equal(result.items[0].coordinateWarning, '');
 });
 test('座標欠損・範囲外は除外し、遠い座標を補正せず警告する', () => {
   const bad = [...sample]; bad[2] = '';
@@ -39,6 +39,15 @@ test('座標欠損・範囲外は除外し、遠い座標を補正せず警告�
   const far = [...sample]; far[0] = '牛久大仏'; far[2] = '35.585766'; far[3] = '140.13131';
   const result = runtime([header, bad, out, far]).context.getMapData();
   assert.equal(result.skippedRows, 2); assert.equal(result.total, 1); assert.equal(result.items[0].lat, 35.585766); assert.ok(result.items[0].coordinateWarning);
+});
+
+test('画像ファイル名・公開URLを保持し、パスと実行用URLを拒否する', () => {
+  for (const value of ['手作処かっぱ本舗.jpg'.normalize('NFD'), '牛久駅.jpeg', 'https://example.org/photo.jpg', '', '../photo.jpg', 'javascript:alert(1)', 'data:image/png;base64,test']) {
+    const row = [...sample]; row[8] = value;
+    const result = runtime([header, row]).context.getMapData();
+    const expected = value.startsWith('https://') || /^[^/:]+\.(?:jpg|jpeg)$/i.test(value) ? value.normalize('NFC') : '';
+    assert.equal(result.items[0].image, expected);
+  }
 });
 test('JSONPのコールバック注入を拒否し、公開フィールドだけを返す', () => {
   const { context, reads } = runtime([header, sample]);

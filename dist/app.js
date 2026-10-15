@@ -95,7 +95,11 @@
       if (isGas) raw = await loadGas();
       else if (api) raw = await loadJsonp(api);
       else { const response = await fetch('data.snapshot.json'); if (!response.ok) throw new Error('確認時点のデータを読み込めませんでした。'); raw = await response.json(); }
-      const payload = MapModel.sanitizePayload(raw);
+      const payload = MapModel.sanitizePayload(raw, {
+        imageBaseUrl: isGas ? MAP_CONFIG.imageBaseUrl : '',
+        // 旧APIが消してしまうファイル名だけを、確認済みのシート対応表で補います。
+        legacyImages: Boolean(isGas || (api && api === MAP_CONFIG.apiUrl))
+      });
       state.items = payload.items; state.mode = isGas || api ? 'live' : 'snapshot'; state.ready = true;
       $('source-state').textContent = state.mode === 'live' ? 'スプレッドシート接続済み' : '確認時点のデータを使用中';
       $('data-status').textContent = state.mode === 'live' ? '最新データ' : '確認時点のデータ';

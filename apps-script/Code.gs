@@ -86,13 +86,13 @@ function getMapData() {
         id: 'sheet-' + props.sheetId + '-row-' + rowNumber,
         row: rowNumber, name: name, location: cell('location'), lat: lat, lon: lon,
         description: cell('description'), time: cell('time'), closed: cell('closed'),
-        category: cell('category') || '未分類', image: publicUrl_(cell('image')),
+        category: cell('category') || '未分類', image: imageReference_(cell('image')),
         sourceUrl: publicUrl_(cell('取得したサイト')),
         coordinateWarning: distance > MAP_API.warningDistanceKm ? '牛久エリアの基準点から25km以上離れています。座標を確認してください' : ''
       });
     });
     return { ok: true, schemaVersion: 1, fetchedAt: new Date().toISOString(),
-      source: { sheetName: MAP_API.sheetName, headerRow: headerRow, mode: 'live' },
+      source: { sheetName: MAP_API.sheetName, headerRow: headerRow, mode: 'live', imageReferences: true },
       total: items.length, skippedRows: skippedRows, items: items };
   } catch (error) {
     // 例外の詳細、認証情報、他のセル内容は公開APIに返しません。
@@ -112,6 +112,10 @@ function output_(data, callback) {
     .setMimeType(callback ? ContentService.MimeType.JAVASCRIPT : ContentService.MimeType.JSON);
 }
 function publicUrl_(value) { return /^https?:\/\/[^\s]+$/i.test(value) ? value : ''; }
+function imageReference_(value) {
+  if (publicUrl_(value)) return value;
+  return /^[^/\\\x00-\x1f]+\.(?:jpe?g|png|webp|gif|avif)$/i.test(value) ? value.normalize('NFC') : '';
+}
 function distanceKm_(lat1, lon1, lat2, lon2) {
   const rad = Math.PI / 180;
   const a = Math.pow(Math.sin((lat2 - lat1) * rad / 2), 2) + Math.cos(lat1 * rad) * Math.cos(lat2 * rad) * Math.pow(Math.sin((lon2 - lon1) * rad / 2), 2);
