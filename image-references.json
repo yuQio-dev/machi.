@@ -2,7 +2,7 @@
   "source": {
     "spreadsheetId": "1UJGEZiVQQ3OYiweZG2CgyhgOUkIg8FlaE2KtkyxfZ74",
     "sheetName": "シート1",
-    "range": "'シート1'!A1:J30",
+    "range": "'シート1'!A1:J40",
     "checkedOn": "2026-10-15"
   },
   "items": [
@@ -20,7 +20,7 @@
     },
     {
       "name": "牛久駅（JR常磐線）",
-      "image": "牛久駅.jpg"
+      "image": "牛久駅.jpeg"
     },
     {
       "name": "牛久ミニゴルフ場",
@@ -36,7 +36,7 @@
     },
     {
       "name": "天満屋酒店",
-      "image": "天満屋酒店.jpeg"
+      "image": "天満屋酒店.jpg"
     },
     {
       "name": "伊勢屋",
@@ -52,42 +52,50 @@
     },
     {
       "name": "Dining いごこち屋",
-      "image": "いごこち屋.jpg"
+      "image": "いごこち屋.jpg"
     },
     {
       "name": "芋千",
-      "image": ""
+      "image": "芋千.jpg"
     },
     {
-      "name": "そば処ふしみ",
-      "image": ""
+      "name": "（閉店）そば処ふしみ",
+      "image": "そば処ふしみ.jpg"
     },
     {
       "name": "シャンボール",
-      "image": ""
+      "image": "シャンボール.jpg"
     },
     {
       "name": "DIPIKA",
-      "image": ""
+      "image": "DIPIKA.jpg"
     },
     {
       "name": "観音寺",
-      "image": ""
+      "image": "観音寺(自撮).jpg"
     },
     {
       "name": "金剛院",
-      "image": ""
+      "image": "金剛院(自撮).jpg"
     },
     {
       "name": "井岡神社",
-      "image": ""
+      "image": "井岡神社.jpg"
     },
     {
       "name": "浄妙寺(天台宗)",
-      "image": ""
+      "image": "浄妙寺(自撮).jpg"
     },
     {
       "name": "ヤマイチ味噌",
+      "image": "ヤマイチ味噌.jpg"
+    },
+    {
+      "name": "牛久市観光アヤメ園",
+      "image": ""
+    },
+    {
+      "name": "牛久自然観察の森",
       "image": ""
     }
   ]

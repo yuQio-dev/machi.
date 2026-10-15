@@ -10,14 +10,18 @@ const root = new URL('../', import.meta.url);
 const references = JSON.parse(await readFile(new URL('image-references.json', root), 'utf8'));
 const item = (name, image = '') => ({ name, image, lat: 35.98, lon: 140.15 });
 
-test('シートの指定画像11件を解決し、未配置1件と空欄9件を区別する', () => {
-  const resolved = references.items.filter(spot => M.imageUrl(spot.image));
+test('新しく指定された写真を解決し、未配置の画像と空欄を区別する', () => {
+  for (const name of ['芋千', '（閉店）そば処ふしみ', 'シャンボール', '観音寺', '金剛院', '井岡神社', '浄妙寺(天台宗)', 'ヤマイチ味噌']) {
+    const spot = references.items.find(spot => spot.name === name);
+    assert.ok(spot && M.imageUrl(spot.image), name);
+  }
   const missing = references.items.filter(spot => spot.image && !M.imageUrl(spot.image));
-  assert.equal(resolved.length, 11);
-  assert.deepEqual(missing.map(spot => spot.name), ['Dining いごこち屋']);
-  assert.equal(references.items.filter(spot => !spot.image).length, 9);
-  assert.equal(M.imageUrl('牛久駅.jpg'), 'images/' + encodeURIComponent('牛久駅.jpeg'));
-  assert.equal(M.imageUrl('天満屋酒店.jpeg'), 'images/' + encodeURIComponent('天満屋酒店.jpg'));
+  assert.deepEqual(missing.map(spot => spot.name), ['Dining いごこち屋', 'DIPIKA']);
+  assert.equal(M.imageUrl('牛久駅.jpeg'), 'images/' + encodeURIComponent('牛久駅.jpeg'));
+  assert.equal(M.imageUrl('天満屋酒店.jpg'), 'images/' + encodeURIComponent('天満屋酒店.jpg'));
+  const kongo = references.items.find(spot => spot.name === '金剛院');
+  assert.equal(kongo.image, '金剛院(自撮).jpg');
+  assert.equal(M.imageUrl(kongo.image), 'images/' + encodeURIComponent('金剛院(自撮).jpg'));
 });
 
 test('濁点の表現を正規化し、画像以外のパスやスクリプトを拒否する', () => {
@@ -32,7 +36,7 @@ test('濁点の表現を正規化し、画像以外のパスやスクリプト�
 });
 
 test('旧APIは確認済み対応表を使い、新APIの空欄・変更・別APIを優先する', () => {
-  const raw = { ok: true, items: [item('牛久シャトー'), item('芋千'), item('未知のスポット')] };
+  const raw = { ok: true, items: [item('牛久シャトー'), item('画像未指定'), item('未知のスポット')] };
   assert.equal(M.sanitizePayload(raw).items[0].image, '');
   const legacy = M.sanitizePayload(raw, { legacyImages: true });
   assert.ok(legacy.items[0].image);
@@ -49,7 +53,9 @@ test('旧APIは確認済み対応表を使い、新APIの空欄・変更・別AP
 test('公開画像は元ファイルの内容を保ち、すべてNFCのURLで取得できる配置になる', async () => {
   const source = new URL('images/', root);
   const names = await readdir(source);
-  assert.equal(names.length, 16);
+  assert.ok(names.length > 0);
+  const published = new Set(Object.values(images.files));
+  assert.equal(published.size, names.length);
   for (const name of names) {
     const target = new URL('dist/' + M.imageUrl(name), root);
     const [original, copied] = await Promise.all([readFile(new URL(encodeURIComponent(name), source)), readFile(target)]);

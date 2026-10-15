@@ -68,7 +68,7 @@
       "time": "5:35(始発)~0:34(終電)",
       "closed": "なし",
       "category": "交通",
-      "image": "牛久駅.jpg",
+      "image": "牛久駅.jpeg",
       "sourceUrl": "https://escado.jp/ibarakijiman/",
       "coordinateWarning": ""
     },
@@ -128,7 +128,7 @@
       "time": "9:00～19:00",
       "closed": "水",
       "category": "酒屋",
-      "image": "天満屋酒店.jpeg",
+      "image": "天満屋酒店.jpg",
       "sourceUrl": "https://ushikukankou.com/tenmanya.htm",
       "coordinateWarning": ""
     },
@@ -188,7 +188,7 @@
       "time": "17:00 - 22:00",
       "closed": "日、月",
       "category": "居酒屋",
-      "image": "いごこち屋.jpg",
+      "image": "いごこち屋.jpg",
       "sourceUrl": "",
       "coordinateWarning": ""
     },
@@ -203,7 +203,7 @@
       "time": "10:00 - 17:00",
       "closed": "月",
       "category": "スイーツ",
-      "image": "",
+      "image": "芋千.jpg",
       "sourceUrl": "https://iimo1000.thebase.in/items/27962287",
       "coordinateWarning": ""
     },
@@ -233,7 +233,7 @@
       "time": "10:00 - 19:00",
       "closed": "水",
       "category": "スイーツ",
-      "image": "",
+      "image": "シャンボール.jpg",
       "sourceUrl": "https://chambord-f.com/",
       "coordinateWarning": ""
     },
@@ -248,7 +248,7 @@
       "time": "11:00～15:00、17:00～23:00",
       "closed": "水",
       "category": "飲食店",
-      "image": "",
+      "image": "DIPIKA.jpg",
       "sourceUrl": "https://ushiku-sci.org/member/809.html",
       "coordinateWarning": ""
     },
@@ -263,7 +263,7 @@
       "time": "9:00〜15:00",
       "closed": "なし",
       "category": "寺院",
-      "image": "",
+      "image": "観音寺(自撮).jpg",
       "sourceUrl": "https://ushikukankou.com/page/syaji/kannonji.html",
       "coordinateWarning": ""
     },
@@ -278,7 +278,7 @@
       "time": "24時間営業",
       "closed": "なし",
       "category": "寺院",
-      "image": "",
+      "image": "金剛院(自撮).jpg",
       "sourceUrl": "https://ushiku-mukeibunka.com/event/%E9%87%91%E5%89%9B%E9%99%A2_%E5%9B%A3%E5%AD%90%E5%BF%B5%E4%BB%8F/",
       "coordinateWarning": ""
     },
@@ -293,7 +293,7 @@
       "time": "24時間営業",
       "closed": "なし",
       "category": "神社",
-      "image": "",
+      "image": "井岡神社.jpg",
       "sourceUrl": "https://drive.google.com/drive/folders/1ta672Uisl8wLyAemnbZG8IYDF3F1OViT",
       "coordinateWarning": ""
     },
@@ -308,7 +308,7 @@
       "time": "24時間営業",
       "closed": "なし",
       "category": "寺院",
-      "image": "",
+      "image": "浄妙寺(自撮).jpg",
       "sourceUrl": "https://omairi.club/spots/134725",
       "coordinateWarning": ""
     },
@@ -323,7 +323,7 @@
       "time": "9:00~17:00",
       "closed": "日・祝",
       "category": "グルメ",
-      "image": "",
+      "image": "ヤマイチ味噌.jpg",
       "sourceUrl": "https://www.yamaichimiso.co.jp/",
       "coordinateWarning": ""
     }
