@@ -1,0 +1,872 @@
+{
+  "$schema": "../project.schema.json",
+  "format": "machi-design",
+  "schemaVersion": 2,
+  "id": "ushiku-demo",
+  "title": "うしくスポットマップ",
+  "description": "当初の牛久市マップの保存データ（2026年10月14日）から編集できます。",
+  "locale": "ja",
+  "theme": {
+    "accent": "#7952b3",
+    "background": "#f6f3fb",
+    "foreground": "#332b43"
+  },
+  "responsive": {
+    "mobileBelow": 768
+  },
+  "initialScreenId": "main",
+  "datasets": [
+    {
+      "id": "ushiku",
+      "name": "牛久市のサンプル3地点",
+      "columns": [
+        {
+          "key": "name",
+          "label": "スポット名",
+          "type": "string",
+          "visibility": "public"
+        },
+        {
+          "key": "lat",
+          "label": "緯度",
+          "type": "number",
+          "visibility": "public"
+        },
+        {
+          "key": "lon",
+          "label": "経度",
+          "type": "number",
+          "visibility": "public"
+        },
+        {
+          "key": "location",
+          "label": "住所",
+          "type": "string",
+          "visibility": "public"
+        },
+        {
+          "key": "category",
+          "label": "カテゴリ",
+          "type": "string",
+          "visibility": "public"
+        },
+        {
+          "key": "description",
+          "label": "紹介文",
+          "type": "string",
+          "visibility": "public"
+        },
+        {
+          "key": "image",
+          "label": "写真URL",
+          "type": "string",
+          "visibility": "public"
+        },
+        {
+          "key": "sourceUrl",
+          "label": "Webサイト",
+          "type": "string",
+          "visibility": "public"
+        }
+      ],
+      "mapping": {
+        "name": "name",
+        "lat": "lat",
+        "lon": "lon",
+        "location": "location",
+        "category": "category",
+        "description": "description",
+        "image": "image",
+        "sourceUrl": "sourceUrl"
+      },
+      "rows": [
+        {
+          "id": "sheet-0-row-4",
+          "values": {
+            "name": "牛久シャトー",
+            "lat": 35.97802056,
+            "lon": 140.1473454,
+            "location": "茨城県牛久市中央3-20-1",
+            "category": "ワイン醸造所",
+            "description": "明治時代に誕生した日本初の本格的ワイン醸造所で、赤レンガ造りの美しい景観からロケ地としても人気のスポット。",
+            "image": "https://yuqio-dev.github.io/ushiku-map/images/%E7%89%9B%E4%B9%85%E3%82%B7%E3%83%A3%E3%83%88%E3%83%BC.jpg",
+            "sourceUrl": "https://www.ushikukankou.com/%E7%89%9B%E4%B9%85%E3%82%B7%E3%83%A3%E3%83%88%E3%83%BC/"
+          }
+        },
+        {
+          "id": "sheet-0-row-5",
+          "values": {
+            "name": "手作処かっぱ本舗",
+            "lat": 35.98645215,
+            "lon": 140.1398715,
+            "location": "茨城県牛久市田宮町45-10",
+            "category": "お土産やさん",
+            "description": "牛久沼のかっぱ伝説にちなんだお店で、牛久の名産品や手作りのせんべい・団子を楽しめる。",
+            "image": "https://yuqio-dev.github.io/ushiku-map/images/%E6%89%8B%E4%BD%9C%E5%87%A6%E3%81%8B%E3%81%A3%E3%81%B1%E6%9C%AC%E8%88%97.jpg",
+            "sourceUrl": "https://ushikukankou.com/kappahonpo.htm"
+          }
+        },
+        {
+          "id": "sheet-0-row-6",
+          "values": {
+            "name": "牛久大仏",
+            "lat": 35.585766,
+            "lon": 140.13131,
+            "location": "茨城県牛久市2083",
+            "category": "観光名所",
+            "description": "高さ約120mの大きな仏像。世界最大級の青銅製仏像として知られている。季節・曜日によって営業時間は異なる。",
+            "image": "https://yuqio-dev.github.io/ushiku-map/images/%E7%89%9B%E4%B9%85%E5%A4%A7%E4%BB%8F.png",
+            "sourceUrl": "https://www.city.ushiku.lg.jp/city-promotion/tanoshimu/kankochi-shokai/page013838.html"
+          }
+        },
+        {
+          "id": "sheet-0-row-7",
+          "values": {
+            "name": "牛久駅（JR常磐線）",
+            "lat": 35.97575825,
+            "lon": 140.141044,
+            "location": "茨城県牛久市牛久町282",
+            "category": "交通",
+            "description": "茨城県牛久市牛久町にある東日本旅客鉄道（JR東日本）常磐線の駅である。",
+            "image": "https://yuqio-dev.github.io/ushiku-map/images/%E7%89%9B%E4%B9%85%E9%A7%85.jpeg",
+            "sourceUrl": "https://escado.jp/ibarakijiman/"
+          }
+        },
+        {
+          "id": "sheet-0-row-8",
+          "values": {
+            "name": "牛久ミニゴルフ場",
+            "lat": 35.96664974,
+            "lon": 140.1585085,
+            "location": "茨城県牛久市神谷2-34-12",
+            "category": "ゴルフ場",
+            "description": "14 ホール、1,010 ヤードのシンプルなゴルフ場。パターやバンカーなどの練習場がある。",
+            "image": "https://yuqio-dev.github.io/ushiku-map/images/%E7%89%9B%E4%B9%85%E3%83%9F%E3%83%8B%E3%82%B4%E3%83%AB%E3%83%95%E5%A0%B4.jpg",
+            "sourceUrl": "https://ushikukankou.com/mini_golf.htm"
+          }
+        },
+        {
+          "id": "sheet-0-row-9",
+          "values": {
+            "name": "南部珈琲",
+            "lat": 35.98839877,
+            "lon": 140.1464624,
+            "location": "茨城県牛久市栄町1-21",
+            "category": "カフェ",
+            "description": "自家焙煎の香り高いコーヒーが人気のカフェ。",
+            "image": "https://yuqio-dev.github.io/ushiku-map/images/%E5%8D%97%E9%83%A8%E7%8F%88%E7%90%B2.webp",
+            "sourceUrl": "https://www.nanbu-coffee.com/22aboutus/"
+          }
+        },
+        {
+          "id": "sheet-0-row-10",
+          "values": {
+            "name": "二胡ケ亭",
+            "lat": 35.98697146,
+            "lon": 140.1480199,
+            "location": "茨城県牛久市栄町1-9-3",
+            "category": "飲食店",
+            "description": "焼豚や調味料が手作りで、ヘルシー志向の中華料理。",
+            "image": "https://yuqio-dev.github.io/ushiku-map/images/%E4%BA%8C%E8%83%A1%E3%82%B1%E4%BA%AD.jpg",
+            "sourceUrl": "https://nikoniko-tei.com/"
+          }
+        },
+        {
+          "id": "sheet-0-row-11",
+          "values": {
+            "name": "天満屋酒店",
+            "lat": 35.97780311,
+            "lon": 140.1480521,
+            "location": "茨城県牛久市南21-2",
+            "category": "酒屋",
+            "description": "地酒専門店。日本酒・焼酎の種類が豊富で品質管理もしっかりとしたお店。",
+            "image": "https://yuqio-dev.github.io/ushiku-map/images/%E5%A4%A9%E6%BA%80%E5%B1%8B%E9%85%92%E5%BA%97.jpg",
+            "sourceUrl": "https://ushikukankou.com/tenmanya.htm"
+          }
+        },
+        {
+          "id": "sheet-0-row-12",
+          "values": {
+            "name": "伊勢屋",
+            "lat": 35.97820433,
+            "lon": 140.1394176,
+            "location": "茨城県牛久市田宮188-2",
+            "category": "老舗和菓子店",
+            "description": "大福道明寺やみたらし団子が楽しめる、和菓子の名店。",
+            "image": "https://yuqio-dev.github.io/ushiku-map/images/%E4%BC%8A%E5%8B%A2%E5%B1%8B.jpg",
+            "sourceUrl": "https://civicpower.jp/ushiku-gourmetthon/leader-iseya/"
+          }
+        },
+        {
+          "id": "sheet-0-row-13",
+          "values": {
+            "name": "ふらんす食堂",
+            "lat": 35.97790488,
+            "lon": 140.1420053,
+            "location": "茨城県牛久市中央5-13-11",
+            "category": "飲食店",
+            "description": "カジュアルなフレンチレストラン。ランチコースが好評。夏はかき氷がおすすめ。",
+            "image": "https://yuqio-dev.github.io/ushiku-map/images/",
+            "sourceUrl": "https://www.ushikukankou.com/%E3%81%B5%E3%82%89%E3%82%93%E3%81%99%E9%A3%9F%E5%A0%82%E3%80%80chez-nakajima/"
+          }
+        },
+        {
+          "id": "sheet-0-row-14",
+          "values": {
+            "name": "タマノ酒屋",
+            "lat": 35.98650355,
+            "lon": 140.1380214,
+            "location": "茨城県牛久市牛久町3193",
+            "category": "飲食店",
+            "description": "生産者を感じられる酒(つなげたい文化、つたえたいお酒)を販売。",
+            "image": "https://yuqio-dev.github.io/ushiku-map/images/%E3%82%BF%E3%83%9E%E3%83%8E%E9%85%92%E5%BA%97.jpg",
+            "sourceUrl": "https://saketama.com/"
+          }
+        },
+        {
+          "id": "sheet-0-row-15",
+          "values": {
+            "name": "Dining いごこち屋",
+            "lat": 35.97800344,
+            "lon": 140.1490223,
+            "location": "茨城県牛久市南11-2",
+            "category": "居酒屋",
+            "description": "新鮮な魚料理と肉の煮込みがおすすめの逸品。火曜・水曜のランチでは気まぐれ定食を楽しめる。",
+            "image": "https://yuqio-dev.github.io/ushiku-map/images/%E3%81%84%E3%81%94%E3%81%93%E3%81%A1%E5%B1%8B.jpg",
+            "sourceUrl": ""
+          }
+        },
+        {
+          "id": "sheet-0-row-16",
+          "values": {
+            "name": "芋千",
+            "lat": 35.97760322,
+            "lon": 140.1414172,
+            "location": "茨城県牛久市中央5-14-25",
+            "category": "スイーツ",
+            "description": "焼き芋スイーツ専門店。テイクアウトも可能。",
+            "image": "https://yuqio-dev.github.io/ushiku-map/images/%E8%8A%8B%E5%8D%83.jpg",
+            "sourceUrl": "https://iimo1000.thebase.in/items/27962287"
+          }
+        },
+        {
+          "id": "sheet-0-row-17",
+          "values": {
+            "name": "ふしみ",
+            "lat": 35.97480433,
+            "lon": 140.1488984,
+            "location": "茨城県牛久市中央4-7-1",
+            "category": "飲食店",
+            "description": "蕎麦処",
+            "image": "https://yuqio-dev.github.io/ushiku-map/images/",
+            "sourceUrl": "https://www.ushikukankou.com/%E3%81%B5%E3%81%97%E3%81%BF/"
+          }
+        },
+        {
+          "id": "sheet-0-row-18",
+          "values": {
+            "name": "シャンボール",
+            "lat": 35.97840488,
+            "lon": 140.1502604,
+            "location": "茨城県牛久市中央3-16-2",
+            "category": "スイーツ",
+            "description": "ケーキ屋さん",
+            "image": "https://yuqio-dev.github.io/ushiku-map/images/%E3%82%B7%E3%83%A3%E3%83%B3%E3%83%9C%E3%83%BC%E3%83%AB.jpg",
+            "sourceUrl": "https://chambord-f.com/"
+          }
+        },
+        {
+          "id": "sheet-0-row-19",
+          "values": {
+            "name": "DIPIKA",
+            "lat": 35.97450399,
+            "lon": 140.1432806,
+            "location": "茨城県牛久市南1-1-35",
+            "category": "飲食店",
+            "description": "ネパール料理店",
+            "image": "https://yuqio-dev.github.io/ushiku-map/images/DIPIKA.jpg",
+            "sourceUrl": "https://ushiku-sci.org/member/809.html"
+          }
+        },
+        {
+          "id": "sheet-0-row-20",
+          "values": {
+            "name": "観音寺",
+            "lat": 35.9796,
+            "lon": 140.1836,
+            "location": "茨城県牛久市2976",
+            "category": "寺院",
+            "description": "歴史ある寺院であり、観音菩薩を祀っている。地域の人々に親しまれている寺院の一つ。",
+            "image": "https://yuqio-dev.github.io/ushiku-map/images/%E8%A6%B3%E9%9F%B3%E5%AF%BA(%E8%87%AA%E6%92%AE).jpg",
+            "sourceUrl": "https://ushikukankou.com/page/syaji/kannonji.html"
+          }
+        },
+        {
+          "id": "sheet-0-row-21",
+          "values": {
+            "name": "金剛院",
+            "lat": 35.971482,
+            "lon": 140.239958,
+            "location": "茨城県牛久市813",
+            "category": "寺院",
+            "description": "牛久市にある古刹。桜の季節には境内が美しく彩られる。",
+            "image": "https://yuqio-dev.github.io/ushiku-map/images/%E9%87%91%E5%89%9B%E9%99%A2(%E8%87%AA%E6%92%AE).jpg",
+            "sourceUrl": "https://ushiku-mukeibunka.com/event/%E9%87%91%E5%89%9B%E9%99%A2_%E5%9B%A3%E5%AD%90%E5%BF%B5%E4%BB%8F/"
+          }
+        },
+        {
+          "id": "sheet-0-row-22",
+          "values": {
+            "name": "井岡神社",
+            "lat": 35.962313,
+            "lon": 140.244573,
+            "location": "茨城県牛久市2324",
+            "category": "神社",
+            "description": "地域の人々に親しまれている歴史ある神社。境内には落ち着いた雰囲気がある。",
+            "image": "https://yuqio-dev.github.io/ushiku-map/images/%E4%BA%95%E5%B2%A1%E7%A5%9E%E7%A4%BE.jpg",
+            "sourceUrl": "https://drive.google.com/drive/folders/1ta672Uisl8wLyAemnbZG8IYDF3F1OViT"
+          }
+        },
+        {
+          "id": "sheet-0-row-23",
+          "values": {
+            "name": "浄妙寺(天台宗)",
+            "lat": 35.958878,
+            "lon": 140.243784,
+            "location": "茨城県牛久市猪子町1986",
+            "category": "寺院",
+            "description": "歴史ある寺院で、地域の人々に親しまれている。",
+            "image": "https://yuqio-dev.github.io/ushiku-map/images/%E6%B5%84%E5%A6%99%E5%AF%BA(%E8%87%AA%E6%92%AE).jpg",
+            "sourceUrl": "https://omairi.club/spots/134725"
+          }
+        },
+        {
+          "id": "sheet-0-row-24",
+          "values": {
+            "name": "ヤマイチ味噌",
+            "lat": 35.960071,
+            "lon": 140.227304,
+            "location": "茨城県牛久市島田町2713",
+            "category": "グルメ",
+            "description": "老舗の味噌蔵。昔ながらの製法で作られた味噌や関連商品を購入できる。",
+            "image": "https://yuqio-dev.github.io/ushiku-map/images/%E3%83%A4%E3%83%9E%E3%82%A4%E3%83%81%E5%91%B3%E5%99%8C.jpg",
+            "sourceUrl": "https://www.yamaichimiso.co.jp/"
+          }
+        }
+      ],
+      "searchMatch": "all",
+      "filterMatch": "all",
+      "source": {
+        "kind": "inline",
+        "label": "既存サンプルCSVの先頭3地点。内容の正確性は未検証。",
+        "url": ""
+      }
+    }
+  ],
+  "screens": [
+    {
+      "id": "main",
+      "name": "メイン画面",
+      "frames": {
+        "desktop": {
+          "width": 1280,
+          "height": 800
+        },
+        "mobile": {
+          "width": 390,
+          "height": 844
+        }
+      },
+      "components": [
+        {
+          "id": "heading",
+          "kind": "app-header",
+          "version": 1,
+          "name": "ヘッダー",
+          "parentId": null,
+          "props": {
+            "title": "うしくスポットマップ",
+            "description": "牛久市の地点データを使う設計例"
+          },
+          "style": {},
+          "binding": null,
+          "interactions": [],
+          "layouts": {
+            "desktop": {
+              "x": 0,
+              "y": 0,
+              "width": 1280,
+              "height": 80,
+              "zIndex": 1,
+              "hidden": false,
+              "horizontal": "stretch",
+              "vertical": "start",
+              "presentation": "inline"
+            },
+            "mobile": {
+              "x": 0,
+              "y": 0,
+              "width": 390,
+              "height": 72,
+              "zIndex": 1,
+              "hidden": false,
+              "horizontal": "stretch",
+              "vertical": "start",
+              "presentation": "inline"
+            }
+          },
+          "transition": {
+            "type": "none",
+            "durationMs": 0,
+            "direction": "up"
+          }
+        },
+        {
+          "id": "search",
+          "kind": "place-search",
+          "version": 1,
+          "name": "キーワード検索",
+          "parentId": null,
+          "props": {
+            "placeholder": "地点を検索",
+            "searchFields": [
+              "name",
+              "location",
+              "description"
+            ]
+          },
+          "style": {},
+          "binding": {
+            "datasetId": "ushiku",
+            "mode": "collection"
+          },
+          "interactions": [
+            {
+              "event": "query-change",
+              "actions": [
+                {
+                  "type": "set-query",
+                  "datasetId": "ushiku",
+                  "value": {
+                    "source": "event",
+                    "key": "value"
+                  }
+                }
+              ]
+            },
+            {
+              "event": "clear",
+              "actions": [
+                {
+                  "type": "set-query",
+                  "datasetId": "ushiku",
+                  "value": {
+                    "source": "literal",
+                    "value": ""
+                  }
+                }
+              ]
+            }
+          ],
+          "layouts": {
+            "desktop": {
+              "x": 16,
+              "y": 96,
+              "width": 288,
+              "height": 44,
+              "zIndex": 1,
+              "hidden": false,
+              "horizontal": "start",
+              "vertical": "start",
+              "presentation": "inline"
+            },
+            "mobile": {
+              "x": 12,
+              "y": 84,
+              "width": 366,
+              "height": 44,
+              "zIndex": 1,
+              "hidden": false,
+              "horizontal": "stretch",
+              "vertical": "start",
+              "presentation": "inline"
+            }
+          },
+          "transition": {
+            "type": "none",
+            "durationMs": 0,
+            "direction": "up"
+          }
+        },
+        {
+          "id": "categories",
+          "kind": "category-chips",
+          "version": 1,
+          "name": "カテゴリチップ",
+          "parentId": null,
+          "props": {
+            "field": "category",
+            "allLabel": "すべて",
+            "multiple": false
+          },
+          "style": {},
+          "binding": {
+            "datasetId": "ushiku",
+            "mode": "collection"
+          },
+          "interactions": [
+            {
+              "event": "filter-change",
+              "actions": [
+                {
+                  "type": "set-filter",
+                  "datasetId": "ushiku",
+                  "field": "category",
+                  "operator": "eq",
+                  "value": {
+                    "source": "event",
+                    "key": "value"
+                  }
+                }
+              ]
+            }
+          ],
+          "layouts": {
+            "desktop": {
+              "x": 16,
+              "y": 152,
+              "width": 288,
+              "height": 80,
+              "zIndex": 1,
+              "hidden": false,
+              "horizontal": "start",
+              "vertical": "start",
+              "presentation": "inline"
+            },
+            "mobile": {
+              "x": 12,
+              "y": 140,
+              "width": 366,
+              "height": 44,
+              "zIndex": 1,
+              "hidden": false,
+              "horizontal": "stretch",
+              "vertical": "start",
+              "presentation": "inline"
+            }
+          },
+          "transition": {
+            "type": "none",
+            "durationMs": 0,
+            "direction": "up"
+          }
+        },
+        {
+          "id": "count",
+          "kind": "result-count",
+          "version": 1,
+          "name": "件数",
+          "parentId": null,
+          "props": {
+            "suffix": "件のスポット",
+            "showTotal": true
+          },
+          "style": {},
+          "binding": {
+            "datasetId": "ushiku",
+            "mode": "collection"
+          },
+          "interactions": [],
+          "layouts": {
+            "desktop": {
+              "x": 16,
+              "y": 244,
+              "width": 288,
+              "height": 24,
+              "zIndex": 1,
+              "hidden": false,
+              "horizontal": "start",
+              "vertical": "start",
+              "presentation": "inline"
+            },
+            "mobile": {
+              "x": 12,
+              "y": 196,
+              "width": 366,
+              "height": 24,
+              "zIndex": 1,
+              "hidden": false,
+              "horizontal": "stretch",
+              "vertical": "start",
+              "presentation": "inline"
+            }
+          },
+          "transition": {
+            "type": "none",
+            "durationMs": 0,
+            "direction": "up"
+          }
+        },
+        {
+          "id": "map",
+          "kind": "map-view",
+          "version": 1,
+          "name": "地図",
+          "parentId": null,
+          "props": {
+            "center": {
+              "lat": 35.978,
+              "lon": 140.147
+            },
+            "zoom": 14,
+            "minZoom": 3,
+            "maxZoom": 19,
+            "tileSource": "osm-standard"
+          },
+          "style": {},
+          "binding": {
+            "datasetId": "ushiku",
+            "mode": "collection"
+          },
+          "interactions": [
+            {
+              "event": "place-select",
+              "actions": [
+                {
+                  "type": "select-place",
+                  "datasetId": "ushiku",
+                  "value": {
+                    "source": "event",
+                    "key": "placeId"
+                  }
+                },
+                {
+                  "type": "open-panel",
+                  "targetId": "detail"
+                }
+              ]
+            }
+          ],
+          "layouts": {
+            "desktop": {
+              "x": 320,
+              "y": 80,
+              "width": 960,
+              "height": 720,
+              "zIndex": 1,
+              "hidden": false,
+              "horizontal": "stretch",
+              "vertical": "stretch",
+              "presentation": "inline"
+            },
+            "mobile": {
+              "x": 0,
+              "y": 232,
+              "width": 390,
+              "height": 612,
+              "zIndex": 1,
+              "hidden": false,
+              "horizontal": "stretch",
+              "vertical": "stretch",
+              "presentation": "inline"
+            }
+          },
+          "transition": {
+            "type": "none",
+            "durationMs": 0,
+            "direction": "up"
+          }
+        },
+        {
+          "id": "places",
+          "kind": "place-list",
+          "version": 1,
+          "name": "地点一覧",
+          "parentId": null,
+          "props": {
+            "displayFields": [
+              "name",
+              "category",
+              "description"
+            ],
+            "imageField": "image",
+            "emptyLabel": "条件に一致する地点はありません"
+          },
+          "style": {},
+          "binding": {
+            "datasetId": "ushiku",
+            "mode": "collection"
+          },
+          "interactions": [
+            {
+              "event": "place-select",
+              "actions": [
+                {
+                  "type": "select-place",
+                  "datasetId": "ushiku",
+                  "value": {
+                    "source": "event",
+                    "key": "placeId"
+                  }
+                },
+                {
+                  "type": "open-panel",
+                  "targetId": "detail"
+                }
+              ]
+            }
+          ],
+          "layouts": {
+            "desktop": {
+              "x": 16,
+              "y": 280,
+              "width": 288,
+              "height": 504,
+              "zIndex": 1,
+              "hidden": false,
+              "horizontal": "start",
+              "vertical": "stretch",
+              "presentation": "panel",
+              "initialOpen": true
+            },
+            "mobile": {
+              "x": 12,
+              "y": 492,
+              "width": 366,
+              "height": 340,
+              "zIndex": 1,
+              "hidden": false,
+              "horizontal": "stretch",
+              "vertical": "end",
+              "presentation": "bottom-sheet",
+              "initialOpen": false
+            }
+          },
+          "transition": {
+            "type": "none",
+            "durationMs": 0,
+            "direction": "up"
+          }
+        },
+        {
+          "id": "detail",
+          "kind": "place-detail",
+          "version": 1,
+          "name": "地点詳細",
+          "parentId": null,
+          "props": {
+            "displayFields": [
+              "name",
+              "location",
+              "category",
+              "description"
+            ],
+            "imageField": "image",
+            "closable": true,
+            "emptyLabel": "地点を選択してください"
+          },
+          "style": {},
+          "binding": {
+            "datasetId": "ushiku",
+            "mode": "selection"
+          },
+          "interactions": [
+            {
+              "event": "close",
+              "actions": [
+                {
+                  "type": "close-panel",
+                  "targetId": "detail"
+                }
+              ]
+            }
+          ],
+          "layouts": {
+            "desktop": {
+              "x": 924,
+              "y": 112,
+              "width": 332,
+              "height": 520,
+              "zIndex": 5,
+              "hidden": false,
+              "horizontal": "end",
+              "vertical": "start",
+              "presentation": "panel",
+              "initialOpen": false
+            },
+            "mobile": {
+              "x": 12,
+              "y": 484,
+              "width": 366,
+              "height": 348,
+              "zIndex": 5,
+              "hidden": false,
+              "horizontal": "stretch",
+              "vertical": "end",
+              "presentation": "bottom-sheet",
+              "initialOpen": false
+            }
+          },
+          "transition": {
+            "type": "slide",
+            "durationMs": 200,
+            "direction": "up"
+          }
+        },
+        {
+          "id": "show-list",
+          "kind": "floating-action",
+          "version": 1,
+          "name": "フローティング操作",
+          "parentId": null,
+          "props": {
+            "icon": "list",
+            "label": "一覧"
+          },
+          "style": {},
+          "binding": null,
+          "interactions": [
+            {
+              "event": "activate",
+              "actions": [
+                {
+                  "type": "open-panel",
+                  "targetId": "places"
+                }
+              ]
+            }
+          ],
+          "layouts": {
+            "desktop": {
+              "x": 16,
+              "y": 720,
+              "width": 120,
+              "height": 48,
+              "zIndex": 1,
+              "hidden": true,
+              "horizontal": "stretch",
+              "vertical": "start",
+              "presentation": "inline"
+            },
+            "mobile": {
+              "x": 124,
+              "y": 244,
+              "width": 142,
+              "height": 44,
+              "zIndex": 3,
+              "hidden": false,
+              "horizontal": "center",
+              "vertical": "start",
+              "presentation": "inline"
+            }
+          },
+          "transition": {
+            "type": "none",
+            "durationMs": 0,
+            "direction": "up"
+          }
+        }
+      ]
+    }
+  ]
+}

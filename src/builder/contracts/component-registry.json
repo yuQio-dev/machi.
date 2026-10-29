@@ -1,0 +1,1813 @@
+{
+  "registryVersion": 1,
+  "valueTypes": {
+    "place-id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]{0,63}$"
+    },
+    "screen-id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]{0,63}$"
+    },
+    "string": {
+      "type": "string",
+      "maxLength": 1000,
+      "default": ""
+    },
+    "url": {
+      "type": "string",
+      "maxLength": 2048,
+      "default": ""
+    },
+    "filter-value": {
+      "anyOf": [
+        {
+          "type": [
+            "string",
+            "number",
+            "boolean",
+            "null"
+          ]
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "boolean",
+              "null"
+            ]
+          },
+          "maxItems": 50,
+          "minItems": 0
+        }
+      ]
+    },
+    "filters": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "field": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9_]{0,63}$"
+          },
+          "operator": {
+            "enum": [
+              "eq",
+              "in",
+              "contains",
+              "range"
+            ],
+            "default": "eq"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean",
+                  "null"
+                ]
+              },
+              {
+                "type": "array",
+                "items": {
+                  "type": [
+                    "string",
+                    "number",
+                    "boolean",
+                    "null"
+                  ]
+                },
+                "maxItems": 50,
+                "minItems": 0
+              }
+            ]
+          }
+        },
+        "required": [
+          "field",
+          "operator",
+          "value"
+        ],
+        "additionalProperties": false
+      },
+      "maxItems": 50,
+      "minItems": 0
+    },
+    "bounds": {
+      "type": "object",
+      "properties": {
+        "north": {
+          "type": "number",
+          "minimum": -90,
+          "maximum": 90,
+          "default": 90
+        },
+        "south": {
+          "type": "number",
+          "minimum": -90,
+          "maximum": 90,
+          "default": -90
+        },
+        "east": {
+          "type": "number",
+          "minimum": -180,
+          "maximum": 180,
+          "default": 180
+        },
+        "west": {
+          "type": "number",
+          "minimum": -180,
+          "maximum": 180,
+          "default": -180
+        }
+      },
+      "required": [
+        "north",
+        "south",
+        "east",
+        "west"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "components": [
+    {
+      "kind": "map-view",
+      "version": 1,
+      "name": "地図",
+      "category": "地図本体",
+      "placement": "canvas",
+      "priority": "A",
+      "status": "contract-defined",
+      "bindingModes": [
+        "collection"
+      ],
+      "presentations": [
+        "inline"
+      ],
+      "propsSchema": {
+        "type": "object",
+        "properties": {
+          "center": {
+            "type": "object",
+            "properties": {
+              "lat": {
+                "type": "number",
+                "minimum": -90,
+                "maximum": 90,
+                "default": 35.978
+              },
+              "lon": {
+                "type": "number",
+                "minimum": -180,
+                "maximum": 180,
+                "default": 140.147
+              }
+            },
+            "required": [
+              "lat",
+              "lon"
+            ],
+            "additionalProperties": false
+          },
+          "zoom": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 20,
+            "default": 14
+          },
+          "minZoom": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 20,
+            "default": 3
+          },
+          "maxZoom": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 20,
+            "default": 19
+          },
+          "tileSource": {
+            "enum": [
+              "osm-standard"
+            ],
+            "default": "osm-standard"
+          }
+        },
+        "required": [
+          "center",
+          "zoom",
+          "minZoom",
+          "maxZoom",
+          "tileSource"
+        ],
+        "additionalProperties": false
+      },
+      "events": {
+        "place-select": {
+          "placeId": "place-id"
+        },
+        "viewport-change": {
+          "bounds": "bounds"
+        }
+      }
+    },
+    {
+      "kind": "map-zoom",
+      "version": 1,
+      "name": "拡大縮小",
+      "category": "地図の補助",
+      "placement": "map-setting",
+      "priority": "A",
+      "status": "contract-defined",
+      "bindingModes": [],
+      "presentations": [
+        "inline"
+      ],
+      "propsSchema": {
+        "type": "object",
+        "properties": {
+          "position": {
+            "enum": [
+              "top-left",
+              "top-right",
+              "bottom-left",
+              "bottom-right"
+            ],
+            "default": "top-right"
+          },
+          "step": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 3,
+            "default": 1
+          }
+        },
+        "required": [
+          "position",
+          "step"
+        ],
+        "additionalProperties": false
+      },
+      "events": {}
+    },
+    {
+      "kind": "map-locate",
+      "version": 1,
+      "name": "現在地",
+      "category": "地図の補助",
+      "placement": "map-setting",
+      "priority": "B",
+      "status": "contract-defined",
+      "bindingModes": [],
+      "presentations": [
+        "inline"
+      ],
+      "propsSchema": {
+        "type": "object",
+        "properties": {
+          "position": {
+            "enum": [
+              "top-left",
+              "top-right",
+              "bottom-left",
+              "bottom-right"
+            ],
+            "default": "top-right"
+          },
+          "follow": {
+            "type": "boolean",
+            "default": false
+          }
+        },
+        "required": [
+          "position",
+          "follow"
+        ],
+        "additionalProperties": false
+      },
+      "events": {}
+    },
+    {
+      "kind": "map-fit",
+      "version": 1,
+      "name": "全地点表示",
+      "category": "地図の補助",
+      "placement": "map-setting",
+      "priority": "A",
+      "status": "contract-defined",
+      "bindingModes": [],
+      "presentations": [
+        "inline"
+      ],
+      "propsSchema": {
+        "type": "object",
+        "properties": {
+          "position": {
+            "enum": [
+              "top-left",
+              "top-right",
+              "bottom-left",
+              "bottom-right"
+            ],
+            "default": "top-right"
+          },
+          "label": {
+            "type": "string",
+            "maxLength": 80,
+            "default": "全地点を表示"
+          }
+        },
+        "required": [
+          "position",
+          "label"
+        ],
+        "additionalProperties": false
+      },
+      "events": {}
+    },
+    {
+      "kind": "map-legend",
+      "version": 1,
+      "name": "凡例",
+      "category": "地図の補助",
+      "placement": "canvas",
+      "priority": "B",
+      "status": "contract-defined",
+      "bindingModes": [
+        "collection"
+      ],
+      "presentations": [
+        "inline"
+      ],
+      "propsSchema": {
+        "type": "object",
+        "properties": {
+          "field": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9_]{0,63}$"
+          },
+          "interactive": {
+            "type": "boolean",
+            "default": false
+          }
+        },
+        "required": [
+          "field",
+          "interactive"
+        ],
+        "additionalProperties": false
+      },
+      "events": {
+        "filter-change": {
+          "value": "filter-value"
+        }
+      }
+    },
+    {
+      "kind": "map-scale",
+      "version": 1,
+      "name": "縮尺",
+      "category": "地図の補助",
+      "placement": "map-setting",
+      "priority": "B",
+      "status": "contract-defined",
+      "bindingModes": [],
+      "presentations": [
+        "inline"
+      ],
+      "propsSchema": {
+        "type": "object",
+        "properties": {
+          "position": {
+            "enum": [
+              "top-left",
+              "top-right",
+              "bottom-left",
+              "bottom-right"
+            ],
+            "default": "top-right"
+          },
+          "units": {
+            "enum": [
+              "metric"
+            ],
+            "default": "metric"
+          }
+        },
+        "required": [
+          "position",
+          "units"
+        ],
+        "additionalProperties": false
+      },
+      "events": {}
+    },
+    {
+      "kind": "map-attribution",
+      "version": 1,
+      "name": "出典表示",
+      "category": "地図の補助",
+      "placement": "map-setting",
+      "priority": "A",
+      "status": "contract-defined",
+      "bindingModes": [],
+      "presentations": [
+        "inline"
+      ],
+      "propsSchema": {
+        "type": "object",
+        "properties": {
+          "position": {
+            "enum": [
+              "top-left",
+              "top-right",
+              "bottom-left",
+              "bottom-right"
+            ],
+            "default": "top-right"
+          },
+          "visible": {
+            "const": true
+          }
+        },
+        "required": [
+          "position",
+          "visible"
+        ],
+        "additionalProperties": false
+      },
+      "events": {}
+    },
+    {
+      "kind": "map-cluster",
+      "version": 1,
+      "name": "近接ピンの集約",
+      "category": "地図の補助",
+      "placement": "map-setting",
+      "priority": "A",
+      "status": "contract-defined",
+      "bindingModes": [],
+      "presentations": [
+        "inline"
+      ],
+      "propsSchema": {
+        "type": "object",
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "default": true
+          },
+          "radius": {
+            "type": "number",
+            "minimum": 10,
+            "maximum": 150,
+            "default": 60
+          }
+        },
+        "required": [
+          "enabled",
+          "radius"
+        ],
+        "additionalProperties": false
+      },
+      "events": {}
+    },
+    {
+      "kind": "place-search",
+      "version": 1,
+      "name": "キーワード検索",
+      "category": "検索",
+      "placement": "canvas",
+      "priority": "A",
+      "status": "contract-defined",
+      "bindingModes": [
+        "collection"
+      ],
+      "presentations": [
+        "inline"
+      ],
+      "propsSchema": {
+        "type": "object",
+        "properties": {
+          "placeholder": {
+            "type": "string",
+            "maxLength": 80,
+            "default": "地点を検索"
+          },
+          "searchFields": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^[A-Za-z][A-Za-z0-9_]{0,63}$"
+            },
+            "maxItems": 50,
+            "minItems": 1
+          }
+        },
+        "required": [
+          "placeholder",
+          "searchFields"
+        ],
+        "additionalProperties": false
+      },
+      "events": {
+        "query-change": {
+          "value": "string"
+        },
+        "clear": {}
+      }
+    },
+    {
+      "kind": "place-suggestions",
+      "version": 1,
+      "name": "検索候補",
+      "category": "検索",
+      "placement": "canvas",
+      "priority": "B",
+      "status": "contract-defined",
+      "bindingModes": [
+        "collection"
+      ],
+      "presentations": [
+        "inline"
+      ],
+      "propsSchema": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 20,
+            "default": 8
+          },
+          "labelField": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9_]{0,63}$"
+          }
+        },
+        "required": [
+          "limit",
+          "labelField"
+        ],
+        "additionalProperties": false
+      },
+      "events": {
+        "place-select": {
+          "placeId": "place-id"
+        }
+      }
+    },
+    {
+      "kind": "category-chips",
+      "version": 1,
+      "name": "カテゴリチップ",
+      "category": "絞り込み",
+      "placement": "canvas",
+      "priority": "A",
+      "status": "contract-defined",
+      "bindingModes": [
+        "collection"
+      ],
+      "presentations": [
+        "inline"
+      ],
+      "propsSchema": {
+        "type": "object",
+        "properties": {
+          "field": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9_]{0,63}$"
+          },
+          "allLabel": {
+            "type": "string",
+            "maxLength": 40,
+            "default": "すべて"
+          },
+          "multiple": {
+            "type": "boolean",
+            "default": false
+          }
+        },
+        "required": [
+          "field",
+          "allLabel",
+          "multiple"
+        ],
+        "additionalProperties": false
+      },
+      "events": {
+        "filter-change": {
+          "value": "filter-value"
+        }
+      }
+    },
+    {
+      "kind": "category-select",
+      "version": 1,
+      "name": "カテゴリ選択",
+      "category": "絞り込み",
+      "placement": "canvas",
+      "priority": "B",
+      "status": "contract-defined",
+      "bindingModes": [
+        "collection"
+      ],
+      "presentations": [
+        "inline"
+      ],
+      "propsSchema": {
+        "type": "object",
+        "properties": {
+          "field": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9_]{0,63}$"
+          },
+          "placeholder": {
+            "type": "string",
+            "maxLength": 80,
+            "default": "カテゴリ"
+          },
+          "multiple": {
+            "type": "boolean",
+            "default": false
+          }
+        },
+        "required": [
+          "field",
+          "placeholder",
+          "multiple"
+        ],
+        "additionalProperties": false
+      },
+      "events": {
+        "filter-change": {
+          "value": "filter-value"
+        }
+      }
+    },
+    {
+      "kind": "filter-panel",
+      "version": 1,
+      "name": "詳細条件",
+      "category": "絞り込み",
+      "placement": "canvas",
+      "priority": "B",
+      "status": "contract-defined",
+      "bindingModes": [
+        "collection"
+      ],
+      "presentations": [
+        "panel",
+        "drawer"
+      ],
+      "propsSchema": {
+        "type": "object",
+        "properties": {
+          "fields": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^[A-Za-z][A-Za-z0-9_]{0,63}$"
+            },
+            "maxItems": 50,
+            "minItems": 1
+          },
+          "applyMode": {
+            "enum": [
+              "immediate",
+              "confirm"
+            ],
+            "default": "immediate"
+          }
+        },
+        "required": [
+          "fields",
+          "applyMode"
+        ],
+        "additionalProperties": false
+      },
+      "events": {
+        "filters-apply": {
+          "filters": "filters"
+        },
+        "reset": {}
+      }
+    },
+    {
+      "kind": "place-list",
+      "version": 1,
+      "name": "地点一覧",
+      "category": "一覧",
+      "placement": "canvas",
+      "priority": "A",
+      "status": "contract-defined",
+      "bindingModes": [
+        "collection"
+      ],
+      "presentations": [
+        "panel",
+        "bottom-sheet"
+      ],
+      "propsSchema": {
+        "type": "object",
+        "properties": {
+          "displayFields": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^[A-Za-z][A-Za-z0-9_]{0,63}$"
+            },
+            "maxItems": 50,
+            "minItems": 1
+          },
+          "imageField": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^[A-Za-z][A-Za-z0-9_]{0,63}$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "emptyLabel": {
+            "type": "string",
+            "maxLength": 160,
+            "default": "条件に一致する地点はありません"
+          }
+        },
+        "required": [
+          "displayFields",
+          "imageField",
+          "emptyLabel"
+        ],
+        "additionalProperties": false
+      },
+      "events": {
+        "place-select": {
+          "placeId": "place-id"
+        }
+      }
+    },
+    {
+      "kind": "place-card",
+      "version": 1,
+      "name": "地点カード",
+      "category": "一覧",
+      "placement": "canvas",
+      "priority": "B",
+      "status": "contract-defined",
+      "bindingModes": [
+        "selection",
+        "record"
+      ],
+      "presentations": [
+        "inline"
+      ],
+      "propsSchema": {
+        "type": "object",
+        "properties": {
+          "displayFields": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^[A-Za-z][A-Za-z0-9_]{0,63}$"
+            },
+            "maxItems": 50,
+            "minItems": 1
+          },
+          "imageField": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^[A-Za-z][A-Za-z0-9_]{0,63}$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "displayFields",
+          "imageField"
+        ],
+        "additionalProperties": false
+      },
+      "events": {
+        "place-select": {
+          "placeId": "place-id"
+        }
+      }
+    },
+    {
+      "kind": "result-count",
+      "version": 1,
+      "name": "件数",
+      "category": "一覧",
+      "placement": "canvas",
+      "priority": "A",
+      "status": "contract-defined",
+      "bindingModes": [
+        "collection"
+      ],
+      "presentations": [
+        "inline"
+      ],
+      "propsSchema": {
+        "type": "object",
+        "properties": {
+          "suffix": {
+            "type": "string",
+            "maxLength": 80,
+            "default": "件のスポット"
+          },
+          "showTotal": {
+            "type": "boolean",
+            "default": true
+          }
+        },
+        "required": [
+          "suffix",
+          "showTotal"
+        ],
+        "additionalProperties": false
+      },
+      "events": {}
+    },
+    {
+      "kind": "place-detail",
+      "version": 1,
+      "name": "地点詳細",
+      "category": "地点詳細",
+      "placement": "canvas",
+      "priority": "A",
+      "status": "contract-defined",
+      "bindingModes": [
+        "selection",
+        "record"
+      ],
+      "presentations": [
+        "panel",
+        "popover",
+        "bottom-sheet"
+      ],
+      "propsSchema": {
+        "type": "object",
+        "properties": {
+          "displayFields": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^[A-Za-z][A-Za-z0-9_]{0,63}$"
+            },
+            "maxItems": 50,
+            "minItems": 1
+          },
+          "imageField": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^[A-Za-z][A-Za-z0-9_]{0,63}$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "closable": {
+            "type": "boolean",
+            "default": true
+          },
+          "emptyLabel": {
+            "type": "string",
+            "maxLength": 160,
+            "default": "地点を選択してください"
+          }
+        },
+        "required": [
+          "displayFields",
+          "imageField",
+          "closable",
+          "emptyLabel"
+        ],
+        "additionalProperties": false
+      },
+      "events": {
+        "close": {},
+        "link-open": {
+          "url": "url"
+        }
+      }
+    },
+    {
+      "kind": "photo-gallery",
+      "version": 1,
+      "name": "写真表示・ギャラリー",
+      "category": "地点詳細",
+      "placement": "canvas",
+      "priority": "B",
+      "status": "contract-defined",
+      "bindingModes": [
+        "selection",
+        "record"
+      ],
+      "presentations": [
+        "inline"
+      ],
+      "propsSchema": {
+        "type": "object",
+        "properties": {
+          "imageFields": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^[A-Za-z][A-Za-z0-9_]{0,63}$"
+            },
+            "maxItems": 50,
+            "minItems": 1
+          },
+          "altField": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9_]{0,63}$"
+          },
+          "fit": {
+            "enum": [
+              "cover",
+              "contain"
+            ],
+            "default": "cover"
+          }
+        },
+        "required": [
+          "imageFields",
+          "altField",
+          "fit"
+        ],
+        "additionalProperties": false
+      },
+      "events": {}
+    },
+    {
+      "kind": "external-link",
+      "version": 1,
+      "name": "外部リンク",
+      "category": "地点詳細",
+      "placement": "canvas",
+      "priority": "A",
+      "status": "contract-defined",
+      "bindingModes": [
+        "selection",
+        "record"
+      ],
+      "presentations": [
+        "inline"
+      ],
+      "propsSchema": {
+        "type": "object",
+        "properties": {
+          "label": {
+            "type": "string",
+            "maxLength": 80,
+            "default": "Webサイトを見る"
+          },
+          "url": {
+            "type": "string",
+            "maxLength": 2048,
+            "default": ""
+          },
+          "urlField": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^[A-Za-z][A-Za-z0-9_]{0,63}$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "newTab": {
+            "type": "boolean",
+            "default": true
+          }
+        },
+        "required": [
+          "label",
+          "url",
+          "urlField",
+          "newTab"
+        ],
+        "additionalProperties": false
+      },
+      "events": {
+        "activate": {}
+      }
+    },
+    {
+      "kind": "app-header",
+      "version": 1,
+      "name": "ヘッダー",
+      "category": "ナビゲーション",
+      "placement": "canvas",
+      "priority": "A",
+      "status": "contract-defined",
+      "bindingModes": [],
+      "presentations": [
+        "inline"
+      ],
+      "propsSchema": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "maxLength": 160,
+            "default": "わたしの地図"
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 500,
+            "default": ""
+          }
+        },
+        "required": [
+          "title",
+          "description"
+        ],
+        "additionalProperties": false
+      },
+      "events": {}
+    },
+    {
+      "kind": "screen-tabs",
+      "version": 1,
+      "name": "画面タブ",
+      "category": "ナビゲーション",
+      "placement": "canvas",
+      "priority": "B",
+      "status": "contract-defined",
+      "bindingModes": [],
+      "presentations": [
+        "inline"
+      ],
+      "propsSchema": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "label": {
+                  "type": "string",
+                  "maxLength": 80,
+                  "default": ""
+                },
+                "screenId": {
+                  "type": "string",
+                  "pattern": "^[a-z][a-z0-9-]{0,63}$"
+                }
+              },
+              "required": [
+                "label",
+                "screenId"
+              ],
+              "additionalProperties": false
+            },
+            "maxItems": 8,
+            "minItems": 1
+          }
+        },
+        "required": [
+          "items"
+        ],
+        "additionalProperties": false
+      },
+      "events": {
+        "navigate": {
+          "screenId": "screen-id"
+        }
+      }
+    },
+    {
+      "kind": "side-menu",
+      "version": 1,
+      "name": "サイドメニュー",
+      "category": "ナビゲーション",
+      "placement": "canvas",
+      "priority": "B",
+      "status": "contract-defined",
+      "bindingModes": [],
+      "presentations": [
+        "drawer"
+      ],
+      "propsSchema": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "label": {
+                  "type": "string",
+                  "maxLength": 80,
+                  "default": ""
+                },
+                "screenId": {
+                  "type": "string",
+                  "pattern": "^[a-z][a-z0-9-]{0,63}$"
+                }
+              },
+              "required": [
+                "label",
+                "screenId"
+              ],
+              "additionalProperties": false
+            },
+            "maxItems": 8,
+            "minItems": 1
+          }
+        },
+        "required": [
+          "items"
+        ],
+        "additionalProperties": false
+      },
+      "events": {
+        "navigate": {
+          "screenId": "screen-id"
+        },
+        "close": {}
+      }
+    },
+    {
+      "kind": "bottom-navigation",
+      "version": 1,
+      "name": "下部ナビ",
+      "category": "ナビゲーション",
+      "placement": "canvas",
+      "priority": "B",
+      "status": "contract-defined",
+      "bindingModes": [],
+      "presentations": [
+        "inline"
+      ],
+      "propsSchema": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "label": {
+                  "type": "string",
+                  "maxLength": 80,
+                  "default": ""
+                },
+                "screenId": {
+                  "type": "string",
+                  "pattern": "^[a-z][a-z0-9-]{0,63}$"
+                }
+              },
+              "required": [
+                "label",
+                "screenId"
+              ],
+              "additionalProperties": false
+            },
+            "maxItems": 8,
+            "minItems": 1
+          }
+        },
+        "required": [
+          "items"
+        ],
+        "additionalProperties": false
+      },
+      "events": {
+        "navigate": {
+          "screenId": "screen-id"
+        }
+      }
+    },
+    {
+      "kind": "back-button",
+      "version": 1,
+      "name": "戻る",
+      "category": "ナビゲーション",
+      "placement": "canvas",
+      "priority": "B",
+      "status": "contract-defined",
+      "bindingModes": [],
+      "presentations": [
+        "inline"
+      ],
+      "propsSchema": {
+        "type": "object",
+        "properties": {
+          "label": {
+            "type": "string",
+            "maxLength": 80,
+            "default": "戻る"
+          }
+        },
+        "required": [
+          "label"
+        ],
+        "additionalProperties": false
+      },
+      "events": {
+        "activate": {}
+      }
+    },
+    {
+      "kind": "button",
+      "version": 1,
+      "name": "ボタン",
+      "category": "操作",
+      "placement": "canvas",
+      "priority": "A",
+      "status": "contract-defined",
+      "bindingModes": [],
+      "presentations": [
+        "inline"
+      ],
+      "propsSchema": {
+        "type": "object",
+        "properties": {
+          "label": {
+            "type": "string",
+            "maxLength": 80,
+            "default": "ボタン"
+          },
+          "variant": {
+            "enum": [
+              "filled",
+              "outline",
+              "ghost"
+            ],
+            "default": "filled"
+          },
+          "disabled": {
+            "type": "boolean",
+            "default": false
+          }
+        },
+        "required": [
+          "label",
+          "variant",
+          "disabled"
+        ],
+        "additionalProperties": false
+      },
+      "events": {
+        "activate": {}
+      }
+    },
+    {
+      "kind": "icon-button",
+      "version": 1,
+      "name": "アイコンボタン",
+      "category": "操作",
+      "placement": "canvas",
+      "priority": "B",
+      "status": "contract-defined",
+      "bindingModes": [],
+      "presentations": [
+        "inline"
+      ],
+      "propsSchema": {
+        "type": "object",
+        "properties": {
+          "icon": {
+            "type": "string",
+            "maxLength": 80,
+            "default": "map-pin"
+          },
+          "ariaLabel": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80
+          },
+          "disabled": {
+            "type": "boolean",
+            "default": false
+          }
+        },
+        "required": [
+          "icon",
+          "ariaLabel",
+          "disabled"
+        ],
+        "additionalProperties": false
+      },
+      "events": {
+        "activate": {}
+      }
+    },
+    {
+      "kind": "floating-action",
+      "version": 1,
+      "name": "フローティング操作",
+      "category": "操作",
+      "placement": "canvas",
+      "priority": "B",
+      "status": "contract-defined",
+      "bindingModes": [],
+      "presentations": [
+        "inline"
+      ],
+      "propsSchema": {
+        "type": "object",
+        "properties": {
+          "icon": {
+            "type": "string",
+            "maxLength": 80,
+            "default": "list"
+          },
+          "label": {
+            "type": "string",
+            "maxLength": 80,
+            "default": "一覧"
+          }
+        },
+        "required": [
+          "icon",
+          "label"
+        ],
+        "additionalProperties": false
+      },
+      "events": {
+        "activate": {}
+      }
+    },
+    {
+      "kind": "text",
+      "version": 1,
+      "name": "見出し・本文",
+      "category": "情報表示",
+      "placement": "canvas",
+      "priority": "A",
+      "status": "contract-defined",
+      "bindingModes": [
+        "selection",
+        "record"
+      ],
+      "presentations": [
+        "inline"
+      ],
+      "propsSchema": {
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string",
+            "maxLength": 4000,
+            "default": "テキスト"
+          },
+          "field": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^[A-Za-z][A-Za-z0-9_]{0,63}$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "level": {
+            "enum": [
+              "body",
+              "h1",
+              "h2",
+              "caption"
+            ],
+            "default": "body"
+          }
+        },
+        "required": [
+          "text",
+          "field",
+          "level"
+        ],
+        "additionalProperties": false
+      },
+      "events": {}
+    },
+    {
+      "kind": "image",
+      "version": 1,
+      "name": "画像",
+      "category": "情報表示",
+      "placement": "canvas",
+      "priority": "B",
+      "status": "contract-defined",
+      "bindingModes": [
+        "selection",
+        "record"
+      ],
+      "presentations": [
+        "inline"
+      ],
+      "propsSchema": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string",
+            "maxLength": 2048,
+            "default": ""
+          },
+          "field": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^[A-Za-z][A-Za-z0-9_]{0,63}$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "alt": {
+            "type": "string",
+            "maxLength": 500,
+            "default": ""
+          },
+          "fit": {
+            "enum": [
+              "cover",
+              "contain"
+            ],
+            "default": "cover"
+          }
+        },
+        "required": [
+          "url",
+          "field",
+          "alt",
+          "fit"
+        ],
+        "additionalProperties": false
+      },
+      "events": {}
+    },
+    {
+      "kind": "icon",
+      "version": 1,
+      "name": "アイコン",
+      "category": "情報表示",
+      "placement": "canvas",
+      "priority": "B",
+      "status": "contract-defined",
+      "bindingModes": [],
+      "presentations": [
+        "inline"
+      ],
+      "propsSchema": {
+        "type": "object",
+        "properties": {
+          "icon": {
+            "type": "string",
+            "maxLength": 80,
+            "default": "map-pin"
+          },
+          "label": {
+            "type": "string",
+            "maxLength": 80,
+            "default": ""
+          }
+        },
+        "required": [
+          "icon",
+          "label"
+        ],
+        "additionalProperties": false
+      },
+      "events": {}
+    },
+    {
+      "kind": "badge",
+      "version": 1,
+      "name": "バッジ",
+      "category": "情報表示",
+      "placement": "canvas",
+      "priority": "B",
+      "status": "contract-defined",
+      "bindingModes": [
+        "selection",
+        "record"
+      ],
+      "presentations": [
+        "inline"
+      ],
+      "propsSchema": {
+        "type": "object",
+        "properties": {
+          "label": {
+            "type": "string",
+            "maxLength": 80,
+            "default": "カテゴリ"
+          },
+          "field": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^[A-Za-z][A-Za-z0-9_]{0,63}$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "label",
+          "field"
+        ],
+        "additionalProperties": false
+      },
+      "events": {}
+    },
+    {
+      "kind": "container",
+      "version": 1,
+      "name": "コンテナー・グループ",
+      "category": "レイアウト",
+      "placement": "canvas",
+      "priority": "A",
+      "status": "contract-defined",
+      "bindingModes": [],
+      "presentations": [
+        "inline"
+      ],
+      "propsSchema": {
+        "type": "object",
+        "properties": {
+          "clip": {
+            "type": "boolean",
+            "default": false
+          }
+        },
+        "required": [
+          "clip"
+        ],
+        "additionalProperties": false
+      },
+      "events": {}
+    },
+    {
+      "kind": "divider",
+      "version": 1,
+      "name": "区切り・余白",
+      "category": "レイアウト",
+      "placement": "canvas",
+      "priority": "B",
+      "status": "contract-defined",
+      "bindingModes": [],
+      "presentations": [
+        "inline"
+      ],
+      "propsSchema": {
+        "type": "object",
+        "properties": {
+          "axis": {
+            "enum": [
+              "horizontal",
+              "vertical"
+            ],
+            "default": "horizontal"
+          },
+          "line": {
+            "type": "boolean",
+            "default": true
+          }
+        },
+        "required": [
+          "axis",
+          "line"
+        ],
+        "additionalProperties": false
+      },
+      "events": {}
+    },
+    {
+      "kind": "drawer",
+      "version": 1,
+      "name": "ドロワー",
+      "category": "レイアウト",
+      "placement": "canvas",
+      "priority": "B",
+      "status": "contract-defined",
+      "bindingModes": [],
+      "presentations": [
+        "drawer"
+      ],
+      "propsSchema": {
+        "type": "object",
+        "properties": {
+          "closable": {
+            "type": "boolean",
+            "default": true
+          }
+        },
+        "required": [
+          "closable"
+        ],
+        "additionalProperties": false
+      },
+      "events": {
+        "close": {}
+      }
+    },
+    {
+      "kind": "dialog",
+      "version": 1,
+      "name": "ダイアログ",
+      "category": "レイアウト",
+      "placement": "canvas",
+      "priority": "B",
+      "status": "contract-defined",
+      "bindingModes": [],
+      "presentations": [
+        "dialog"
+      ],
+      "propsSchema": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "maxLength": 160,
+            "default": "確認"
+          },
+          "closable": {
+            "type": "boolean",
+            "default": true
+          }
+        },
+        "required": [
+          "title",
+          "closable"
+        ],
+        "additionalProperties": false
+      },
+      "events": {
+        "close": {}
+      }
+    },
+    {
+      "kind": "loading-state",
+      "version": 1,
+      "name": "読み込み中",
+      "category": "状態の通知",
+      "placement": "canvas",
+      "priority": "A",
+      "status": "contract-defined",
+      "bindingModes": [
+        "collection"
+      ],
+      "presentations": [
+        "inline"
+      ],
+      "propsSchema": {
+        "type": "object",
+        "properties": {
+          "label": {
+            "type": "string",
+            "maxLength": 160,
+            "default": "読み込み中"
+          }
+        },
+        "required": [
+          "label"
+        ],
+        "additionalProperties": false
+      },
+      "events": {}
+    },
+    {
+      "kind": "empty-state",
+      "version": 1,
+      "name": "データなし・検索0件",
+      "category": "状態の通知",
+      "placement": "canvas",
+      "priority": "A",
+      "status": "contract-defined",
+      "bindingModes": [
+        "collection"
+      ],
+      "presentations": [
+        "inline"
+      ],
+      "propsSchema": {
+        "type": "object",
+        "properties": {
+          "label": {
+            "type": "string",
+            "maxLength": 160,
+            "default": "地点がありません"
+          },
+          "resetLabel": {
+            "type": "string",
+            "maxLength": 80,
+            "default": "条件をクリア"
+          }
+        },
+        "required": [
+          "label",
+          "resetLabel"
+        ],
+        "additionalProperties": false
+      },
+      "events": {
+        "reset": {}
+      }
+    },
+    {
+      "kind": "error-state",
+      "version": 1,
+      "name": "失敗・再試行",
+      "category": "状態の通知",
+      "placement": "canvas",
+      "priority": "A",
+      "status": "contract-defined",
+      "bindingModes": [
+        "collection"
+      ],
+      "presentations": [
+        "inline"
+      ],
+      "propsSchema": {
+        "type": "object",
+        "properties": {
+          "label": {
+            "type": "string",
+            "maxLength": 160,
+            "default": "データを取得できませんでした"
+          },
+          "retryLabel": {
+            "type": "string",
+            "maxLength": 80,
+            "default": "再試行"
+          }
+        },
+        "required": [
+          "label",
+          "retryLabel"
+        ],
+        "additionalProperties": false
+      },
+      "events": {
+        "retry": {}
+      }
+    },
+    {
+      "kind": "toast",
+      "version": 1,
+      "name": "操作結果の通知",
+      "category": "状態の通知",
+      "placement": "canvas",
+      "priority": "B",
+      "status": "contract-defined",
+      "bindingModes": [],
+      "presentations": [
+        "inline"
+      ],
+      "propsSchema": {
+        "type": "object",
+        "properties": {
+          "durationMs": {
+            "type": "number",
+            "minimum": 1000,
+            "maximum": 10000,
+            "default": 4000
+          },
+          "position": {
+            "enum": [
+              "top-left",
+              "top-right",
+              "bottom-left",
+              "bottom-right"
+            ],
+            "default": "top-right"
+          }
+        },
+        "required": [
+          "durationMs",
+          "position"
+        ],
+        "additionalProperties": false
+      },
+      "events": {}
+    }
+  ]
+}

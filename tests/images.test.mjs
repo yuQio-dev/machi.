@@ -11,12 +11,13 @@ const references = JSON.parse(await readFile(new URL('image-references.json', ro
 const item = (name, image = '') => ({ name, image, lat: 35.98, lon: 140.15 });
 
 test('新しく指定された写真を解決し、未配置の画像と空欄を区別する', () => {
-  for (const name of ['芋千', '（閉店）そば処ふしみ', 'シャンボール', '観音寺', '金剛院', '井岡神社', '浄妙寺(天台宗)', 'ヤマイチ味噌']) {
+  for (const name of ['芋千', '（閉店）そば処ふしみ', 'シャンボール', '観音寺', '金剛院', '井岡神社', '浄妙寺(天台宗)', 'ヤマイチ味噌', 'Dining いごこち屋', 'DIPIKA']) {
     const spot = references.items.find(spot => spot.name === name);
     assert.ok(spot && M.imageUrl(spot.image), name);
   }
   const missing = references.items.filter(spot => spot.image && !M.imageUrl(spot.image));
-  assert.deepEqual(missing.map(spot => spot.name), ['Dining いごこち屋', 'DIPIKA']);
+  assert.deepEqual(missing.map(spot => spot.name), []);
+  assert.equal(M.imageUrl('未配置の写真.jpg'), '');
   assert.equal(M.imageUrl('牛久駅.jpeg'), 'images/' + encodeURIComponent('牛久駅.jpeg'));
   assert.equal(M.imageUrl('天満屋酒店.jpg'), 'images/' + encodeURIComponent('天満屋酒店.jpg'));
   const kongo = references.items.find(spot => spot.name === '金剛院');

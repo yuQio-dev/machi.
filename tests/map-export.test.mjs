@@ -1,0 +1,21 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
+import { loadSource } from './load-builder.mjs';
+const { mapHtml } = await loadSource('exportMap');
+const sample = JSON.parse(await readFile(new URL('../src/builder/contracts/ushiku-demo.machi.json', import.meta.url), 'utf8'));
+test('downloaded HTML keeps design and public fields, excludes internal data and escapes script delimiters', () => {
+  const design = structuredClone(sample);
+  design.title = '<script>title</script>';
+  design.datasets[0].source.url = 'https://private.invalid/source';
+  design.datasets[0].columns.push({ key:'secret',type:'string',label:'内部',visibility:'internal' });
+  design.datasets[0].rows[0].values.secret = 'PRIVATE-SENTINEL';
+  design.datasets[0].rows[0].values.name = '</script><script>alert(1)</script>';
+  const html = mapHtml(design, 'window.example="</script>";', 'body{margin:0}');
+  assert.ok(!html.includes('PRIVATE-SENTINEL'));
+  assert.ok(!html.includes('private.invalid'));
+  assert.equal((html.match(/<\/script>/g)||[]).length, 2);
+  const data = JSON.parse(html.match(/type="application\/json">(.*?)<\/script>/s)[1]);
+  assert.equal(data.datasets[0].rows[0].values.name, design.datasets[0].rows[0].values.name);
+  assert.deepEqual(data.screens, design.screens);
+});

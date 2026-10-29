@@ -1,0 +1,8 @@
+.canvas-component.editable[data-inline-text]::after { pointer-events: none; }
+.inline-text-display { display: block; min-width: 0; cursor: text; white-space: inherit; overflow: inherit; text-overflow: inherit; }
+.inline-text-display.is-empty { opacity: .55; }
+.inline-text-display:focus-visible { outline: 2px solid #7952b3; outline-offset: 2px; }
+.inline-text-input { display: block; width: 100%; min-width: 0; margin: 0; padding: 0; border: 0; border-radius: 0; background: transparent; color: inherit; font: inherit; letter-spacing: inherit; line-height: inherit; outline: none; cursor: text; }
+.inline-text-input:focus { box-shadow: inset 0 -2px #7952b3; }
+.text-preview .inline-text-display, .text-preview textarea.inline-text-input { width: 100%; height: 100%; white-space: pre-wrap; overflow-wrap: anywhere; }
+.text-preview textarea.inline-text-input { resize: none; overflow: auto; }

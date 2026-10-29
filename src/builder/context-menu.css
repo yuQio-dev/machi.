@@ -1,0 +1,21 @@
+.editor-context-menu{position:fixed;z-index:11000;width:230px;max-width:calc(100vw - 16px);max-height:calc(100dvh - 16px);overflow:auto;padding:6px;background:#fff;border:1px solid #e4daed;border-radius:12px;box-shadow:0 10px 36px #30204026;color:#392e47}
+.context-menu-title{font-size:11px;color:#897398;padding:8px 10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;border-bottom:1px solid #f0e9f6;margin-bottom:4px}
+.editor-context-menu button{display:block;width:100%;text-align:left;padding:10px 12px;min-height:38px;border:0;border-radius:6px;background:transparent;color:inherit;font-size:13px}
+.editor-context-menu button:hover,.editor-context-menu button:focus{background:#f2eafa;outline:2px solid #7952b3;outline-offset:-2px}
+.editor-context-menu button[aria-disabled=true]{color:#aaa0b2;cursor:default}
+.editor-context-menu button.danger{color:#ad354d;border-top:1px solid #eee6f3;margin-top:4px;border-radius:0 0 6px 6px}
+.component-color-dialog{width:min(410px,calc(100vw - 32px));max-height:calc(100dvh - 40px);overflow:auto;padding:24px;border:1px solid #dfd3eb;border-radius:16px;background:#fff;color:#392e47;box-shadow:0 20px 60px #30204033}
+.component-color-dialog::backdrop{background:#24183166}
+.component-color-dialog h2{margin:0 0 8px;font-size:20px}
+.component-color-dialog p{font-size:12px;line-height:1.7;color:#7c6a8c}
+.component-color-dialog fieldset{border:0;border-top:1px solid #eee6f3;margin:16px 0 0;padding:12px 0 0;min-width:0}
+.component-color-dialog legend{padding:0 8px 0 0;font-size:13px;font-weight:600}
+.color-inputs{display:flex;gap:10px;align-items:center}
+.color-inputs input[type=color]{width:46px;height:36px;border:1px solid #e1d5ec;border-radius:6px;padding:3px;background:#fff;cursor:pointer}
+.color-inputs input:not([type=color]){width:130px;padding:8px 10px;border:1px solid #e1d5ec;border-radius:6px;color:#514062;font-family:monospace}
+.color-inputs input[aria-invalid=true]{border-color:#ad354d}
+.color-swatches{display:flex;gap:10px;margin-top:10px;flex-wrap:wrap}
+.color-swatches button{width:28px;height:28px;border:1px solid #b9a9c7;border-radius:50%;padding:0}
+.component-color-dialog .dialog-actions>button{padding:9px 14px;border:1px solid #dcd0e7;border-radius:7px;background:#fff;color:#655176;font-size:13px}
+.canvas-component[data-custom-background]>:first-child,.canvas-component[data-custom-background] .place-card{background:inherit}
+.canvas-component[data-custom-color]>:first-child,.canvas-component[data-custom-color] :is(.panel-heading,.place-card,.place-card-copy small,.detail-field span,.detail-field small,.count-preview small,.app-header-preview small,.search-preview input,.empty-preview,.category-preview button){color:inherit}

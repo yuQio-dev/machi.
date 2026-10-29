@@ -29,6 +29,10 @@ jobs:
         uses: actions/setup-node@v7
         with:
           node-version: '24'
+      - name: Install locked dependencies
+        run: npm ci
+      - name: Build sketch editor
+        run: npm run build:sketch
       - name: Build image assets and Apps Script HTML
         run: npm run build
       - name: Test API schema and map filters
@@ -38,6 +42,8 @@ jobs:
           node --check dist/app.js
           node --check dist/model.js
           node --check dist/config.js
+          node --check dist/builder/app.mjs
+          node --check dist/builder/core.mjs
       - name: Configure Pages
         uses: actions/configure-pages@v6
       - name: Upload map assets

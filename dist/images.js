@@ -7,6 +7,8 @@ globalThis.MapImages = {
     "checkedOn": "2026-10-15"
   },
   "files": {
+    "DIPIKA.jpg": "images/DIPIKA.jpg",
+    "いごこち屋.jpg": "images/%E3%81%84%E3%81%94%E3%81%93%E3%81%A1%E5%B1%8B.jpg",
     "そば処ふしみ.jpg": "images/%E3%81%9D%E3%81%B0%E5%87%A6%E3%81%B5%E3%81%97%E3%81%BF.jpg",
     "ふらんす食堂.jpg": "images/%E3%81%B5%E3%82%89%E3%82%93%E3%81%99%E9%A3%9F%E5%A0%82.jpg",
     "シャンボール.jpg": "images/%E3%82%B7%E3%83%A3%E3%83%B3%E3%83%9C%E3%83%BC%E3%83%AB.jpg",
