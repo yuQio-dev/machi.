@@ -6,3 +6,6 @@
 node_modules/
 *.tar.gz
 *.tar
+
+dist/
+machi-refactor-backup-*/

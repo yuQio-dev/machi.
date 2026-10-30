@@ -3,7 +3,7 @@ import vm from 'node:vm';
 
 const root = new URL('../', import.meta.url);
 const context = vm.createContext({ console, Buffer, Uint8Array, ArrayBuffer, TextDecoder, TextEncoder });
-vm.runInContext(await readFile(new URL('dist/builder/vendor/xlsx.full.min.js', root), 'utf8'), context);
+vm.runInContext(await readFile(new URL('src/vendor/xlsx.full.min.js', root), 'utf8'), context);
 const XLSX = context.XLSX;
 const output = new URL('examples/import/', root);
 await mkdir(output, { recursive: true });

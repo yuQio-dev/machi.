@@ -1,14 +1,13 @@
 {
-  "name": "ushiku-map",
+  "name": "machi",
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "node scripts/serve.mjs",
-    "build": "node scripts/build-apps-script.mjs",
-    "build:samples": "node scripts/build-builder-samples.mjs",
-    "dev:sketch": "node scripts/prepare-sketch.mjs && vite --config src/builder/vite.config.ts",
-    "build:sketch": "node scripts/prepare-sketch.mjs && tsc -p src/builder/tsconfig.json && vite build --config src/builder/vite.config.ts && node scripts/build-map-viewer.mjs",
-    "test": "node --test tests/*.test.mjs"
+    "dev": "vite --config src/editor/vite.config.ts",
+    "build": "tsc -p src/editor/tsconfig.json && vite build --config src/editor/vite.config.ts && node scripts/build-viewer.mjs && node scripts/build-public-files.mjs",
+    "preview": "node scripts/serve.mjs",
+    "test": "node --test tests/*.test.mjs",
+    "build:examples": "node scripts/create-generic-map-examples.mjs && node scripts/build-import-examples.mjs && node scripts/create-editor-evaluation.mjs"
   },
   "dependencies": {
     "ajv": "8.20.0",

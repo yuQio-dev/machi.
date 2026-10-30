@@ -1,9 +1,9 @@
 import { readFile, mkdir, writeFile } from 'node:fs/promises';
-import { loadSource } from '../tests/load-builder.mjs';
+import { loadSource } from '../tests/load-editor.mjs';
 
 const runtime = await loadSource('runtime');
 const model = await loadSource('model');
-const source = JSON.parse(await readFile(new URL('../src/builder/contracts/ushiku-demo.machi.json', import.meta.url), 'utf8'));
+const source = JSON.parse(await readFile(new URL('../src/editor/contracts/map-sample.machi.json', import.meta.url), 'utf8'));
 const rows = Array.from({ length: 12 }, (_, i) => ({
   id: `sample-${i + 1}`,
   values: { name: `サンプル地点 ${String(i + 1).padStart(2, '0')}`, lat: 35.676 + Math.floor(i / 4) * .003, lon: 139.760 + (i % 4) * .003,
@@ -17,7 +17,13 @@ const csv = [csvFields.join(','), ...rows.map(row => csvFields.map(key => `"${St
 await writeFile(new URL('sample-data.csv', output), '\ufeff' + csv);
 
 for (const [name, label] of [['map', '地図中心型'], ['list', '一覧併設型'], ['guide', '案内重視型']]) {
-  const design = JSON.parse(JSON.stringify(source).replaceAll('"ushiku"', '"sample"'));
+  const design = structuredClone(source);
+  for (const screen of design.screens) for (const component of screen.components) {
+    if (component.binding?.datasetId === 'places') component.binding.datasetId = 'sample';
+    for (const interaction of component.interactions) for (const action of interaction.actions) {
+      if (action.datasetId === 'places') action.datasetId = 'sample';
+    }
+  }
   design.id = `generic-${name}`;
   design.title = `${label}の完成例`;
   design.description = '表示検証用の架空データです。実在施設の案内ではありません。';

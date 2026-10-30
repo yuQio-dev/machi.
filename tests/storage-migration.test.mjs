@@ -1,9 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
-import { loadSource } from './load-builder.mjs';
+import { loadSource } from './load-editor.mjs';
 const storage = await loadSource('storage'), model = await loadSource('model');
-const legacy = JSON.parse(await readFile(new URL('../src/builder/contracts/ushiku-demo.v1.machi.json', import.meta.url),'utf8'));
+const legacy = JSON.parse(await readFile(new URL('../src/editor/contracts/map-sample.v1.machi.json', import.meta.url),'utf8'));
 
 // Transactional adapter for failure injection, not a replacement for browser persistence checks.
 function database(initial, failBackup = false) {

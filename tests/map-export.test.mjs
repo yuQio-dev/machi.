@@ -1,9 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
-import { loadSource } from './load-builder.mjs';
+import { loadSource } from './load-editor.mjs';
 const { mapHtml } = await loadSource('exportMap');
-const sample = JSON.parse(await readFile(new URL('../src/builder/contracts/ushiku-demo.machi.json', import.meta.url), 'utf8'));
+const sample = JSON.parse(await readFile(new URL('../src/editor/contracts/map-sample.machi.json', import.meta.url), 'utf8'));
 test('downloaded HTML keeps design and public fields, excludes internal data and escapes script delimiters', () => {
   const design = structuredClone(sample);
   design.title = '<script>title</script>';

@@ -1,4 +1,4 @@
-name: Test and deploy map to GitHub Pages
+name: Test and deploy machi. to GitHub Pages
 
 on:
   push:
@@ -21,35 +21,22 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - name: Check out source
-        uses: actions/checkout@v7
+      - uses: actions/checkout@v7
         with:
           persist-credentials: false
-      - name: Set up Node.js
-        uses: actions/setup-node@v7
+      - uses: actions/setup-node@v7
         with:
           node-version: '24'
       - name: Install locked dependencies
         run: npm ci
-      - name: Build sketch editor
-        run: npm run build:sketch
-      - name: Build image assets and Apps Script HTML
+      - name: Build machi. editor and viewer
         run: npm run build
-      - name: Test API schema and map filters
+      - name: Test machi.
         run: npm test
-      - name: Check browser JavaScript syntax
-        run: |
-          node --check dist/app.js
-          node --check dist/model.js
-          node --check dist/config.js
-          node --check dist/builder/app.mjs
-          node --check dist/builder/core.mjs
-      - name: Configure Pages
-        uses: actions/configure-pages@v6
-      - name: Upload map assets
-        uses: actions/upload-pages-artifact@v5
+      - uses: actions/configure-pages@v6
+      - uses: actions/upload-pages-artifact@v5
         with:
           path: dist
-      - name: Deploy to Pages
+      - name: Deploy machi.
         id: deployment
         uses: actions/deploy-pages@v5

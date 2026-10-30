@@ -1,7 +1,7 @@
 import { readFile, mkdir, writeFile } from 'node:fs/promises';
-import { loadSource } from '../tests/load-builder.mjs';
+import { loadSource } from '../tests/load-editor.mjs';
 const runtime=await loadSource('runtime'),model=await loadSource('model'),commands=await loadSource('commands');
-const design=JSON.parse(await readFile(new URL('../src/builder/contracts/ushiku-demo.machi.json',import.meta.url),'utf8'));
+const design=JSON.parse(await readFile(new URL('../src/editor/contracts/map-sample.machi.json',import.meta.url),'utf8'));
 design.id='editor-evaluation'; design.title='machi. 操作評価用';
 const main=design.screens[0];main.components.push(runtime.createComponent('text',design,main));
 for(const device of ['desktop','mobile'])main.components.forEach((component,index)=>component.layouts[device].zIndex=index+1);

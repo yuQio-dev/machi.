@@ -4,7 +4,7 @@
   "schemaVersion": 2,
   "id": "editor-evaluation",
   "title": "machi. 操作評価用",
-  "description": "設計とAI編集の往復を説明する例。観光情報の正確性の検証ではありません。",
+  "description": "操作確認用の架空データです。実在する施設の案内ではありません。",
   "locale": "ja",
   "theme": {
     "accent": "#7952b3",
@@ -17,12 +17,12 @@
   "initialScreenId": "main",
   "datasets": [
     {
-      "id": "ushiku",
-      "name": "牛久市のサンプル3地点",
+      "id": "places",
+      "name": "架空のサンプル地点",
       "columns": [
         {
           "key": "name",
-          "label": "スポット名",
+          "label": "地点名",
           "type": "string",
           "visibility": "public"
         },
@@ -81,42 +81,42 @@
       },
       "rows": [
         {
-          "id": "ushiku-1",
+          "id": "sample-1",
           "values": {
-            "name": "牛久シャトー",
-            "lat": 35.97802056,
-            "lon": 140.1473454,
-            "location": "茨城県牛久市中央3-20-1",
-            "category": "ワイン醸造所",
-            "description": "明治時代に誕生した日本初の本格的ワイン醸造所で、赤レンガ造りの美しい景観からロケ地としても人気のスポット。",
-            "image": "https://yuqio-dev.github.io/ushiku-map/images/%E7%89%9B%E4%B9%85%E3%82%B7%E3%83%A3%E3%83%88%E3%83%BC.jpg",
-            "sourceUrl": "https://www.ushikukankou.com/%E7%89%9B%E4%B9%85%E3%82%B7%E3%83%A3%E3%83%88%E3%83%BC/"
+            "name": "サンプル公園",
+            "lat": 35.676,
+            "lon": 139.76,
+            "location": "サンプル区画 1",
+            "category": "公園",
+            "description": "架空の地点 1 の説明です。",
+            "image": "",
+            "sourceUrl": ""
           }
         },
         {
-          "id": "ushiku-2",
+          "id": "sample-2",
           "values": {
-            "name": "手作処かっぱ本舗",
-            "lat": 35.98645215,
-            "lon": 140.1398715,
-            "location": "茨城県牛久市田宮町45-10",
-            "category": "お土産やさん",
-            "description": "牛久沼のかっぱ伝説にちなんだお店で、牛久の名産品や手作りのせんべい・団子を楽しめる。",
-            "image": "https://yuqio-dev.github.io/ushiku-map/images/%E6%89%8B%E4%BD%9C%E5%87%A6%E3%81%8B%E3%81%A3%E3%81%B1%E6%9C%AC%E8%88%97.jpg",
-            "sourceUrl": "https://ushikukankou.com/kappahonpo.htm"
+            "name": "サンプル図書館",
+            "lat": 35.679,
+            "lon": 139.76299999999998,
+            "location": "サンプル区画 2",
+            "category": "施設",
+            "description": "架空の地点 2 の説明です。",
+            "image": "",
+            "sourceUrl": ""
           }
         },
         {
-          "id": "ushiku-3",
+          "id": "sample-3",
           "values": {
-            "name": "牛久駅（JR常磐線）",
-            "lat": 35.97575825,
-            "lon": 140.141044,
-            "location": "茨城県牛久市牛久町282",
-            "category": "交通",
-            "description": "茨城県牛久市牛久町にある東日本旅客鉄道（JR東日本）常磐線の駅である。",
-            "image": "https://yuqio-dev.github.io/ushiku-map/images/%E7%89%9B%E4%B9%85%E9%A7%85.jpeg",
-            "sourceUrl": "https://escado.jp/ibarakijiman/"
+            "name": "サンプル広場",
+            "lat": 35.682,
+            "lon": 139.766,
+            "location": "サンプル区画 3",
+            "category": "公園",
+            "description": "架空の地点 3 の説明です。",
+            "image": "",
+            "sourceUrl": ""
           }
         }
       ],
@@ -124,7 +124,7 @@
       "filterMatch": "all",
       "source": {
         "kind": "inline",
-        "label": "既存サンプルCSVの先頭3地点。内容の正確性は未検証。",
+        "label": "架空の操作確認用データ",
         "url": ""
       }
     }
@@ -151,8 +151,8 @@
           "name": "ヘッダー",
           "parentId": null,
           "props": {
-            "title": "うしくスポットマップ",
-            "description": "牛久市の地点データを使う設計例"
+            "title": "サンプル地図",
+            "description": "地点やカテゴリを自由に差し替えられます"
           },
           "style": {},
           "binding": null,
@@ -203,7 +203,7 @@
           },
           "style": {},
           "binding": {
-            "datasetId": "ushiku",
+            "datasetId": "places",
             "mode": "collection"
           },
           "interactions": [
@@ -212,7 +212,7 @@
               "actions": [
                 {
                   "type": "set-query",
-                  "datasetId": "ushiku",
+                  "datasetId": "places",
                   "value": {
                     "source": "event",
                     "key": "value"
@@ -225,7 +225,7 @@
               "actions": [
                 {
                   "type": "set-query",
-                  "datasetId": "ushiku",
+                  "datasetId": "places",
                   "value": {
                     "source": "literal",
                     "value": ""
@@ -277,7 +277,7 @@
           },
           "style": {},
           "binding": {
-            "datasetId": "ushiku",
+            "datasetId": "places",
             "mode": "collection"
           },
           "interactions": [
@@ -286,7 +286,7 @@
               "actions": [
                 {
                   "type": "set-filter",
-                  "datasetId": "ushiku",
+                  "datasetId": "places",
                   "field": "category",
                   "operator": "eq",
                   "value": {
@@ -334,12 +334,12 @@
           "name": "件数",
           "parentId": null,
           "props": {
-            "suffix": "件のスポット",
+            "suffix": "件の地点",
             "showTotal": true
           },
           "style": {},
           "binding": {
-            "datasetId": "ushiku",
+            "datasetId": "places",
             "mode": "collection"
           },
           "interactions": [],
@@ -384,8 +384,8 @@
           "parentId": null,
           "props": {
             "center": {
-              "lat": 35.978,
-              "lon": 140.147
+              "lat": 35.679,
+              "lon": 139.763
             },
             "zoom": 14,
             "minZoom": 3,
@@ -394,7 +394,7 @@
           },
           "style": {},
           "binding": {
-            "datasetId": "ushiku",
+            "datasetId": "places",
             "mode": "collection"
           },
           "interactions": [
@@ -403,7 +403,7 @@
               "actions": [
                 {
                   "type": "select-place",
-                  "datasetId": "ushiku",
+                  "datasetId": "places",
                   "value": {
                     "source": "event",
                     "key": "placeId"
@@ -463,7 +463,7 @@
           },
           "style": {},
           "binding": {
-            "datasetId": "ushiku",
+            "datasetId": "places",
             "mode": "collection"
           },
           "interactions": [
@@ -472,7 +472,7 @@
               "actions": [
                 {
                   "type": "select-place",
-                  "datasetId": "ushiku",
+                  "datasetId": "places",
                   "value": {
                     "source": "event",
                     "key": "placeId"
@@ -536,7 +536,7 @@
           },
           "style": {},
           "binding": {
-            "datasetId": "ushiku",
+            "datasetId": "places",
             "mode": "selection"
           },
           "interactions": [

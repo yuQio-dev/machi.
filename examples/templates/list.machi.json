@@ -25,7 +25,7 @@
       "columns": [
         {
           "key": "name",
-          "label": "スポット名",
+          "label": "地点名",
           "type": "string",
           "visibility": "public"
         },

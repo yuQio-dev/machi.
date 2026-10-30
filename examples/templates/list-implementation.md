@@ -61,14 +61,14 @@ places と detail: 矩形の重なりあり（重なり順を参照）
 親子は内包として扱い、補助推定より正本の座標と重なり順を優先してください。
 
 表示仕様:
-- 一覧併設型 / ヘッダー (heading): {"background":"#faf8fd","color":"#332b43","fontSize":14,"fontFamily":"Inter,\"Noto Sans JP\",\"Yu Gothic\",sans-serif","radius":8}
-- 一覧併設型 / キーワード検索 (search): {"background":"#faf8fd","color":"#332b43","fontSize":14,"fontFamily":"Inter,\"Noto Sans JP\",\"Yu Gothic\",sans-serif","radius":8}
-- 一覧併設型 / カテゴリチップ (categories): {"background":"#faf8fd","color":"#332b43","fontSize":14,"fontFamily":"Inter,\"Noto Sans JP\",\"Yu Gothic\",sans-serif","radius":8}
-- 一覧併設型 / 件数 (count): {"background":"#faf8fd","color":"#332b43","fontSize":14,"fontFamily":"Inter,\"Noto Sans JP\",\"Yu Gothic\",sans-serif","radius":8}
-- 一覧併設型 / 地図 (map): {"background":"#faf8fd","color":"#332b43","fontSize":14,"fontFamily":"Inter,\"Noto Sans JP\",\"Yu Gothic\",sans-serif","radius":8} / ピン色: {"normal":"#7952b3","normalBorder":"#7952b3","selected":"#7952b3","selectedBorder":"#7952b3"}
-- 一覧併設型 / 地点一覧 (places): {"background":"#faf8fd","color":"#332b43","fontSize":14,"fontFamily":"Inter,\"Noto Sans JP\",\"Yu Gothic\",sans-serif","radius":8}
-- 一覧併設型 / 地点詳細 (detail): {"background":"#faf8fd","color":"#332b43","fontSize":14,"fontFamily":"Inter,\"Noto Sans JP\",\"Yu Gothic\",sans-serif","radius":8}
-- 一覧併設型 / フローティング操作 (show-list): {"background":"#7952b3","color":"#ffffff","fontSize":14,"fontFamily":"Inter,\"Noto Sans JP\",\"Yu Gothic\",sans-serif","radius":12}
+- 一覧併設型 / ヘッダー (heading): {"background":"#faf8fd","color":"#332b43","fontSize":14,"fontFamily":"\"M PLUS Rounded 1c\",\"Hiragino Maru Gothic ProN\",\"Yu Gothic UI\",\"Noto Sans JP\",sans-serif","radius":8}
+- 一覧併設型 / キーワード検索 (search): {"background":"#faf8fd","color":"#332b43","fontSize":14,"fontFamily":"\"M PLUS Rounded 1c\",\"Hiragino Maru Gothic ProN\",\"Yu Gothic UI\",\"Noto Sans JP\",sans-serif","radius":8}
+- 一覧併設型 / カテゴリチップ (categories): {"background":"#faf8fd","color":"#332b43","fontSize":14,"fontFamily":"\"M PLUS Rounded 1c\",\"Hiragino Maru Gothic ProN\",\"Yu Gothic UI\",\"Noto Sans JP\",sans-serif","radius":8}
+- 一覧併設型 / 件数 (count): {"background":"#faf8fd","color":"#332b43","fontSize":14,"fontFamily":"\"M PLUS Rounded 1c\",\"Hiragino Maru Gothic ProN\",\"Yu Gothic UI\",\"Noto Sans JP\",sans-serif","radius":8}
+- 一覧併設型 / 地図 (map): {"background":"#faf8fd","color":"#332b43","fontSize":14,"fontFamily":"\"M PLUS Rounded 1c\",\"Hiragino Maru Gothic ProN\",\"Yu Gothic UI\",\"Noto Sans JP\",sans-serif","radius":8} / ピン色: {"normal":"#7952b3","normalBorder":"#7952b3","selected":"#7952b3","selectedBorder":"#7952b3"}
+- 一覧併設型 / 地点一覧 (places): {"background":"#faf8fd","color":"#332b43","fontSize":14,"fontFamily":"\"M PLUS Rounded 1c\",\"Hiragino Maru Gothic ProN\",\"Yu Gothic UI\",\"Noto Sans JP\",sans-serif","radius":8}
+- 一覧併設型 / 地点詳細 (detail): {"background":"#faf8fd","color":"#332b43","fontSize":14,"fontFamily":"\"M PLUS Rounded 1c\",\"Hiragino Maru Gothic ProN\",\"Yu Gothic UI\",\"Noto Sans JP\",sans-serif","radius":8}
+- 一覧併設型 / フローティング操作 (show-list): {"background":"#7952b3","color":"#ffffff","fontSize":14,"fontFamily":"\"M PLUS Rounded 1c\",\"Hiragino Maru Gothic ProN\",\"Yu Gothic UI\",\"Noto Sans JP\",sans-serif","radius":12}
 共通余白（px）: {"categoryGap":6,"cardGap":10,"cardPadding":8,"detailPadding":12}。
 明示された個別指定を優先し、選択したピンは半径10px、それ以外は7pxとします。
 
@@ -88,7 +88,7 @@ places と detail: 矩形の重なりあり（重なり順を参照）
 
 ## 掲載データ
 
-- 架空のサンプル地点: 12地点。掲載列: スポット名、緯度、経度、住所、カテゴリ、紹介文、写真URL、Webサイト
+- 架空のサンプル地点: 12地点。掲載列: 地点名、緯度、経度、住所、カテゴリ、紹介文、写真URL、Webサイト
 内部列と取得元URLは除外済みです。掲載区分・緯度経度を推測で変更しないでください。
 
 ## 確認項目
@@ -125,7 +125,7 @@ places と detail: 矩形の重なりあり（重なり順を参照）
       "columns": [
         {
           "key": "name",
-          "label": "スポット名",
+          "label": "地点名",
           "type": "string",
           "visibility": "public"
         },

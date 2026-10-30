@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
-import { loadSource } from './load-builder.mjs';
+import { loadSource } from './load-editor.mjs';
 
 const [model, runtime] = await Promise.all(['model', 'runtime'].map(loadSource));
 const read = async name => JSON.parse(await readFile(new URL(`../examples/templates/${name}.machi.json`, import.meta.url), 'utf8'));

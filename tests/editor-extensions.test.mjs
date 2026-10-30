@@ -1,10 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
-import { loadSource } from './load-builder.mjs';
+import { loadSource } from './load-editor.mjs';
 const [commands, geometry, model, runtime, theme, flow, auto, history] = await Promise.all(['commands','geometry','model','runtime','theme','flow','autoLayout','history'].map(loadSource));
-const sample = JSON.parse(await readFile(new URL('../src/builder/contracts/ushiku-demo.machi.json', import.meta.url), 'utf8'));
-const legacy = JSON.parse(await readFile(new URL('../src/builder/contracts/ushiku-demo.v1.machi.json', import.meta.url), 'utf8'));
+const sample = JSON.parse(await readFile(new URL('../src/editor/contracts/map-sample.machi.json', import.meta.url), 'utf8'));
+const legacy = JSON.parse(await readFile(new URL('../src/editor/contracts/map-sample.v1.machi.json', import.meta.url), 'utf8'));
 const design = () => structuredClone(sample), sid = sample.screens[0].id;
 const run = (source, ids, command, device='desktop', screenId=sid) => commands.applyCommand(source,screenId,device,ids,command);
 const component = (source,id) => source.screens.flatMap(screen=>screen.components).find(item=>item.id===id);
