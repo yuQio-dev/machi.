@@ -59,7 +59,7 @@ test('groups: 両端末の見た目と重なり順を保ち、親子同時選択
   assert.ok(run(before,['heading','detail'],{type:'group'}).warnings.length);
 });
 
-test('groups: 全9部品の隣接組合せと入れ子で座標・保存形式が成立する',()=>{
+test('groups: 既存部品の隣接組合せと入れ子で座標・保存形式が成立する',()=>{
   const before=design();before.screens[0].components.push(runtime.createComponent('text',before,before.screens[0]));
   for(const device of ['desktop','mobile'])before.screens[0].components.forEach((item,i)=>item.layouts[device].zIndex=i+1);
   for(let i=0;i<before.screens[0].components.length-1;i++){

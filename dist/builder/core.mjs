@@ -36,13 +36,16 @@ export function tableFromGrid(grid, headerIndex) {
   if (!Array.isArray(grid) || !grid.some(row => row.some(value => String(value ?? '').trim()))) throw new Error('表が空です。見出しとスポットの行を入れてください。');
   if (headerIndex === undefined) {
     let best = -1;
-    grid.slice(0, 10).forEach((row, index) => {
+    let candidates = 0;
+    grid.forEach((row, index) => {
       if (!row.some(value => String(value ?? '').trim())) return;
+      if (candidates++ >= 10) return;
       const mapping = detectMapping(row);
       const score = Object.values(mapping).filter(value => value >= 0).length + ['name', 'lat', 'lon'].filter(key => mapping[key] >= 0).length * 3;
       if (score > best) { best = score; headerIndex = index; }
     });
   }
+  if (!Number.isInteger(headerIndex) || headerIndex < 0 || headerIndex >= grid.length) throw new Error('見出しの行を確認してください。');
   const width = grid.reduce((max, row, index) => index < headerIndex ? max : Math.max(max, row.length), 0);
   if (width > 50) throw new Error('この版は50列までの表に対応しています。必要な列だけにして取り込んでください。');
   const headers = Array.from({ length: width }, (_, index) => String(grid[headerIndex][index] ?? '').trim() || `列${index + 1}`);
@@ -51,6 +54,14 @@ export function tableFromGrid(grid, headerIndex) {
   if (count > MAX_ROWS) throw new Error(`この版は${MAX_ROWS.toLocaleString()}行までです。表を分けて取り込んでください。`);
   const rows = inputRows.map(row => Array.from({ length: width }, (_, index) => String(row[index] ?? '')));
   return { headers, rows, headerRow: headerIndex + 1, mapping: detectMapping(headers) };
+}
+export function worksheetGrid(sheet, utils) {
+  if (!sheet || !sheet['!ref']) return [];
+  const range = utils.decode_range(sheet['!ref']);
+  // Preserve spreadsheet row and column numbers, even when the used range starts below A1.
+  range.s = { r: 0, c: 0 };
+  if (range.e.c >= 50) throw new Error('この版は50列までの表に対応しています。必要な列だけにして取り込んでください。');
+  return utils.sheet_to_json(sheet, { header: 1, defval: '', raw: false, blankrows: true, range });
 }
 export function validateTable(table, mapping = table.mapping) {
   const missing = FIELDS.filter(field => field.required && (!Number.isInteger(mapping[field.key]) || mapping[field.key] < 0 || mapping[field.key] >= table.headers.length)).map(field => field.label);
@@ -93,15 +104,18 @@ export function googleSheetSource(value) {
   let input;
   try { input = new URL(value); } catch { throw new Error('GoogleスプレッドシートのURLを入力してください。'); }
   if (input.protocol !== 'https:' || input.hostname !== 'docs.google.com' || input.username || input.password) throw new Error('docs.google.comのスプレッドシートURLを入力してください。');
-  const regular = input.pathname.match(/^\/spreadsheets\/d\/([a-zA-Z0-9_-]{20,})(?:\/|$)/);
+  const regular = input.pathname.match(/^\/spreadsheets\/(?:u\/\d+\/)?d\/([a-zA-Z0-9_-]{20,})(?:\/|$)/);
   const published = input.pathname.match(/^\/spreadsheets\/d\/e\/([a-zA-Z0-9_-]{20,})(?:\/|$)/);
   if (!regular && !published) throw new Error('表のURLを確認してください。ファイルのIDを読み取れません。');
   const fragment = new URLSearchParams(input.hash.slice(1));
-  const gid = input.searchParams.get('gid') || fragment.get('gid') || '0';
-  if (!/^\d+$/.test(gid)) throw new Error('シートのgidは数字で指定してください。');
+  const gid = input.searchParams.get('gid') ?? fragment.get('gid');
+  if (gid !== null && !/^\d+$/.test(gid)) throw new Error('シートのgidは数字で指定してください。');
   const url = new URL(published ? `/spreadsheets/d/e/${published[1]}/pub` : `/spreadsheets/d/${regular[1]}/export`, 'https://docs.google.com');
   url.searchParams.set(published ? 'output' : 'format', 'csv');
-  url.searchParams.set('gid', gid);
+  if (gid !== null) {
+    url.searchParams.set('gid', gid);
+    if (published) url.searchParams.set('single', 'true');
+  }
   return { url: url.href, original: input.href, id: (published || regular)[1], gid };
 }
 export async function readGoogleSheet(value, fetcher = fetch) {

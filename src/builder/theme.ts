@@ -26,7 +26,7 @@ export function resolveAppearance(design: Design, component: Component) {
   if (managed && !component.editor?.group) {
     defaults.background = surface; defaults.color = text;
     defaults.fontSize = 14 * Number(theme.scale || 1);
-    defaults.fontFamily = theme.font === 'serif' ? '"Yu Mincho","Hiragino Mincho ProN",serif' : theme.font === 'mono' ? 'ui-monospace,"Yu Gothic",monospace' : 'Inter,"Noto Sans JP","Yu Gothic",sans-serif';
+    defaults.fontFamily = theme.font === 'serif' ? '"Yu Mincho","Hiragino Mincho ProN",serif' : theme.font === 'mono' ? 'ui-monospace,"Yu Gothic",monospace' : '"M PLUS Rounded 1c","Hiragino Maru Gothic ProN","Yu Gothic UI","Noto Sans JP",sans-serif';
     defaults.radius = component.kind === 'floating-action' ? 12 : 8;
     if (theme.shape === 'square') defaults.radius = 0;
     if (theme.shape === 'round') defaults.radius = component.kind === 'floating-action' ? 64 : 24;

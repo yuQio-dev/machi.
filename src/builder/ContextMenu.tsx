@@ -34,7 +34,7 @@ export function ContextMenu({ x, y, label, items, onAction, onClose }: {
     };
   }, [onClose]);
   return createPortal(<div ref={menu} className="editor-context-menu" role="menu" aria-label={label}
-    style={{ left: x, top: y }} onContextMenu={event => event.preventDefault()} onKeyDown={event => {
+    style={{ left: x, top: y }} onWheel={event => event.stopPropagation()} onContextMenu={event => event.preventDefault()} onKeyDown={event => {
       const buttons = [...menu.current!.querySelectorAll<HTMLElement>('[role="menuitem"]')];
       const index = buttons.indexOf(document.activeElement as HTMLElement);
       if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'z') {

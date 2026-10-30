@@ -1,4 +1,4 @@
-import { FIELDS, PUBLIC_FIELDS, DEFAULT_SETTINGS, PALETTE, escapeHtml as e, tableFromGrid, validateTable, categoriesOf, colorOf, filterPoints, readGoogleSheet, publicSnapshot, encodeShare, decodeShare, changedPoints } from './core.mjs';
+import { FIELDS, PUBLIC_FIELDS, DEFAULT_SETTINGS, PALETTE, escapeHtml as e, tableFromGrid, worksheetGrid, validateTable, categoriesOf, colorOf, filterPoints, readGoogleSheet, publicSnapshot, encodeShare, decodeShare, changedPoints } from './core.mjs';
 
 const $ = id => document.getElementById(id);
 const clone = value => structuredClone(value);
@@ -146,9 +146,15 @@ async function readFile(file) {
       imported([keys, ...snapshot.items.map(item => keys.map(key => item[key] ?? ''))], { kind: 'file', name: file.name, readAt: new Date().toISOString() });
     } else if (/\.xlsx$/i.test(file.name)) {
       if (new Uint8Array(buffer)[0] !== 0x50 || new Uint8Array(buffer)[1] !== 0x4b) throw new Error('Excelファイルを読み取れません。Excelで.xlsxとして保存し直してください。');
-      state.workbook = XLSX.read(buffer, { type: 'array', raw: true });
-      state.sheet = state.workbook.SheetNames[0];
-      imported(XLSX.utils.sheet_to_json(state.workbook.Sheets[state.sheet], { header: 1, defval: '', raw: false, blankrows: true }), { kind: 'file', name: file.name, sheet: state.sheet, readAt: new Date().toISOString() });
+      const workbook = XLSX.read(buffer, { type: 'array', raw: true });
+      let firstError, selected;
+      for (const name of workbook.SheetNames) {
+        try { const grid = worksheetGrid(workbook.Sheets[name], XLSX.utils); tableFromGrid(grid); selected = { name, grid }; break; }
+        catch (error) { firstError ||= error; }
+      }
+      if (!selected) throw firstError || new Error('シートがありません。');
+      state.workbook = workbook; state.sheet = selected.name;
+      imported(selected.grid, { kind: 'file', name: file.name, sheet: state.sheet, readAt: new Date().toISOString() });
     } else {
       let text;
       try { text = new TextDecoder('utf-8', { fatal: true }).decode(buffer); } catch { throw new Error('文字コードを読み取れません。CSV UTF-8で保存し直して取り込んでください。'); }
@@ -164,7 +170,7 @@ async function readGoogle() {
     const result = await readGoogleSheet(state.sheetUrl.trim());
     if (state !== request) return;
     state.workbook = null;
-    imported(csvGrid(result.text), { kind: 'google', name: 'Googleスプレッドシート', url: result.source.original, sheet: `gid: ${result.source.gid}`, readAt: new Date().toISOString() });
+    imported(csvGrid(result.text), { kind: 'google', name: 'Googleスプレッドシート', url: result.source.original, sheet: result.source.gid === null ? '既定のシート' : `gid: ${result.source.gid}`, readAt: new Date().toISOString() });
   } catch (error) { if (state !== request) return; state.busy = false; state.error = error.message; render(); announce(error.message); }
 }
 async function loadSample() {
@@ -485,7 +491,14 @@ document.addEventListener('change', event => {
   const target = event.target;
   if (target.dataset.mapping) { state.table.mapping[target.dataset.mapping] = Number(target.value); state.excluded = false; updateImportValidation(); queueSave(); }
   if (target.id === 'exclude-invalid') { state.excluded = target.checked; updateImportValidation(); queueSave(); }
-  if (target.id === 'workbook-sheet') { state.sheet = target.value; imported(XLSX.utils.sheet_to_json(state.workbook.Sheets[state.sheet], { header: 1, defval: '', raw: false, blankrows: true }), { ...state.source, sheet: state.sheet }); }
+  if (target.id === 'workbook-sheet') {
+    const name = target.value;
+    try {
+      const grid = worksheetGrid(state.workbook.Sheets[name], XLSX.utils);
+      tableFromGrid(grid);
+      state.sheet = name; imported(grid, { ...state.source, sheet: name });
+    } catch (error) { state.error = error.message; render(); }
+  }
   if (target.dataset.toggle) { remember(); state.settings[target.dataset.toggle] = target.checked; updateSettings(); }
   if (target.matches('select[data-setting]')) { remember(); state.settings[target.dataset.setting] = target.value; updateSettings(); }
   if (target.dataset.publicField) { remember(); state.settings.publicFields = target.checked ? [...state.settings.publicFields, target.dataset.publicField] : state.settings.publicFields.filter(key => key !== target.dataset.publicField); updateSettings(); }

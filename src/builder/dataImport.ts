@@ -4,8 +4,8 @@ import type { Dataset, Design } from './model';
 export function importTableDesign(design: Design, table: Table, mapping: Record<string, number>, published: string[], source: { kind: string; label: string; url: string }): Design {
   const checked = validateTable(table, mapping);
   if (checked.missing.length || checked.duplicatedColumns || !checked.valid.length) throw new Error('列対応と有効な地点を確認してください');
-  const target = design.datasets[0];
   const known = FIELDS.filter(field => field.key !== 'id');
+  const target = design.datasets[0] || { id: 'places', columns: [], mapping: Object.fromEntries(known.map(field => [field.key, field.key])), rows: [], searchMatch: 'all', filterMatch: 'all' };
   const assigned = new Set(Object.values(mapping).filter(index => index >= 0));
   const extras = table.headers.map((label, index) => ({ key: `extra_${index}`, label, index })).filter(column => !assigned.has(column.index));
   if (known.length + extras.length + 2 > 50) throw new Error('内部列を含めると50列を超えます。不要な列を減らしてください');
@@ -31,7 +31,7 @@ export function importTableDesign(design: Design, table: Table, mapping: Record<
   };
   const next = structuredClone(design);
   const renamedFields = new Map(Object.entries(target.mapping).map(([role, field]) => [field, role]));
-  next.datasets = next.datasets.map(dataset => dataset.id === target.id ? nextDataset : dataset);
+  next.datasets = design.datasets.length ? next.datasets.map(dataset => dataset.id === target.id ? nextDataset : dataset) : [nextDataset];
   for (const screen of next.screens) for (const component of screen.components) {
     if (component.binding?.datasetId !== target.id) continue;
     for (const key of ['searchFields', 'displayFields']) {

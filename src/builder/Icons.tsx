@@ -1,10 +1,18 @@
 export const partNames: Record<string, string> = {
   'map-view': '地図', 'app-header': 'ヘッダー', 'place-search': '検索', 'category-chips': 'カテゴリ', 'result-count': '件数',
-  'place-list': '一覧', 'place-detail': '詳細', 'floating-action': 'ボタン', text: 'テキスト',
+  'place-list': '一覧', 'place-detail': '詳細', 'floating-action': 'フローティング操作', text: 'テキスト',
+  button: 'ボタン', 'icon-button': 'アイコンボタン', chip: '汎用チップ', container: 'コンテナー', card: 'カード',
+  'list-item': 'リスト項目', image: '画像', divider: '区切り', dialog: 'ダイアログ', 'text-field': 'テキスト入力',
+  select: '選択欄', switch: 'スイッチ', checkbox: 'チェックボックス', 'screen-tabs': '画面タブ',
+  'bottom-navigation': '下部ナビ', 'side-menu': 'サイドナビ',
 };
 export const partIcons: Record<string, string> = {
   'map-view': 'map', 'app-header': 'web_asset', 'place-search': 'search', 'category-chips': 'filter_list', 'result-count': 'tag',
   'place-list': 'format_list_bulleted', 'place-detail': 'article', 'floating-action': 'smart_button', text: 'text_fields',
+  button: 'smart_button', 'icon-button': 'radio_button_checked', chip: 'label', container: 'crop_square', card: 'credit_card',
+  'list-item': 'format_list_bulleted', image: 'image', divider: 'horizontal_rule', dialog: 'chat_bubble', 'text-field': 'text_fields',
+  select: 'arrow_drop_down_circle', switch: 'toggle_on', checkbox: 'check_box', 'screen-tabs': 'tabs',
+  'bottom-navigation': 'view_agenda', 'side-menu': 'menu',
 };
 export function Icon({ name }: { name: string }) {
   const paths: Record<string, string> = {

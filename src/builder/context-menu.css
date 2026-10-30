@@ -1,4 +1,4 @@
-.editor-context-menu{position:fixed;z-index:11000;width:230px;max-width:calc(100vw - 16px);max-height:calc(100dvh - 16px);overflow:auto;padding:6px;background:#fff;border:1px solid #e4daed;border-radius:12px;box-shadow:0 10px 36px #30204026;color:#392e47}
+.editor-context-menu{position:fixed;z-index:11000;width:230px;max-width:calc(100vw - 16px);max-height:calc(100dvh - 16px);overflow-y:auto;overscroll-behavior:contain;padding:6px;background:#fff;border:1px solid #e4daed;border-radius:12px;box-shadow:0 10px 36px #30204026;color:#392e47}
 .context-menu-title{font-size:11px;color:#897398;padding:8px 10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;border-bottom:1px solid #f0e9f6;margin-bottom:4px}
 .editor-context-menu button{display:block;width:100%;text-align:left;padding:10px 12px;min-height:38px;border:0;border-radius:6px;background:transparent;color:inherit;font-size:13px}
 .editor-context-menu button:hover,.editor-context-menu button:focus{background:#f2eafa;outline:2px solid #7952b3;outline-offset:-2px}

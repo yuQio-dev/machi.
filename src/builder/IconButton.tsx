@@ -6,10 +6,11 @@ type Props = Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'title' | 'aria-label
   icon: string;
   label: string;
   hint?: string;
+  showLabel?: boolean;
 };
 let dismissTooltip: (() => void) | null = null;
 
-export function IconButton({ icon, label, hint, className = '', children, ...props }: Props) {
+export function IconButton({ icon, label, hint, showLabel = false, className = '', children, ...props }: Props) {
   const button = useRef<HTMLButtonElement>(null), tooltip = useRef<HTMLDivElement>(null);
   const timer = useRef<number | undefined>(undefined);
   const id = useId();
@@ -38,8 +39,8 @@ export function IconButton({ icon, label, hint, className = '', children, ...pro
   }, [open, label, hint]);
   return <span className="icon-button-wrap" onPointerEnter={() => { clear(); timer.current = window.setTimeout(show, 250); }} onPointerLeave={leave}
     onFocusCapture={() => { clear(); show(); }} onBlurCapture={close} onPointerDown={close} onClickCapture={close}>
-    <button {...props} ref={button} type={props.type || 'button'} aria-label={label} aria-describedby={open ? id : undefined} className={`icon-button ${className}`}>
-      {children || <Icon name={icon} />}
+    <button {...props} ref={button} type={props.type || 'button'} aria-label={label} aria-describedby={open ? id : undefined} className={`icon-button ${showLabel || (!children && className.split(' ').includes('primary-button')) ? 'has-label' : ''} ${className}`}>
+      {children || <><Icon name={icon} />{(showLabel || className.split(' ').includes('primary-button')) && <span>{label}</span>}</>}
     </button>
     {open && createPortal(<div id={id} ref={tooltip} className="button-tooltip" role="tooltip" style={position} onPointerEnter={clear} onPointerLeave={leave}>{label}{hint && <small>{hint}</small>}</div>, button.current?.closest('dialog[open], [popover]') || document.body)}
   </span>;

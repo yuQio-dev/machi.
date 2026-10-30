@@ -1,0 +1,98 @@
+/* Editor chrome only: project colors inside the designed screen remain editable. */
+:root { --machi-accent: #08749f; --machi-canvas: #eaf6fb; }
+.editor { color: #193b4b; background: #eaf6fb; }
+.editor .brand, .editor .brand span { color: #08749f; }
+.editor .topbar { border-color: #d2e8f1; }
+.editor :is(.tool-rail, .library-panel, .inspector-panel) { background: #f7fcfe; border-color: #d6eaf1; }
+.editor :is(.panel-title, .project-name, .catalog-group > summary, .screen-select, .screen-select select, .zoom-control output) { color: #21475a; }
+.editor .selection-tools > summary { color: #32677e; }
+.editor :is(.part-search, .setting-field input, .setting-field select, .setting-field textarea, .fields input, .fields select, .fields textarea, .appearance-section, .interaction-card, .screen-select select) { background: #f0f8fb; border-color: #cfe5ee; color: #23495b; }
+.editor :is(.setting-field, .fields label, .property-label, .hint, .side-footer, .canvas-status, .eyebrow) { color: #567789; }
+.editor :is(.prompt-workspace, .flow-workspace) { background-color: #eaf6fb; }
+.editor :is(.canvas-panel, .stage-scroll) { background-color: #f5f5f5; }
+.editor .stage-scroll { background-image: radial-gradient(#dadde0 1px, transparent 1px); }
+.mode-edit .stage-scroll.tools-open { padding-top: 145px !important; }
+.editor :is(.splitter, .library-height-handle) { background: #dceff6; }
+.editor :is(.splitter, .library-height-handle)::after { background: #86b9cb; }
+.editor :is(.splitter, .library-height-handle):is(:hover, :focus-visible) { background: #bce2f0; }
+.editor .part-grid button.icon-button, .editor .part-grid .part-tile > .icon-button-wrap:first-child > button { background: #eaf5fa; color: #165d7c; }
+.editor .part-grid button.icon-button .material-icon, .editor .catalog-group > summary > .material-icon, .editor .layer-list .material-icon { color: #08749f; }
+.editor .part-grid .part-tile > .icon-button-wrap:first-child > button:is(:hover, :focus-visible) { background: #d9eff8; border-color: #a4d2e4; }
+.editor .part-grid .part-favorite button.icon-button { background: transparent; color: #08749f; }
+.editor .part-grid .part-favorite button.icon-button:hover { background: #cbe8f4; }
+.editor :is(.layer-list button, .tool-rail button.icon-button) { color: #346477; }
+.editor .layer-list small { flex: none; white-space: nowrap; }
+.editor .catalog-group > summary { line-height: 1.4; }
+.editor .layer-list button.selected { color: #075f85; background: #d8eff9; box-shadow: inset 2px 0 #1684b0; }
+.editor :is(.tool-rail, .prompt-outline-layout) button.icon-button:is(.active, [aria-pressed=true], [aria-current=true]) { background: #d5edf8; color: #076d98; }
+.editor :is(.canvas-toolbar, .canvas-edit-tools, .zoom-control, .project-actions-menu) { background: #fff; border-color: #cee6ef; }
+.editor :is(.tool-pair, .settings-tabs) { background: #e8f4f8; }
+.editor .canvas-controls .icon-button-wrap > button, .editor .canvas-edit-tools .icon-button-wrap > button, .editor .zoom-control .icon-button-wrap > button { color: #32667a; }
+.editor .canvas-controls .icon-button-wrap > button[aria-pressed=true], .editor .canvas-edit-tools .icon-button-wrap > button[aria-pressed=true], .editor .settings-tabs button.icon-button[aria-pressed=true], .editor .presentation-picker button.icon-button[aria-pressed=true] { background: #08749f; color: white; border-color: #08749f; }
+.editor :is(.canvas-controls, .canvas-edit-tools, .zoom-control) .icon-button-wrap > button:hover:not(:disabled) { background: #d9eff8; color: #075f85; }
+.editor :is(.canvas-controls, .canvas-edit-tools) .icon-button-wrap > button[aria-pressed=true]:hover { background: #075f85; color: white; }
+.editor button.icon-button.primary-button, .editor .top-actions button.prompt-primary, .component-color-dialog button.icon-button.primary-button { background: #08749f !important; border-color: #08749f !important; color: white !important; }
+.editor button.icon-button.primary-button:hover, .editor .top-actions button.prompt-primary:hover, .component-color-dialog button.icon-button.primary-button:hover { background: #075f85 !important; }
+.editor button.icon-button { color: #376779; }
+.editor button.icon-button:hover:not(:disabled) { background: #dff1f8; color: #075f85; }
+.editor :is(button, input, select, textarea):focus-visible, .editor-context-menu button:focus-visible { outline-color: #08749f; }
+.editor :is(.checkbox-setting input, .field-picker input) { accent-color: #08749f; }
+.editor .frame-edit .canvas-component.is-selected { outline-color: #087fb0; }
+.editor .frame-edit .canvas-component.editor-group.is-selected { outline-color: #087fb0; }
+.editor .moveable-control-box { --moveable-color: #087fb0 !important; }
+.editor-context-menu, .component-color-dialog { color: #193b4b; border-color: #cbe4ee; }
+.button-tooltip, .editor .notice { background: #17475b; }
+.editor-context-menu .context-menu-title { color: #5c7b89; border-color: #e0eff5; }
+.editor-context-menu button:is(:hover, :focus) { background: #e3f3f9; outline-color: #08749f; }
+.editor .prompt-sections details, .editor .flow-node, .editor .flow-viewport { border-color: #cfe6ef; }
+.editor .flow-node { background: #e7f5fb; color: #1d4f65; }
+.editor .flow-board svg path[stroke] { stroke: #08749f; animation: connection-in 180ms ease-out both; transition: stroke 140ms ease-out, stroke-width 140ms ease-out; }
+.editor .flow-board svg path[stroke]:hover { stroke: #064e70; stroke-width: 3; }
+.editor .flow-board svg marker path { fill: #08749f; }
+
+/* The device frame is outside the design coordinates and is never exported. */
+.mode-edit .stage.device-frame { isolation: isolate; overflow: visible; }
+.mode-edit .stage.device-frame::before { content: ''; position: absolute; z-index: -1; pointer-events: none; box-shadow: 0 8px 24px #0002; }
+.mode-edit .stage.device-frame-desktop::before { inset: -25px -4px -4px; border-radius: 8px; background: radial-gradient(circle at 14px 12px, #ff6057 0 4px, transparent 4.5px), radial-gradient(circle at 29px 12px, #ffbd2e 0 4px, transparent 4.5px), radial-gradient(circle at 44px 12px, #28c840 0 4px, transparent 4.5px), #252525; }
+.mode-edit .stage.device-frame-desktop::after { content: 'PC'; position: absolute; top: -20px; left: 50%; transform: translateX(-50%); z-index: 2; color: #bdbdbd; font: 600 10px/1 'Yu Gothic UI', sans-serif; pointer-events: none; }
+.mode-edit .stage.device-frame-mobile::before { inset: -12px -8px -10px; border: 6px solid #292929; border-radius: 23px; background: white; }
+.mode-edit .stage.device-frame-mobile::after { content: ''; position: absolute; top: -6px; left: 50%; width: min(72px, 48%); height: 9px; transform: translateX(-50%); z-index: 2; border-radius: 0 0 7px 7px; background: #292929; pointer-events: none; }
+
+/* Resize the contents with the panel rather than the viewport. */
+.library-panel { container: library / inline-size; }
+.inspector-panel { container: inspector / inline-size; }
+.editor .part-tile > .icon-button-wrap:first-child > button span:not(.material-icon) { min-width: 0; max-width: 100%; line-height: 1.4; overflow-wrap: anywhere; word-break: normal; text-align: center; }
+@container library (max-width: 260px) {
+  .editor .part-grid, .editor .catalog-group:last-child .part-grid { grid-template-columns: minmax(0, 1fr); }
+  .editor .part-grid .part-tile > .icon-button-wrap:first-child > button { flex-direction: row; justify-content: flex-start; height: auto; min-height: 52px; gap: 10px; padding: 8px 38px 8px 12px; }
+  .editor .part-tile > .icon-button-wrap:first-child > button span:not(.material-icon) { flex: 1; text-align: left; }
+}
+@container inspector (max-width: 320px) {
+  .editor .inspector-content { padding-inline: 14px; }
+  .editor .inspector-content :is(.settings-head, .settings-tabs) { margin-inline: -14px; }
+  .editor .inspector-content :is(.setting-field, .fields label, .hint) { line-height: 1.5; overflow-wrap: anywhere; }
+  .editor .settings-tabs button.icon-button.has-label { gap: 4px; padding-inline: 5px; }
+}
+.canvas-component.editable { transition: left 140ms ease-out, top 140ms ease-out, width 140ms ease-out, height 140ms ease-out, outline-color 140ms ease-out, box-shadow 140ms ease-out; }
+.canvas-component.editable.is-manipulating { transition: outline-color 140ms ease-out, box-shadow 140ms ease-out; box-shadow: 0 8px 22px #126d9238; }
+.canvas-edit-tools { animation: canvas-tools-in 140ms ease-out both; }
+@keyframes canvas-tools-in { from { opacity: 0; translate: 0 -4px; } to { opacity: 1; translate: 0 0; } }
+@keyframes connection-in { from { opacity: 0; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) {
+  .canvas-component.editable { transition: none; }
+  .canvas-edit-tools { animation: none; }
+  .editor .flow-board svg path[stroke] { animation: none; transition: none; }
+}
+
+/* A quieter sky palette keeps the canvas and the primary action distinct. */
+:root { --machi-accent: #08749f; }
+.editor :is(.tool-rail, .library-panel, .inspector-panel) { background: #fff; border-color: #e4edf1; }
+.editor :is(.splitter, .library-height-handle) { background: #f1f7fa; }
+.editor :is(.splitter, .library-height-handle)::after { background: #bad4df; }
+.editor :is(.part-search, .setting-field input, .setting-field select, .setting-field textarea, .fields input, .fields select, .fields textarea, .interaction-card) { background: #fbfdfe; border-color: #dbeaf0; }
+.editor :is(.appearance-section, .settings-tabs, .tool-pair) { background: #f2f8fb; }
+.editor .part-grid button.icon-button, .editor .part-grid .part-tile > .icon-button-wrap:first-child > button { background: #f4f9fb; color: #24566b; }
+.editor .part-grid .part-tile > .icon-button-wrap:first-child > button:is(:hover, :focus-visible) { background: #e7f4f9; border-color: #b7dce9; }
+.editor .part-grid .part-favorite button.icon-button { background: transparent; }
+.editor .layer-list button.selected, .editor :is(.tool-rail, .prompt-outline-layout) button.icon-button:is(.active, [aria-pressed=true], [aria-current=true]) { background: #e4f3f9; }
+.editor :is(.canvas-toolbar, .canvas-edit-tools, .zoom-control) { border-color: #e0edf2; box-shadow: 0 4px 16px #315c7014; }

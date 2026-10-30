@@ -8,7 +8,16 @@ export function LayoutHandles({ items, frame, snap, commit }: {
   commit: (patches: Record<string, Partial<Layout>>) => void;
 }) {
   const moveable = useRef<Moveable>(null);
-  useLayoutEffect(() => { moveable.current?.updateRect(); });
+  useLayoutEffect(() => {
+    const until = performance.now() + 160;
+    let frameId = 0;
+    const update = () => {
+      moveable.current?.updateRect();
+      if (performance.now() < until) frameId = requestAnimationFrame(update);
+    };
+    update();
+    return () => cancelAnimationFrame(frameId);
+  });
   useEffect(() => {
     const update = () => moveable.current?.updateRect();
     const observer = new ResizeObserver(update), panel = items[0]?.target.closest('.canvas-panel');
@@ -20,6 +29,7 @@ export function LayoutHandles({ items, frame, snap, commit }: {
     item.target.style.left = `${Math.round(item.layout.x + dx)}px`;
     item.target.style.top = `${Math.round(item.layout.y + dy)}px`;
   };
+  const manipulating = (active: boolean) => items.forEach(item => item.target.classList.toggle('is-manipulating', active));
   const finish = () => commit(Object.fromEntries(items.map(item => [item.id, {
     x: parseFloat(item.target.style.left), y: parseFloat(item.target.style.top),
     width: parseFloat(item.target.style.width), height: parseFloat(item.target.style.height),
@@ -32,14 +42,16 @@ export function LayoutHandles({ items, frame, snap, commit }: {
     elementSnapDirections={{ left: true, right: true, top: true, bottom: true, center: true, middle: true }}
     horizontalGuidelines={[0, frame.height / 2, frame.height]} verticalGuidelines={[0, frame.width / 2, frame.width]}
     elementGuidelines={elements} snapThreshold={6}
+    onDragStart={() => manipulating(true)}
     onDrag={event => position(items[0], event.beforeDist[0], event.beforeDist[1])}
-    onDragEnd={event => { if (event.lastEvent) finish(); }}
+    onDragEnd={event => { manipulating(false); if (event.lastEvent) finish(); }}
+    onDragGroupStart={() => manipulating(true)}
     onDragGroup={event => { const delta = event.events[0]?.beforeDist; if (delta) items.forEach(item => position(item, delta[0], delta[1])); }}
-    onDragGroupEnd={event => { if (event.events.some(item => item.lastEvent)) finish(); }}
-    onResizeStart={event => { event.setMin([40, 30]); if (event.dragStart) event.dragStart.set([0, 0]); }}
+    onDragGroupEnd={event => { manipulating(false); if (event.events.some(item => item.lastEvent)) finish(); }}
+    onResizeStart={event => { manipulating(true); event.setMin([40, 30]); if (event.dragStart) event.dragStart.set([0, 0]); }}
     onResize={event => {
       items[0].target.style.width = `${Math.round(event.width)}px`;
       items[0].target.style.height = `${Math.round(event.height)}px`;
       position(items[0], event.drag.beforeTranslate[0], event.drag.beforeTranslate[1]);
-    }} onResizeEnd={event => { if (event.lastEvent) finish(); }} />;
+    }} onResizeEnd={event => { manipulating(false); if (event.lastEvent) finish(); }} />;
 }

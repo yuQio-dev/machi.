@@ -18,7 +18,7 @@
   "datasets": [
     {
       "id": "ushiku",
-      "name": "牛久市のサンプル3地点",
+      "name": "牛久市の保存データ",
       "columns": [
         {
           "key": "name",

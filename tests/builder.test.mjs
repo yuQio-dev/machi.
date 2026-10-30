@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import vm from 'node:vm';
-import { detectMapping, tableFromGrid, validateTable, googleSheetSource, readGoogleSheet, publicSnapshot, encodeShare, decodeShare, escapeHtml, safeUrl, colorOf, filterPoints, changedPoints, DEFAULT_SETTINGS } from '../dist/builder/core.mjs';
+import { detectMapping, tableFromGrid, worksheetGrid, validateTable, googleSheetSource, readGoogleSheet, publicSnapshot, encodeShare, decodeShare, escapeHtml, safeUrl, colorOf, filterPoints, changedPoints, DEFAULT_SETTINGS } from '../dist/builder/core.mjs';
 const headers = ['地点ID', 'スポット名', '緯度', '経度', '住所', 'カテゴリ', '紹介文', '写真URL', '内部メモ'];
 const row = ['a', '牛久シャトー', '35.978', '140.147', '牛久市', '観光', '紹介文', 'https://example.com/a.jpg', '秘密のメモ'];
 function table(rows = [row]) { return tableFromGrid([headers, ...rows]); }
@@ -47,9 +47,15 @@ test('builder: Google Sheets URLのgid・CSVエクスポート・公開形式を
   assert.equal(new URL(actual.url).searchParams.has('headers'), false);
   const published = googleSheetSource(`https://docs.google.com/spreadsheets/d/e/2PACX-${id}/pubhtml?gid=7`);
   assert.equal(new URL(published.url).searchParams.get('output'), 'csv');
+  assert.equal(new URL(published.url).searchParams.get('single'), 'true');
+  const account = googleSheetSource(`https://docs.google.com/spreadsheets/u/2/d/${id}/edit?usp=sharing#gid=123`);
+  assert.equal(new URL(account.url).searchParams.get('gid'), '123');
+  const noGid = googleSheetSource(`https://docs.google.com/spreadsheets/d/e/2PACX-${id}/pub?output=csv`);
+  assert.equal(noGid.gid, null);
+  assert.equal(new URL(noGid.url).searchParams.has('gid'), false);
 });
 test('builder: 任意ホスト・認証付きURL・偽のGoogleホスト・不正gidを拒否する', () => {
-  for (const value of ['javascript:alert(1)', 'https://docs.google.com.evil.test/spreadsheets/d/abcdefghijklmnopqrstuvwxyz', 'https://user:pass@docs.google.com/spreadsheets/d/abcdefghijklmnopqrstuvwxyz', 'https://example.com/a', 'http://docs.google.com/spreadsheets/d/abcdefghijklmnopqrstuvwxyz', 'https://docs.google.com/spreadsheets/d/abcdefghijklmnopqrstuvwxyz/edit#gid=x']) assert.throws(() => googleSheetSource(value));
+  for (const value of ['javascript:alert(1)', 'https://docs.google.com.evil.test/spreadsheets/d/abcdefghijklmnopqrstuvwxyz', 'https://user:pass@docs.google.com/spreadsheets/d/abcdefghijklmnopqrstuvwxyz', 'https://example.com/a', 'http://docs.google.com/spreadsheets/d/abcdefghijklmnopqrstuvwxyz', 'https://docs.google.com/spreadsheets/d/abcdefghijklmnopqrstuvwxyz/edit#gid=x', 'https://docs.google.com/spreadsheets/d/abcdefghijklmnopqrstuvwxyz/edit?gid=']) assert.throws(() => googleSheetSource(value));
 });
 test('builder: Sheetsの取得は実CSVを返し、HTML・HTTP失敗・通信失敗は成功扱いしない', async () => {
   const url = 'https://docs.google.com/spreadsheets/d/abcdefghijklmnopqrstuvwxyz/edit';
@@ -118,4 +124,28 @@ test('builder: 実XLSXの2シート・CSVの引用符・セル内改行を読み
   const actual = tableFromGrid(XLSX.utils.sheet_to_json(parsed.Sheets[parsed.SheetNames[0]], { header: 1, defval: '', raw: false }));
   assert.equal(validateTable(actual).valid[0].name, '喫茶「まち,カフェ」');
   assert.match(validateTable(actual).valid[0].description, /1行目\n2行目/);
+});
+test('builder: 空シートと先頭に空行・空列があるXLSXの元の行と列を保持する', async () => {
+  const book = XLSX.read(await readFile(new URL('../examples/import/multiple-sheets.xlsx', import.meta.url)), { type: 'buffer' });
+  assert.deepEqual(Array.from(book.SheetNames), ['空のシート', '地点データ', '別の地点']);
+  assert.throws(() => tableFromGrid(worksheetGrid(book.Sheets[book.SheetNames[0]], XLSX.utils)), /空/);
+  const grid = worksheetGrid(book.Sheets['地点データ'], XLSX.utils);
+  const table = tableFromGrid(grid);
+  assert.equal(table.headerRow, 12);
+  assert.equal(table.mapping.name, 1);
+  const checked = validateTable(table);
+  assert.equal(checked.valid[0].row, 13);
+  assert.equal(checked.invalid[0].row, 14);
+  assert.equal(tableFromGrid(grid, 12).headerRow, 13);
+  assert.throws(() => tableFromGrid(grid, NaN), /見出し/);
+  const alternate = tableFromGrid(worksheetGrid(book.Sheets['別の地点'], XLSX.utils));
+  assert.equal(validateTable(alternate).valid[0].name, '検証用駅');
+});
+test('builder: 入力例のCSVは引用符・改行と不正行を保持する', async () => {
+  const csv = await readFile(new URL('../examples/import/places.csv', import.meta.url), 'utf8');
+  const book = XLSX.read(csv, { type: 'string', raw: true });
+  const checked = validateTable(tableFromGrid(worksheetGrid(book.Sheets[book.SheetNames[0]], XLSX.utils)));
+  assert.equal(checked.valid[0].name, '検証用,公園');
+  assert.equal(checked.valid[0].description, '1行目\n2行目');
+  assert.equal(checked.invalid[0].row, 3);
 });

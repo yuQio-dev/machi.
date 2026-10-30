@@ -14,6 +14,9 @@
       "maxLength": 1000,
       "default": ""
     },
+    "boolean": {
+      "type": "boolean"
+    },
     "url": {
       "type": "string",
       "maxLength": 2048,
@@ -1313,6 +1316,337 @@
       },
       "events": {
         "activate": {}
+      }
+    },
+    {
+      "kind": "chip",
+      "version": 1,
+      "name": "汎用チップ",
+      "category": "操作",
+      "placement": "canvas",
+      "priority": "B",
+      "status": "contract-defined",
+      "bindingModes": [],
+      "presentations": [
+        "inline"
+      ],
+      "propsSchema": {
+        "type": "object",
+        "properties": {
+          "label": {
+            "type": "string",
+            "maxLength": 80,
+            "default": "チップ"
+          },
+          "variant": {
+            "enum": [
+              "filled",
+              "outline"
+            ],
+            "default": "filled"
+          },
+          "selected": {
+            "type": "boolean",
+            "default": false
+          }
+        },
+        "required": [
+          "label",
+          "variant",
+          "selected"
+        ],
+        "additionalProperties": false
+      },
+      "events": {
+        "activate": {}
+      }
+    },
+    {
+      "kind": "card",
+      "version": 1,
+      "name": "カード",
+      "category": "コンテナー",
+      "placement": "canvas",
+      "priority": "B",
+      "status": "contract-defined",
+      "bindingModes": [],
+      "presentations": [
+        "inline"
+      ],
+      "propsSchema": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "maxLength": 160,
+            "default": "カード"
+          },
+          "supportingText": {
+            "type": "string",
+            "maxLength": 500,
+            "default": "説明文"
+          },
+          "imageUrl": {
+            "type": "string",
+            "maxLength": 2048,
+            "default": ""
+          },
+          "imageAlt": {
+            "type": "string",
+            "maxLength": 500,
+            "default": ""
+          }
+        },
+        "required": [
+          "title",
+          "supportingText",
+          "imageUrl",
+          "imageAlt"
+        ],
+        "additionalProperties": false
+      },
+      "events": {
+        "activate": {}
+      }
+    },
+    {
+      "kind": "list-item",
+      "version": 1,
+      "name": "リスト項目",
+      "category": "コンテナー",
+      "placement": "canvas",
+      "priority": "B",
+      "status": "contract-defined",
+      "bindingModes": [],
+      "presentations": [
+        "inline"
+      ],
+      "propsSchema": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "maxLength": 160,
+            "default": "項目"
+          },
+          "supportingText": {
+            "type": "string",
+            "maxLength": 300,
+            "default": "補足"
+          },
+          "icon": {
+            "type": "string",
+            "maxLength": 80,
+            "default": "circle"
+          }
+        },
+        "required": [
+          "title",
+          "supportingText",
+          "icon"
+        ],
+        "additionalProperties": false
+      },
+      "events": {
+        "activate": {}
+      }
+    },
+    {
+      "kind": "text-field",
+      "version": 1,
+      "name": "テキスト入力",
+      "category": "入力",
+      "placement": "canvas",
+      "priority": "B",
+      "status": "contract-defined",
+      "bindingModes": [],
+      "presentations": [
+        "inline"
+      ],
+      "propsSchema": {
+        "type": "object",
+        "properties": {
+          "label": {
+            "type": "string",
+            "maxLength": 80,
+            "default": "名前"
+          },
+          "placeholder": {
+            "type": "string",
+            "maxLength": 120,
+            "default": "入力してください"
+          },
+          "initialValue": {
+            "type": "string",
+            "maxLength": 500,
+            "default": ""
+          },
+          "inputType": {
+            "enum": [
+              "text",
+              "search",
+              "email",
+              "number"
+            ],
+            "default": "text"
+          }
+        },
+        "required": [
+          "label",
+          "placeholder",
+          "initialValue",
+          "inputType"
+        ],
+        "additionalProperties": false
+      },
+      "events": {
+        "change": {
+          "value": "string"
+        }
+      }
+    },
+    {
+      "kind": "select",
+      "version": 1,
+      "name": "選択欄",
+      "category": "入力",
+      "placement": "canvas",
+      "priority": "B",
+      "status": "contract-defined",
+      "bindingModes": [],
+      "presentations": [
+        "inline"
+      ],
+      "propsSchema": {
+        "type": "object",
+        "properties": {
+          "label": {
+            "type": "string",
+            "maxLength": 80,
+            "default": "項目"
+          },
+          "placeholder": {
+            "type": "string",
+            "maxLength": 120,
+            "default": "選択してください"
+          },
+          "options": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "label": {
+                  "type": "string",
+                  "maxLength": 80,
+                  "default": "選択肢"
+                },
+                "value": {
+                  "type": "string",
+                  "maxLength": 80,
+                  "default": "option"
+                }
+              },
+              "required": [
+                "label",
+                "value"
+              ],
+              "additionalProperties": false
+            },
+            "maxItems": 40,
+            "minItems": 1
+          },
+          "initialValue": {
+            "type": "string",
+            "maxLength": 80,
+            "default": "option"
+          }
+        },
+        "required": [
+          "label",
+          "placeholder",
+          "options",
+          "initialValue"
+        ],
+        "additionalProperties": false
+      },
+      "events": {
+        "change": {
+          "value": "string"
+        }
+      }
+    },
+    {
+      "kind": "switch",
+      "version": 1,
+      "name": "スイッチ",
+      "category": "入力",
+      "placement": "canvas",
+      "priority": "B",
+      "status": "contract-defined",
+      "bindingModes": [],
+      "presentations": [
+        "inline"
+      ],
+      "propsSchema": {
+        "type": "object",
+        "properties": {
+          "label": {
+            "type": "string",
+            "maxLength": 80,
+            "default": "オン・オフ"
+          },
+          "checked": {
+            "type": "boolean",
+            "default": false
+          }
+        },
+        "required": [
+          "label",
+          "checked"
+        ],
+        "additionalProperties": false
+      },
+      "events": {
+        "change": {
+          "value": "boolean"
+        }
+      }
+    },
+    {
+      "kind": "checkbox",
+      "version": 1,
+      "name": "チェックボックス",
+      "category": "入力",
+      "placement": "canvas",
+      "priority": "B",
+      "status": "contract-defined",
+      "bindingModes": [],
+      "presentations": [
+        "inline"
+      ],
+      "propsSchema": {
+        "type": "object",
+        "properties": {
+          "label": {
+            "type": "string",
+            "maxLength": 80,
+            "default": "確認する"
+          },
+          "checked": {
+            "type": "boolean",
+            "default": false
+          }
+        },
+        "required": [
+          "label",
+          "checked"
+        ],
+        "additionalProperties": false
+      },
+      "events": {
+        "change": {
+          "value": "boolean"
+        }
       }
     },
     {

@@ -1,0 +1,32 @@
+m3e-canvas design reference
+Repository: https://github.com/lnkiai/m3e-canvas
+Revision: 49378e1e35f5de6aaadfcd3f852eeb0edffdbb95
+Copyright (c) 2026 lnkiai
+The workspace layout and palette patterns are referenced in m3e-inspired.css. No m3e-canvas source component code was copied.
+
+MIT License
+
+Copyright (c) 2026 lnkiai
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+M PLUS Rounded 1c
+Copyright 2016 The Rounded M+ Project Authors.
+SIL Open Font License 1.1. License text: MPLUSRounded1c-OFL.txt
+The font is referenced from Google Fonts CSS at runtime; the font binary is not bundled in this build.

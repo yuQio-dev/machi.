@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import type { Design, Device, Screen } from './model';
 import type { Alignment, EditorCommand } from './commands';
 import { groupingReason } from './commands';
@@ -60,13 +60,16 @@ export function ThemePanel({ design, onChange }: { design: Design; onChange: (ne
 export function PromptWorkspace({ design, screenId, onCopy, onSave }: { design: Design; screenId: string; onCopy: (text: string) => void; onSave: (text: string) => void }) {
   const [scope, setScope] = useState('all');
   const [active, setActive] = useState('overview');
-  const sections = buildHandoffSections(design, scope === 'all' ? undefined : screenId);
-  const text = buildHandoffMarkdown(design, scope === 'all' ? undefined : screenId);
-  return <section className="prompt-workspace"><div className="prompt-heading"><div><span className="eyebrow">HANDOFF</span><h2>外部AIへ渡す実装指示</h2><p>設計・配置・操作・掲載データを同じ版から出力します。</p></div><div><IconButton icon="copy" label="コピー" onClick={() => onCopy(text)} /><IconButton icon="download" label="Markdownを保存" className="primary-button" onClick={() => onSave(text)} /></div></div>
+  const targetScreenId = scope === 'all' ? undefined : screenId;
+  const sections = useMemo(() => buildHandoffSections(design, targetScreenId), [design, targetScreenId]);
+  const generated = useMemo(() => buildHandoffMarkdown(design, targetScreenId), [design, targetScreenId]);
+  const [draft, setDraft] = useState(generated);
+  useEffect(() => { setDraft(generated); }, [generated]);
+  return <section className="prompt-workspace"><div className="prompt-heading"><div><span className="eyebrow">HANDOFF</span><h2>外部AIへ渡す実装指示</h2><p>設計・配置・操作・掲載データを同じ版から出力します。</p></div><div><IconButton icon="copy" label="コピー" showLabel onClick={() => onCopy(draft)} /><IconButton icon="download" label="Markdownを保存" className="primary-button" onClick={() => onSave(draft)} /></div></div>
     <label className="setting-field">依頼する範囲<select value={scope} onChange={event => setScope(event.target.value)}><option value="all">全体</option><option value="screen">選択画面: {design.screens.find(screen => screen.id === screenId)?.name}</option></select></label>
     {scope !== 'all' && <p className="hint">依頼文は選択画面に限定します。依存関係を保つため掲載用JSONは全体を添付します。</p>}
     <div className="prompt-outline-layout"><nav aria-label="プロンプトの目次">{sections.map(section => <IconButton key={section.id} icon={({ overview: 'text_fields', screens: 'web_asset', layout: 'grid_view', behavior: 'bolt', appearance: 'palette', data: 'database', checks: 'checklist', json: 'code' } as Record<string,string>)[section.id]} label={section.title} aria-current={active === section.id ? 'true' : undefined} onClick={() => { setActive(section.id); document.getElementById(`prompt-${section.id}`)?.scrollIntoView({ block: 'start' }); }} />)}</nav>
-      <div className="prompt-sections">{sections.map(section => <details key={section.id} id={`prompt-${section.id}`} open={active === section.id || section.id === 'overview'}><summary onClick={() => setActive(section.id)}>{section.title}</summary><pre>{section.text}</pre></details>)}<details><summary>全文を確認・選択</summary><textarea readOnly aria-label="外部AI向け実装指示" value={text} /></details></div></div>
+      <div className="prompt-sections">{sections.map(section => <details key={section.id} id={`prompt-${section.id}`} open={active === section.id || section.id === 'overview'}><summary onClick={() => setActive(section.id)}>{section.title}</summary><pre>{section.text}</pre></details>)}<details className="prompt-edit"><summary>AIに渡す文面を編集</summary><p className="hint">上の各節は生成元です。ここでの修正はコピー・保存する文面だけに反映され、設計JSONは変更しません。画面や依頼範囲を切り替えると修正は破棄されます。</p><textarea aria-label="外部AI向け実装指示を編集" value={draft} onChange={event => setDraft(event.target.value)} spellCheck={false} /><IconButton icon="reset" label="生成文に戻す" disabled={draft === generated} onClick={() => setDraft(generated)} /></details></div></div>
   </section>;
 }
 

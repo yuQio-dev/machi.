@@ -1,0 +1,1054 @@
+{
+  "$schema": "project.schema.json",
+  "format": "machi-design",
+  "schemaVersion": 2,
+  "id": "machi-generic-demo",
+  "title": "まちの紹介ページ",
+  "description": "地点データを接続せずに、汎用部品の配置・入力・画面遷移・ダイアログを試すサンプルです。",
+  "locale": "ja",
+  "theme": {
+    "accent": "#7352ad",
+    "background": "#fcfbfe",
+    "foreground": "#332b43",
+    "managed": true,
+    "palette": "purple",
+    "mode": "light",
+    "shape": "round",
+    "font": "sans",
+    "scale": 1
+  },
+  "responsive": {
+    "mobileBelow": 768
+  },
+  "initialScreenId": "home",
+  "datasets": [],
+  "screens": [
+    {
+      "id": "home",
+      "name": "ホーム",
+      "frames": {
+        "desktop": {
+          "width": 1280,
+          "height": 800
+        },
+        "mobile": {
+          "width": 390,
+          "height": 844
+        }
+      },
+      "components": [
+        {
+          "id": "sample-button",
+          "kind": "button",
+          "version": 1,
+          "name": "案内を開く",
+          "parentId": null,
+          "props": {
+            "label": "案内を開く",
+            "variant": "filled",
+            "disabled": false
+          },
+          "style": {},
+          "binding": null,
+          "interactions": [
+            {
+              "event": "activate",
+              "actions": [
+                {
+                  "type": "open-panel",
+                  "targetId": "confirm-dialog"
+                }
+              ]
+            }
+          ],
+          "transition": {
+            "type": "none",
+            "durationMs": 0,
+            "direction": "up"
+          },
+          "layouts": {
+            "desktop": {
+              "x": 24,
+              "y": 108,
+              "width": 184,
+              "height": 52,
+              "zIndex": 1,
+              "hidden": false,
+              "horizontal": "start",
+              "vertical": "start",
+              "presentation": "inline"
+            },
+            "mobile": {
+              "x": 12,
+              "y": 96,
+              "width": 190,
+              "height": 52,
+              "zIndex": 1,
+              "hidden": false,
+              "horizontal": "start",
+              "vertical": "start",
+              "presentation": "inline"
+            }
+          }
+        },
+        {
+          "id": "sample-icon-button",
+          "kind": "icon-button",
+          "version": 1,
+          "name": "メニューを開く",
+          "parentId": null,
+          "props": {
+            "icon": "menu",
+            "ariaLabel": "メニューを開く",
+            "disabled": false
+          },
+          "style": {},
+          "binding": null,
+          "interactions": [
+            {
+              "event": "activate",
+              "actions": [
+                {
+                  "type": "open-panel",
+                  "targetId": "side-menu"
+                }
+              ]
+            }
+          ],
+          "transition": {
+            "type": "none",
+            "durationMs": 0,
+            "direction": "up"
+          },
+          "layouts": {
+            "desktop": {
+              "x": 224,
+              "y": 108,
+              "width": 52,
+              "height": 52,
+              "zIndex": 1,
+              "hidden": false,
+              "horizontal": "start",
+              "vertical": "start",
+              "presentation": "inline"
+            },
+            "mobile": {
+              "x": 214,
+              "y": 96,
+              "width": 52,
+              "height": 52,
+              "zIndex": 1,
+              "hidden": false,
+              "horizontal": "start",
+              "vertical": "start",
+              "presentation": "inline"
+            }
+          }
+        },
+        {
+          "id": "sample-chip",
+          "kind": "chip",
+          "version": 1,
+          "name": "おすすめ",
+          "parentId": null,
+          "props": {
+            "label": "おすすめ",
+            "variant": "outline",
+            "selected": false
+          },
+          "style": {},
+          "binding": null,
+          "interactions": [
+            {
+              "event": "activate",
+              "actions": []
+            }
+          ],
+          "transition": {
+            "type": "none",
+            "durationMs": 0,
+            "direction": "up"
+          },
+          "layouts": {
+            "desktop": {
+              "x": 292,
+              "y": 112,
+              "width": 128,
+              "height": 44,
+              "zIndex": 1,
+              "hidden": false,
+              "horizontal": "start",
+              "vertical": "start",
+              "presentation": "inline"
+            },
+            "mobile": {
+              "x": 278,
+              "y": 100,
+              "width": 100,
+              "height": 44,
+              "zIndex": 1,
+              "hidden": false,
+              "horizontal": "start",
+              "vertical": "start",
+              "presentation": "inline"
+            }
+          }
+        },
+        {
+          "id": "sample-container",
+          "kind": "container",
+          "version": 1,
+          "name": "紹介エリア",
+          "parentId": null,
+          "props": {
+            "clip": false
+          },
+          "style": {},
+          "binding": null,
+          "interactions": [],
+          "transition": {
+            "type": "none",
+            "durationMs": 0,
+            "direction": "up"
+          },
+          "layouts": {
+            "desktop": {
+              "x": 700,
+              "y": 300,
+              "width": 320,
+              "height": 180,
+              "zIndex": 1,
+              "hidden": false,
+              "horizontal": "start",
+              "vertical": "start",
+              "presentation": "inline"
+            },
+            "mobile": {
+              "x": 12,
+              "y": 620,
+              "width": 366,
+              "height": 80,
+              "zIndex": 1,
+              "hidden": true,
+              "horizontal": "start",
+              "vertical": "start",
+              "presentation": "inline"
+            }
+          }
+        },
+        {
+          "id": "sample-card",
+          "kind": "card",
+          "version": 1,
+          "name": "まちの紹介カード",
+          "parentId": null,
+          "props": {
+            "title": "まちの紹介",
+            "supportingText": "気になる場所を見つけてみましょう。",
+            "imageUrl": "",
+            "imageAlt": ""
+          },
+          "style": {},
+          "binding": null,
+          "interactions": [],
+          "transition": {
+            "type": "none",
+            "durationMs": 0,
+            "direction": "up"
+          },
+          "layouts": {
+            "desktop": {
+              "x": 24,
+              "y": 184,
+              "width": 300,
+              "height": 190,
+              "zIndex": 1,
+              "hidden": false,
+              "horizontal": "start",
+              "vertical": "start",
+              "presentation": "inline"
+            },
+            "mobile": {
+              "x": 12,
+              "y": 164,
+              "width": 366,
+              "height": 160,
+              "zIndex": 1,
+              "hidden": false,
+              "horizontal": "start",
+              "vertical": "start",
+              "presentation": "inline"
+            }
+          }
+        },
+        {
+          "id": "sample-list-item",
+          "kind": "list-item",
+          "version": 1,
+          "name": "おすすめスポット",
+          "parentId": null,
+          "props": {
+            "title": "おすすめスポット",
+            "supportingText": "駅から徒歩5分",
+            "icon": "place"
+          },
+          "style": {},
+          "binding": null,
+          "interactions": [
+            {
+              "event": "activate",
+              "actions": []
+            }
+          ],
+          "transition": {
+            "type": "none",
+            "durationMs": 0,
+            "direction": "up"
+          },
+          "layouts": {
+            "desktop": {
+              "x": 344,
+              "y": 184,
+              "width": 348,
+              "height": 76,
+              "zIndex": 1,
+              "hidden": false,
+              "horizontal": "start",
+              "vertical": "start",
+              "presentation": "inline"
+            },
+            "mobile": {
+              "x": 12,
+              "y": 338,
+              "width": 366,
+              "height": 72,
+              "zIndex": 1,
+              "hidden": false,
+              "horizontal": "start",
+              "vertical": "start",
+              "presentation": "inline"
+            }
+          }
+        },
+        {
+          "id": "sample-image",
+          "kind": "image",
+          "version": 1,
+          "name": "写真",
+          "parentId": null,
+          "props": {
+            "url": "",
+            "field": null,
+            "alt": "サンプル画像",
+            "fit": "cover"
+          },
+          "style": {},
+          "binding": null,
+          "interactions": [],
+          "transition": {
+            "type": "none",
+            "durationMs": 0,
+            "direction": "up"
+          },
+          "layouts": {
+            "desktop": {
+              "x": 720,
+              "y": 108,
+              "width": 240,
+              "height": 160,
+              "zIndex": 1,
+              "hidden": false,
+              "horizontal": "start",
+              "vertical": "start",
+              "presentation": "inline"
+            },
+            "mobile": {
+              "x": 12,
+              "y": 716,
+              "width": 180,
+              "height": 80,
+              "zIndex": 1,
+              "hidden": true,
+              "horizontal": "start",
+              "vertical": "start",
+              "presentation": "inline"
+            }
+          }
+        },
+        {
+          "id": "sample-divider",
+          "kind": "divider",
+          "version": 1,
+          "name": "区切り",
+          "parentId": null,
+          "props": {
+            "axis": "horizontal",
+            "line": true
+          },
+          "style": {},
+          "binding": null,
+          "interactions": [],
+          "transition": {
+            "type": "none",
+            "durationMs": 0,
+            "direction": "up"
+          },
+          "layouts": {
+            "desktop": {
+              "x": 24,
+              "y": 600,
+              "width": 520,
+              "height": 16,
+              "zIndex": 1,
+              "hidden": false,
+              "horizontal": "start",
+              "vertical": "start",
+              "presentation": "inline"
+            },
+            "mobile": {
+              "x": 12,
+              "y": 708,
+              "width": 366,
+              "height": 12,
+              "zIndex": 1,
+              "hidden": false,
+              "horizontal": "start",
+              "vertical": "start",
+              "presentation": "inline"
+            }
+          }
+        },
+        {
+          "id": "confirm-dialog",
+          "kind": "dialog",
+          "version": 1,
+          "name": "案内ダイアログ",
+          "parentId": null,
+          "props": {
+            "title": "まちの案内",
+            "closable": true
+          },
+          "style": {},
+          "binding": null,
+          "interactions": [
+            {
+              "event": "close",
+              "actions": [
+                {
+                  "type": "close-panel",
+                  "targetId": "confirm-dialog"
+                }
+              ]
+            }
+          ],
+          "transition": {
+            "type": "none",
+            "durationMs": 0,
+            "direction": "up"
+          },
+          "layouts": {
+            "desktop": {
+              "x": 700,
+              "y": 500,
+              "width": 360,
+              "height": 220,
+              "zIndex": 1,
+              "hidden": false,
+              "horizontal": "start",
+              "vertical": "start",
+              "presentation": "dialog",
+              "initialOpen": false
+            },
+            "mobile": {
+              "x": 20,
+              "y": 250,
+              "width": 350,
+              "height": 220,
+              "zIndex": 1,
+              "hidden": false,
+              "horizontal": "start",
+              "vertical": "start",
+              "presentation": "dialog",
+              "initialOpen": false
+            }
+          }
+        },
+        {
+          "id": "sample-text-field",
+          "kind": "text-field",
+          "version": 1,
+          "name": "お名前",
+          "parentId": null,
+          "props": {
+            "label": "お名前",
+            "placeholder": "お名前を入力",
+            "initialValue": "",
+            "inputType": "text"
+          },
+          "style": {},
+          "binding": null,
+          "interactions": [
+            {
+              "event": "change",
+              "actions": []
+            }
+          ],
+          "transition": {
+            "type": "none",
+            "durationMs": 0,
+            "direction": "up"
+          },
+          "layouts": {
+            "desktop": {
+              "x": 24,
+              "y": 402,
+              "width": 280,
+              "height": 72,
+              "zIndex": 1,
+              "hidden": false,
+              "horizontal": "start",
+              "vertical": "start",
+              "presentation": "inline"
+            },
+            "mobile": {
+              "x": 12,
+              "y": 426,
+              "width": 366,
+              "height": 72,
+              "zIndex": 1,
+              "hidden": false,
+              "horizontal": "start",
+              "vertical": "start",
+              "presentation": "inline"
+            }
+          }
+        },
+        {
+          "id": "sample-select",
+          "kind": "select",
+          "version": 1,
+          "name": "興味のあるテーマ",
+          "parentId": null,
+          "props": {
+            "label": "興味のあるテーマ",
+            "placeholder": "選択してください",
+            "options": [
+              {
+                "value": "food",
+                "label": "食べもの"
+              },
+              {
+                "value": "walk",
+                "label": "散策"
+              }
+            ],
+            "initialValue": "food"
+          },
+          "style": {},
+          "binding": null,
+          "interactions": [
+            {
+              "event": "change",
+              "actions": []
+            }
+          ],
+          "transition": {
+            "type": "none",
+            "durationMs": 0,
+            "direction": "up"
+          },
+          "layouts": {
+            "desktop": {
+              "x": 344,
+              "y": 402,
+              "width": 300,
+              "height": 72,
+              "zIndex": 1,
+              "hidden": false,
+              "horizontal": "start",
+              "vertical": "start",
+              "presentation": "inline"
+            },
+            "mobile": {
+              "x": 12,
+              "y": 510,
+              "width": 366,
+              "height": 72,
+              "zIndex": 1,
+              "hidden": false,
+              "horizontal": "start",
+              "vertical": "start",
+              "presentation": "inline"
+            }
+          }
+        },
+        {
+          "id": "sample-switch",
+          "kind": "switch",
+          "version": 1,
+          "name": "お知らせを受け取る",
+          "parentId": null,
+          "props": {
+            "label": "お知らせを受け取る",
+            "checked": true
+          },
+          "style": {},
+          "binding": null,
+          "interactions": [
+            {
+              "event": "change",
+              "actions": []
+            }
+          ],
+          "transition": {
+            "type": "none",
+            "durationMs": 0,
+            "direction": "up"
+          },
+          "layouts": {
+            "desktop": {
+              "x": 24,
+              "y": 500,
+              "width": 260,
+              "height": 56,
+              "zIndex": 1,
+              "hidden": false,
+              "horizontal": "start",
+              "vertical": "start",
+              "presentation": "inline"
+            },
+            "mobile": {
+              "x": 12,
+              "y": 594,
+              "width": 270,
+              "height": 48,
+              "zIndex": 1,
+              "hidden": false,
+              "horizontal": "start",
+              "vertical": "start",
+              "presentation": "inline"
+            }
+          }
+        },
+        {
+          "id": "sample-checkbox",
+          "kind": "checkbox",
+          "version": 1,
+          "name": "確認しました",
+          "parentId": null,
+          "props": {
+            "label": "内容を確認しました",
+            "checked": false
+          },
+          "style": {},
+          "binding": null,
+          "interactions": [
+            {
+              "event": "change",
+              "actions": []
+            }
+          ],
+          "transition": {
+            "type": "none",
+            "durationMs": 0,
+            "direction": "up"
+          },
+          "layouts": {
+            "desktop": {
+              "x": 344,
+              "y": 500,
+              "width": 280,
+              "height": 48,
+              "zIndex": 1,
+              "hidden": false,
+              "horizontal": "start",
+              "vertical": "start",
+              "presentation": "inline"
+            },
+            "mobile": {
+              "x": 12,
+              "y": 646,
+              "width": 300,
+              "height": 44,
+              "zIndex": 1,
+              "hidden": false,
+              "horizontal": "start",
+              "vertical": "start",
+              "presentation": "inline"
+            }
+          }
+        },
+        {
+          "id": "sample-screen-tabs",
+          "kind": "screen-tabs",
+          "version": 1,
+          "name": "画面タブ",
+          "parentId": null,
+          "props": {
+            "items": [
+              {
+                "label": "ホーム",
+                "screenId": "home"
+              },
+              {
+                "label": "案内",
+                "screenId": "about"
+              }
+            ]
+          },
+          "style": {},
+          "binding": null,
+          "interactions": [
+            {
+              "event": "navigate",
+              "actions": [
+                {
+                  "type": "navigate",
+                  "screen": {
+                    "source": "event",
+                    "key": "screenId"
+                  }
+                }
+              ]
+            }
+          ],
+          "transition": {
+            "type": "none",
+            "durationMs": 0,
+            "direction": "up"
+          },
+          "layouts": {
+            "desktop": {
+              "x": 24,
+              "y": 640,
+              "width": 520,
+              "height": 52,
+              "zIndex": 1,
+              "hidden": false,
+              "horizontal": "start",
+              "vertical": "start",
+              "presentation": "inline"
+            },
+            "mobile": {
+              "x": 12,
+              "y": 730,
+              "width": 366,
+              "height": 48,
+              "zIndex": 1,
+              "hidden": false,
+              "horizontal": "start",
+              "vertical": "start",
+              "presentation": "inline"
+            }
+          }
+        },
+        {
+          "id": "sample-bottom-navigation",
+          "kind": "bottom-navigation",
+          "version": 1,
+          "name": "下部ナビ",
+          "parentId": null,
+          "props": {
+            "items": [
+              {
+                "label": "ホーム",
+                "screenId": "home"
+              },
+              {
+                "label": "案内",
+                "screenId": "about"
+              }
+            ]
+          },
+          "style": {},
+          "binding": null,
+          "interactions": [
+            {
+              "event": "navigate",
+              "actions": [
+                {
+                  "type": "navigate",
+                  "screen": {
+                    "source": "event",
+                    "key": "screenId"
+                  }
+                }
+              ]
+            }
+          ],
+          "transition": {
+            "type": "none",
+            "durationMs": 0,
+            "direction": "up"
+          },
+          "layouts": {
+            "desktop": {
+              "x": 24,
+              "y": 704,
+              "width": 520,
+              "height": 64,
+              "zIndex": 1,
+              "hidden": false,
+              "horizontal": "start",
+              "vertical": "start",
+              "presentation": "inline"
+            },
+            "mobile": {
+              "x": 12,
+              "y": 780,
+              "width": 366,
+              "height": 60,
+              "zIndex": 1,
+              "hidden": false,
+              "horizontal": "start",
+              "vertical": "start",
+              "presentation": "inline"
+            }
+          }
+        },
+        {
+          "id": "side-menu",
+          "kind": "side-menu",
+          "version": 1,
+          "name": "サイドナビ",
+          "parentId": null,
+          "props": {
+            "items": [
+              {
+                "label": "ホーム",
+                "screenId": "home"
+              },
+              {
+                "label": "案内",
+                "screenId": "about"
+              }
+            ]
+          },
+          "style": {},
+          "binding": null,
+          "interactions": [
+            {
+              "event": "navigate",
+              "actions": [
+                {
+                  "type": "navigate",
+                  "screen": {
+                    "source": "event",
+                    "key": "screenId"
+                  }
+                }
+              ]
+            },
+            {
+              "event": "close",
+              "actions": [
+                {
+                  "type": "close-panel",
+                  "targetId": "side-menu"
+                }
+              ]
+            }
+          ],
+          "transition": {
+            "type": "none",
+            "durationMs": 0,
+            "direction": "up"
+          },
+          "layouts": {
+            "desktop": {
+              "x": 980,
+              "y": 108,
+              "width": 260,
+              "height": 500,
+              "zIndex": 1,
+              "hidden": false,
+              "horizontal": "start",
+              "vertical": "start",
+              "presentation": "drawer",
+              "initialOpen": false
+            },
+            "mobile": {
+              "x": 12,
+              "y": 160,
+              "width": 300,
+              "height": 480,
+              "zIndex": 1,
+              "hidden": false,
+              "horizontal": "start",
+              "vertical": "start",
+              "presentation": "drawer",
+              "initialOpen": false
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "about",
+      "name": "案内",
+      "frames": {
+        "desktop": {
+          "width": 1280,
+          "height": 800
+        },
+        "mobile": {
+          "width": 390,
+          "height": 844
+        }
+      },
+      "components": [
+        {
+          "id": "about-header",
+          "kind": "app-header",
+          "version": 1,
+          "name": "案内",
+          "parentId": null,
+          "props": {
+            "title": "まちの案内",
+            "description": "画面タブからホームへ戻れます。"
+          },
+          "style": {},
+          "binding": null,
+          "interactions": [],
+          "transition": {
+            "type": "none",
+            "durationMs": 0,
+            "direction": "up"
+          },
+          "layouts": {
+            "desktop": {
+              "x": 24,
+              "y": 24,
+              "width": 520,
+              "height": 72,
+              "zIndex": 1,
+              "hidden": false,
+              "horizontal": "start",
+              "vertical": "start",
+              "presentation": "inline"
+            },
+            "mobile": {
+              "x": 12,
+              "y": 12,
+              "width": 366,
+              "height": 72,
+              "zIndex": 1,
+              "hidden": false,
+              "horizontal": "start",
+              "vertical": "start",
+              "presentation": "inline"
+            }
+          }
+        },
+        {
+          "id": "about-copy",
+          "kind": "text",
+          "version": 1,
+          "name": "案内文",
+          "parentId": null,
+          "props": {
+            "text": "ボタン・入力・画面遷移を試せる汎用画面のサンプルです。",
+            "field": null,
+            "level": "body"
+          },
+          "style": {},
+          "binding": null,
+          "interactions": [],
+          "transition": {
+            "type": "none",
+            "durationMs": 0,
+            "direction": "up"
+          },
+          "layouts": {
+            "desktop": {
+              "x": 24,
+              "y": 120,
+              "width": 620,
+              "height": 72,
+              "zIndex": 1,
+              "hidden": false,
+              "horizontal": "start",
+              "vertical": "start",
+              "presentation": "inline"
+            },
+            "mobile": {
+              "x": 12,
+              "y": 102,
+              "width": 366,
+              "height": 100,
+              "zIndex": 1,
+              "hidden": false,
+              "horizontal": "start",
+              "vertical": "start",
+              "presentation": "inline"
+            }
+          }
+        },
+        {
+          "id": "about-nav",
+          "kind": "bottom-navigation",
+          "version": 1,
+          "name": "下部ナビ",
+          "parentId": null,
+          "props": {
+            "items": [
+              {
+                "label": "ホーム",
+                "screenId": "home"
+              },
+              {
+                "label": "案内",
+                "screenId": "about"
+              }
+            ]
+          },
+          "style": {},
+          "binding": null,
+          "interactions": [
+            {
+              "event": "navigate",
+              "actions": [
+                {
+                  "type": "navigate",
+                  "screen": {
+                    "source": "event",
+                    "key": "screenId"
+                  }
+                }
+              ]
+            }
+          ],
+          "transition": {
+            "type": "none",
+            "durationMs": 0,
+            "direction": "up"
+          },
+          "layouts": {
+            "desktop": {
+              "x": 24,
+              "y": 704,
+              "width": 520,
+              "height": 64,
+              "zIndex": 1,
+              "hidden": false,
+              "horizontal": "start",
+              "vertical": "start",
+              "presentation": "inline"
+            },
+            "mobile": {
+              "x": 12,
+              "y": 780,
+              "width": 366,
+              "height": 60,
+              "zIndex": 1,
+              "hidden": false,
+              "horizontal": "start",
+              "vertical": "start",
+              "presentation": "inline"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

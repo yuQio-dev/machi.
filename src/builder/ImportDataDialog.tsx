@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { FIELDS, readGoogleSheet, tableFromGrid, validateTable, type Table } from '../../dist/builder/core.mjs';
+import { FIELDS, readGoogleSheet, tableFromGrid, validateTable, worksheetGrid, type Table } from '../../dist/builder/core.mjs';
 import type { Design } from './model';
 import { importTableDesign } from './dataImport';
 import { IconButton } from './IconButton';
 
 type Workbook = { SheetNames: string[]; Sheets: Record<string, unknown> };
-type SheetJS = { read: (data: ArrayBuffer | string, options: Record<string, unknown>) => Workbook; utils: { sheet_to_json: (sheet: unknown, options: Record<string, unknown>) => unknown[][] } };
+type SheetJS = { read: (data: ArrayBuffer | string, options: Record<string, unknown>) => Workbook; utils: { decode_range: (ref: string) => { s: { r: number; c: number }; e: { r: number; c: number } }; sheet_to_json: (sheet: unknown, options: Record<string, unknown>) => unknown[][] } };
 declare global { interface Window { XLSX?: SheetJS } }
 let sheetLoader: Promise<SheetJS> | null = null;
 function loadSheetJS(): Promise<SheetJS> {
@@ -44,8 +44,9 @@ export function ImportDataDialog({ design, onApply, onClose }: { design: Design;
   };
   const chooseSheet = async (book: Workbook, name: string) => {
     const xlsx = await loadSheetJS();
-    useGrid(xlsx.utils.sheet_to_json(book.Sheets[name], { header: 1, defval: '', raw: false }));
     setSheet(name);
+    setTable(null);
+    useGrid(worksheetGrid(book.Sheets[name], xlsx.utils));
   };
   const read = async (kind: 'file' | 'paste' | 'google', file?: File) => {
     const id = ++requestId.current;
@@ -68,7 +69,8 @@ export function ImportDataDialog({ design, onApply, onClose }: { design: Design;
       if (id !== requestId.current) return;
       const name = book.SheetNames[0];
       if (!name) throw new Error('シートがありません');
-      await chooseSheet(book, name); setWorkbook(book); setSource(nextSource);
+      setWorkbook(book); setSource(nextSource);
+      await chooseSheet(book, name);
     } catch (reason) { if (id === requestId.current) setError(reason instanceof Error ? reason.message : '表を読み込めませんでした'); }
     finally { if (id === requestId.current) setBusy(false); }
   };
@@ -78,12 +80,13 @@ export function ImportDataDialog({ design, onApply, onClose }: { design: Design;
   };
   return <dialog ref={dialog} className="data-import-dialog" aria-labelledby="import-data-title" onCancel={event => { event.preventDefault(); onClose(); }}>
     <div className="import-heading"><div><span className="eyebrow">DATA IMPORT</span><h2 id="import-data-title">地点データを取り込む</h2></div><IconButton icon="close" label="取り込みを閉じる" onClick={onClose} /></div>
-    <p className="hint">「{design.datasets[0].name || design.datasets[0].id}」の地点データを置き換えます。配置と動作設定は引き継ぎ、反映後もUndoで戻せます。</p>
+    <p className="hint">{design.datasets[0] ? `「${design.datasets[0].name || design.datasets[0].id}」の地点データを置き換えます。配置と動作設定は引き継ぎ、反映後もUndoで戻せます。` : '地点データを追加します。反映後もUndoで戻せます。'}</p>
     <div className="import-sources"><label className="setting-field">Excel・CSV・TSV<input type="file" accept=".xlsx,.xls,.csv,.tsv" disabled={busy} onChange={event => { void read('file', event.target.files?.[0]); event.target.value = ''; }} /></label>
-      <details><summary>表を貼り付ける</summary><label className="setting-field">CSVまたはタブ区切りの表<textarea aria-label="取り込む表" rows={5} value={paste} onChange={event => setPaste(event.target.value)} /></label><IconButton icon="upload" label="貼り付けた表を読む" disabled={busy || !paste.trim()} hint={busy ? '読み込み中です' : !paste.trim() ? '表を貼り付けてください' : undefined} onClick={() => void read('paste')} /></details>
-      <details><summary>公開Googleスプレッドシート</summary><label className="setting-field">共有URL<input value={url} onChange={event => setUrl(event.target.value)} /></label><IconButton icon="download" label="URLから読む" disabled={busy || !url.trim()} hint={busy ? '読み込み中です' : !url.trim() ? 'URLを入力してください' : undefined} onClick={() => void read('google')} /></details></div>
+      <details><summary>表を貼り付ける</summary><label className="setting-field">CSVまたはタブ区切りの表<textarea aria-label="取り込む表" rows={5} value={paste} onChange={event => setPaste(event.target.value)} /></label><IconButton icon="upload" label="貼り付けた表を読む" showLabel disabled={busy || !paste.trim()} hint={busy ? '読み込み中です' : !paste.trim() ? '表を貼り付けてください' : undefined} onClick={() => void read('paste')} /></details>
+      <details><summary>公開Googleスプレッドシート</summary><p className="hint">対象シートを開いた共有URL（gid付き）またはウェブ公開URLを入力してください。URLからは1シートを読み込みます。取得できない場合はCSVまたはExcelをダウンロードして取り込めます。</p><label className="setting-field">共有URL<input value={url} onChange={event => setUrl(event.target.value)} /></label><IconButton icon="download" label="URLから読む" showLabel disabled={busy || !url.trim()} hint={busy ? '読み込み中です' : !url.trim() ? 'URLを入力してください' : undefined} onClick={() => void read('google')} /></details></div>
     {busy && <p role="status">表を読み込んでいます…</p>}{error && <p role="alert" className="import-error">{error}</p>}
-    {table && checked && <><div className="import-table-options">{workbook && <label className="setting-field">シート<select value={sheet} onChange={event => { setError(''); void chooseSheet(workbook, event.target.value).catch(reason => { setTable(null); setError(String(reason)); }); }}>{workbook.SheetNames.map(name => <option key={name}>{name}</option>)}</select></label>}<label className="setting-field">見出しの行<input type="number" min={1} max={grid.length} value={table.headerRow} onChange={event => { try { useGrid(grid, Math.max(0, Math.min(grid.length - 1, Number(event.target.value) - 1))); } catch (reason) { setError(String(reason)); } }} /></label></div>
+    <div className="import-table-options">{workbook && <label className="setting-field">シート<select value={sheet} disabled={busy} onChange={event => { setError(''); void chooseSheet(workbook, event.target.value).catch(reason => { setTable(null); setError(reason instanceof Error ? reason.message : 'シートを読み込めませんでした'); }); }}>{workbook.SheetNames.map(name => <option key={name}>{name}</option>)}</select></label>}{table && <label className="setting-field">見出しの行<input type="number" min={1} max={grid.length} value={table.headerRow} onChange={event => { const row = event.target.valueAsNumber; if (!Number.isInteger(row) || row < 1 || row > grid.length) return; try { useGrid(grid, row - 1); setError(''); } catch (reason) { setError(reason instanceof Error ? reason.message : '見出しを設定できませんでした'); } }} /></label>}</div>
+    {table && checked && <>
       <fieldset className="field-picker"><legend>列の対応と掲載項目</legend>{FIELDS.filter(field => field.key !== 'id').map(field => {
         const locked = ['name', 'lat', 'lon', 'category'].includes(field.key);
         return <div className="import-mapping-row" key={field.key}><label>{field.label}{field.required ? '（必須）' : ''}<select aria-label={`${field.label}の列`} value={mapping[field.key] ?? -1} onChange={event => { setMapping(current => ({ ...current, [field.key]: Number(event.target.value) })); setExclude(false); }}><option value={-1}>使用しない</option>{table.headers.map((header, index) => <option key={index} value={index}>{index + 1}: {header}</option>)}</select></label><label><input type="checkbox" aria-label={`${field.label}を掲載`} disabled={locked} checked={locked || published.includes(field.key)} onChange={event => setPublished(current => event.target.checked ? [...current, field.key] : current.filter(key => key !== field.key))} />掲載</label></div>;
@@ -93,6 +96,6 @@ export function ImportDataDialog({ design, onApply, onClose }: { design: Design;
       {checked.missing.length > 0 && <p className="import-error">必須列を設定してください: {checked.missing.join('、')}</p>}{checked.duplicatedColumns && <p className="import-error">同じ列を複数の項目へ割り当てています。</p>}
       {checked.invalid.length > 0 && <><ul className="invalid-rows">{checked.invalid.map(row => <li key={row.row}>{row.row}行目・{row.name}: {row.reasons.join('、')}</li>)}</ul><label className="checkbox-setting"><input type="checkbox" checked={exclude} onChange={event => setExclude(event.target.checked)} />不正な{checked.invalid.length}行を除外して取り込む</label></>}
     </>}
-    <div className="dialog-actions"><IconButton icon="close" label="取り消す" onClick={onClose} /><IconButton icon="check" label="確認したデータを反映" className="primary-button" disabled={busy || !checked || checked.missing.length > 0 || checked.duplicatedColumns || !checked.valid.length || (checked.invalid.length > 0 && !exclude)} hint="列の対応と掲載項目を確認して適用" onClick={apply} /></div>
+    <div className="dialog-actions"><IconButton icon="close" label="取り消す" showLabel onClick={onClose} /><IconButton icon="check" label="確認したデータを反映" className="primary-button" disabled={busy || !checked || checked.missing.length > 0 || checked.duplicatedColumns || !checked.valid.length || (checked.invalid.length > 0 && !exclude)} hint="列の対応と掲載項目を確認して適用" onClick={apply} /></div>
   </dialog>;
 }

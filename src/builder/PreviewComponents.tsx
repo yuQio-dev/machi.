@@ -2,6 +2,7 @@ import { MapView } from './MapView';
 import type { Component, Dataset, Design, Device } from './model';
 import { columnLabel, publicFieldSet } from './runtime';
 import { InlineTextField } from './InlineTextField';
+import { Icon } from './Icons';
 
 type Place = Dataset['rows'][number];
 type Dispatch = (component: Component, event: string, payload?: Record<string, unknown>) => void;
@@ -20,6 +21,8 @@ type Props = {
   openPanels: Record<string, boolean>;
   dispatch: Dispatch;
   closePanel: (id: string) => void;
+  previewValues?: Record<string, unknown>;
+  activeScreenId?: string;
   inlineText?: { activeField?: string; start: (field: string) => void; finish: (field: string, value: string | null) => void };
 };
 
@@ -32,7 +35,7 @@ function safeImage(value: unknown): string | null {
 }
 
 export function ComponentContent({
-  design, component, dataset, rows, mode, query, activeFilters, selectedId, fitToken, device, openPanels, dispatch, closePanel, inlineText,
+  design, component, dataset, rows, mode, query, activeFilters, selectedId, fitToken, device, openPanels, dispatch, closePanel, previewValues, activeScreenId, inlineText,
 }: Props) {
   const { kind, props } = component;
   const selected = dataset.rows.find(row => row.id === selectedId) || (mode === 'edit' ? dataset.rows[0] : undefined);
@@ -94,6 +97,52 @@ export function ComponentContent({
   if (kind === 'text') {
     const field = typeof props.field === 'string' && allowed.has(props.field) ? props.field : null;
     return <div className="text-preview">{inlineText && !field ? <InlineTextField label="テキスト" value={String(props.text ?? '')} placeholder="テキストを入力" maxLength={4000} multiline active={inlineText.activeField === 'text'} onStart={() => inlineText.start('text')} onFinish={value => inlineText.finish('text', value)} /> : field ? String(fieldValue(field) ?? props.text ?? '') : String(props.text ?? '')}</div>;
+  }
+  if (kind === 'button') return <button className={`generic-button ${String(props.variant || 'filled')}`} disabled={mode === 'edit' || props.disabled === true} onClick={() => dispatch(component, 'activate')}><span>{String(props.label || 'ボタン')}</span></button>;
+  if (kind === 'icon-button') return <button className="generic-icon-button" aria-label={String(props.ariaLabel || '操作')} disabled={mode === 'edit' || props.disabled === true} onClick={() => dispatch(component, 'activate')}><Icon name={String(props.icon || 'add')} /></button>;
+  if (kind === 'chip') {
+    const active = Boolean(previewValues?.[component.id] ?? props.selected);
+    return <button className={`generic-chip ${active ? 'selected' : ''} ${String(props.variant || 'outline')}`} aria-pressed={active} disabled={mode === 'edit'} onClick={() => dispatch(component, 'activate', { value: !active })}>{String(props.label || 'チップ')}</button>;
+  }
+  if (kind === 'card') {
+    const image = safeImage(props.imageUrl);
+    return <button type="button" className="generic-card" disabled={mode === 'edit'} onClick={() => dispatch(component, 'activate')}>
+      {image && <img src={image} alt={String(props.imageAlt || '')} loading="lazy" />}
+      <span><strong>{String(props.title || 'カード')}</strong><small>{String(props.supportingText || '')}</small></span>
+    </button>;
+  }
+  if (kind === 'list-item') return <button type="button" className="generic-list-item" disabled={mode === 'edit'} onClick={() => dispatch(component, 'activate')}><Icon name={String(props.icon || 'circle')} /><span><strong>{String(props.title || '項目')}</strong><small>{String(props.supportingText || '')}</small></span><Icon name="chevron_right" /></button>;
+  if (kind === 'image') {
+    const field = typeof props.field === 'string' && allowed.has(props.field) ? props.field : null;
+    const source = field ? safeImage(fieldValue(field)) : safeImage(props.url);
+    return source ? <img className={`generic-image ${String(props.fit || 'cover')}`} src={source} alt={String(props.alt || (field ? labelFor(field) : ''))} loading="lazy" /> : <div className="generic-image-placeholder"><Icon name="image" /><span>画像を設定してください</span></div>;
+  }
+  if (kind === 'divider') return <div className={`generic-divider ${props.axis === 'vertical' ? 'vertical' : 'horizontal'} ${props.line === false ? 'spacer' : ''}`} role={props.line === false ? undefined : 'separator'} />;
+  if (kind === 'dialog' || kind === 'side-menu') {
+    if (!panelOpen) return null;
+    const title = kind === 'dialog' ? String(props.title || 'ダイアログ') : String(component.name || 'メニュー');
+    return <section className={`generic-dialog ${kind === 'side-menu' ? 'side-menu-preview' : ''}`} role="dialog" aria-modal={mode === 'preview'} aria-label={title}>
+      <header><strong>{title}</strong>{props.closable !== false && <button aria-label="閉じる" onClick={() => dispatch(component, kind === 'dialog' ? 'close' : 'close')}>×</button>}</header>
+      {kind === 'side-menu' && <nav>{(Array.isArray(props.items) ? props.items : []).map((entry, index) => { const item = entry as { label?: string; screenId?: string }; return <button key={`${item.screenId}-${index}`} onClick={() => dispatch(component, 'navigate', { screenId: item.screenId })}>{item.label || item.screenId}</button>; })}</nav>}
+      {kind === 'dialog' && <div className="generic-dialog-content"><small>ダイアログの内容は配置した部品から設定できます。</small></div>}
+    </section>;
+  }
+  if (kind === 'text-field') {
+    const value = String(previewValues?.[component.id] ?? props.initialValue ?? '');
+    return <label className="generic-field"><span>{String(props.label || '入力')}</span><input aria-label={String(props.label || '入力')} type={String(props.inputType || 'text')} placeholder={String(props.placeholder || '')} value={value} disabled={mode === 'edit'} onChange={event => dispatch(component, 'change', { value: event.target.value })} /></label>;
+  }
+  if (kind === 'select') {
+    const value = String(previewValues?.[component.id] ?? props.initialValue ?? '');
+    const options = Array.isArray(props.options) ? props.options as { label?: string; value?: string }[] : [];
+    return <label className="generic-field"><span>{String(props.label || '項目')}</span><select aria-label={String(props.label || '項目')} value={value} disabled={mode === 'edit'} onChange={event => dispatch(component, 'change', { value: event.target.value })}><option value="">{String(props.placeholder || '選択してください')}</option>{options.map((option, index) => <option key={`${option.value}-${index}`} value={option.value || ''}>{option.label || option.value}</option>)}</select></label>;
+  }
+  if (kind === 'switch' || kind === 'checkbox') {
+    const checked = Boolean(previewValues?.[component.id] ?? props.checked);
+    return <label className={`generic-toggle ${kind}`}><input type="checkbox" role={kind === 'switch' ? 'switch' : undefined} checked={checked} disabled={mode === 'edit'} onChange={event => dispatch(component, 'change', { value: event.target.checked })} /><span className="toggle-track" aria-hidden="true"><i /></span><span>{String(props.label || (kind === 'switch' ? 'オン・オフ' : '確認する'))}</span></label>;
+  }
+  if (kind === 'screen-tabs' || kind === 'bottom-navigation') {
+    const items = Array.isArray(props.items) ? props.items as { label?: string; screenId?: string }[] : [];
+    return <nav className={`generic-navigation ${kind}`} aria-label={kind === 'screen-tabs' ? '画面タブ' : '下部ナビ'}>{items.map((item, index) => <button key={`${item.screenId}-${index}`} className={item.screenId === activeScreenId ? 'active' : ''} disabled={mode === 'edit'} onClick={() => dispatch(component, 'navigate', { screenId: item.screenId })}>{kind === 'bottom-navigation' && <Icon name={index === 0 ? 'home' : 'circle'} />}<span>{item.label || item.screenId}</span></button>)}</nav>;
   }
   return <div className="unsupported-preview"><strong>{component.name}</strong><small>{kind} は表示に未対応です</small></div>;
 }
