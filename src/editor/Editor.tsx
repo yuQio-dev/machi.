@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import Selecto from 'react-selecto';
 import { Group, Panel, Separator, useGroupRef } from 'react-resizable-panels';
@@ -9,7 +9,7 @@ import { buildMapHtml } from './exportMap';
 import './viewer.css';
 import { LayoutHandles } from './LayoutHandles';
 import { describeDiff, validateDesign, type Component, type Design, type Device, type Interaction, type InteractionAction, type Layout, type Screen, type Transition } from './model';
-import { createComponent, createScreen, eventValue, firstFlowKinds, initialPreview, applyPreviewActions, publicColumns, publicFieldSet, visibleRows, setComponentProperty, EMPTY_DATASET, type PreviewState } from './runtime';
+import { createComponent, createScreen, eventValue, firstFlowKinds, initialPreview, applyPreviewActions, publicColumns, publicFieldSet, visibleRows, setComponentProperty, buildHandoffMarkdown, EMPTY_DATASET, type PreviewState } from './runtime';
 import { ComponentContent } from './PreviewComponents';
 import './styles.css';
 import './editor.css';
@@ -20,6 +20,7 @@ import './icon-buttons.css';
 import './inline-text.css';
 import './m3e-inspired.css';
 import './editor-sky.css';
+import './prompt-workspace.css';
 import { applyCommand, copyComponents, groupingReason, type Clipboard, type EditorCommand } from './commands';
 import { overflowWarnings, parentFrame, protectedSelection, roots } from './geometry';
 import { CanvasTree } from './CanvasTree';
@@ -32,6 +33,7 @@ import { IconButton } from './IconButton';
 import { useHistory } from './history';
 import { readSavedDesign, writeSavedDesign } from './storage';
 import { ContextMenu, ColorDialog, type MenuAction, type MenuItem, type Colors, type ColorKey } from './ContextMenu';
+import { StageNav, WorkMenu } from './Workflow';
 
 const validInitial = validateDesign(sample);
 if (!validInitial.design) throw new Error(`同梱設計JSONが無効です: ${validInitial.errors.join(' / ')}`);
@@ -84,16 +86,48 @@ function makeAction(type: string, design: Design, screen: Screen): InteractionAc
 function App() {
   const history = useHistory(initial);
   const design = history.present;
+  const [step, setStep] = useState(1);
+  const importDirty = useRef(false);
+  const [importKey, setImportKey] = useState(0);
+  const setImportDirty = useCallback((value: boolean) => { importDirty.current = value; }, []);
+  const [scope, setScope] = useState('all');
+  const [draft, setDraft] = useState(() => buildHandoffMarkdown(initial));
+  const draftBase = useRef(draft);
+  const [confirmed, setConfirmed] = useState<{ signature: string; design: Design; draft: string } | null>(null);
   const [device, setDevice] = useState<Device>('desktop');
   const [mode, setMode] = useState<Mode>('edit');
   const [sideTab, setSideTab] = useState<'parts' | 'layers' | 'data' | 'theme'>('parts');
   const [settingsTab, setSettingsTab] = useState<SettingsTab>('design');
   const [selected, setSelected] = useState<string[]>([]);
+  const [titleDraft, setTitleDraft] = useState(design.title);
+  const cancelTitle = useRef(false);
+  useEffect(() => setTitleDraft(design.title), [design.title]);
   const [manualZoom, setManualZoom] = useState<number | null>(null);
   const [fitZoom, setFitZoom] = useState(.5);
   const [editorScreenId, setEditorScreenId] = useState(design.initialScreenId);
+  const generated = useMemo(() => buildHandoffMarkdown(design, scope === 'all' ? undefined : editorScreenId), [design, scope, editorScreenId]);
+  const signature = JSON.stringify([design, scope, editorScreenId, draft]);
+  const isConfirmed = confirmed?.signature === signature && !history.staging;
+  useEffect(() => { setConfirmed(null); }, [design, scope, editorScreenId, draft]);
+  useEffect(() => { if (draft === draftBase.current && draftBase.current !== generated) { draftBase.current = generated; setDraft(generated); } }, [generated, draft]);
+  const review = () => {
+    if (draftBase.current !== generated) {
+      if (draft !== draftBase.current && !window.confirm('設計または依頼範囲が変わりました。編集した文面を新しい生成文に置き換えますか？')) return false;
+      draftBase.current = generated; setDraft(generated);
+    }
+    setConfirmed(null); setMode('prompt'); setStep(3);
+    return true;
+  };
+  const navigateStage = (target: number): boolean => {
+    if (step === 1 && target !== 1 && importDirty.current && !window.confirm('読み込んだ表はまだ反映されていません。取り込みをやめますか？')) return false;
+    if (target === 3) { if (!review()) return false; }
+    else if (target === 4 && !isConfirmed) { setNotice('受け渡し前の確認を行ってください'); if (!review()) return false; }
+    else { setStep(target); if ((target === 1 || target === 2) && mode === 'prompt') setMode('edit'); }
+    if (target !== 4 || isConfirmed) setNotice('');
+    if (target !== 1) importDirty.current = false;
+    return true;
+  };
   const [preview, setPreview] = useState<PreviewState>(() => initialPreview(design.screens[0], 'desktop'));
-  const [showDataImport, setShowDataImport] = useState(false);
   const [clipboard, setClipboard] = useState<Clipboard | null>(null);
   const [editingGroupId, setEditingGroupId] = useState<string | null>(null);
   const [inlineEditing, setInlineEditing] = useState<{ id: string; field: string } | null>(null);
@@ -172,6 +206,7 @@ function App() {
       const result = validateDesign(value);
       if (result.design) {
         history.reset(result.design);
+        setStep(2);
         setEditorScreenId(result.design.initialScreenId);
         setPreview(initialPreview(result.design.screens.find(item => item.id === result.design!.initialScreenId)!, 'desktop'));
         setSaveStatus('保存済みの設計を復元');
@@ -210,7 +245,7 @@ function App() {
     const observer = new ResizeObserver(fit);
     observer.observe(host); fit();
     return () => observer.disconnect();
-  }, [frame.width, frame.height, mode, leftOpen, rightOpen, canvasToolsOpen]);
+  }, [frame.width, frame.height, mode, step, leftOpen, rightOpen, canvasToolsOpen]);
 
   useEffect(() => {
     if (!design.screens.some(item => item.id === editorScreenId)) setEditorScreenId(design.initialScreenId);
@@ -223,7 +258,7 @@ function App() {
     const host = stageScroll.current;
     if (!host || mode === 'prompt' || mode === 'flow') return;
     const wheel = (event: WheelEvent) => {
-      if (!event.ctrlKey && !event.metaKey) return;
+      if (event.deltaY === 0) return;
       event.preventDefault();
       const stage = host.querySelector<HTMLElement>('.stage'), canvas = host.querySelector<HTMLElement>('.frame');
       if (!stage || !canvas) return;
@@ -307,12 +342,14 @@ function App() {
     window.setTimeout(() => URL.revokeObjectURL(url), 1000);
   };
   const exportMap = async () => {
-    try { setNotice('閲覧用の地図を作成中…'); const html = await buildMapHtml(design); download(`${design.id}.html`, html, 'text/html;charset=utf-8'); setNotice('地図HTMLをダウンロードしました。ブラウザーで開けます。背景地図・写真には通信が必要です。'); } catch (error) { setNotice(error instanceof Error ? error.message : '地図を書き出せませんでした'); }
+    if (!isConfirmed || !confirmed) { setNotice('受け渡し前の確認を行ってください'); return; }
+    try { setNotice('閲覧用の地図を作成中…'); const html = await buildMapHtml(confirmed.design); download(`${confirmed.design.id}.html`, html, 'text/html;charset=utf-8'); setNotice('地図HTMLをダウンロードしました。ブラウザーで開けます。背景地図・写真には通信が必要です。'); } catch (error) { setNotice(error instanceof Error ? error.message : '地図を書き出せませんでした'); }
   };
   const exportDesign = () => download(`${design.id}.machi.json`, `${JSON.stringify(design, null, 2)}\n`, 'application/json');
-  const exportPrompt = (text: string) => { download(`${design.id}-implementation.md`, text, 'text/markdown;charset=utf-8'); setNotice('Markdownの保存を開始しました'); };
-  const copyPrompt = async (text: string) => {
-    try { await navigator.clipboard.writeText(text); setNotice('実装指示をコピーしました'); }
+  const exportPrompt = () => { if (!isConfirmed || !confirmed) { setNotice('受け渡し前の確認を行ってください'); return; } download(`${confirmed.design.id}-implementation.md`, confirmed.draft, 'text/markdown;charset=utf-8'); setNotice('Markdownの保存を開始しました'); };
+  const copyPrompt = async () => {
+    if (!isConfirmed || !confirmed) { setNotice('受け渡し前の確認を行ってください'); return; }
+    try { await navigator.clipboard.writeText(confirmed.draft); setNotice('実装指示をコピーしました'); }
     catch { setNotice('コピーできませんでした。全文欄からコピーしてください'); }
   };
   const importFile = async (file?: File) => {
@@ -444,7 +481,7 @@ function App() {
   const layers = (parentId: string | null = null, depth = 0): React.ReactNode => screen.components.filter(component => component.parentId === parentId).map(component => <React.Fragment key={component.id}><div className="layer-row" style={{ paddingLeft: depth * 12 }}><button data-layer-id={component.id} aria-pressed={selected.includes(component.id)} className={selected.includes(component.id) ? 'selected' : ''} onClick={event => selectComponent(component.id, event.shiftKey || event.ctrlKey || event.metaKey)} onDoubleClick={() => { if (component.editor?.group) setEditingGroupId(component.id); }}><Icon name={component.editor?.group ? 'folder' : partIcons[component.kind] || 'article'} /><span>{component.name}</span>{component.layouts?.[device]?.hidden && <small>非表示</small>}</button><IconButton icon={component.editor?.locked ? 'lock' : 'lock_open'} className="layer-lock" label={`${component.name}の${component.editor?.locked ? 'ロック解除' : '位置をロック'}`} onClick={() => execute({ type: 'lock', locked: !component.editor?.locked }, [component.id])} /></div>{layers(component.id, depth + 1)}</React.Fragment>);
   const keyDown = (event: React.KeyboardEvent) => {
     const target = event.target as HTMLElement;
-    if (target.closest('input,textarea,select,[contenteditable=true],dialog,[role=dialog],[role=menu]') || contextMenu || colorSelection || pending || autoLayout || showDataImport) return;
+    if (target.closest('input,textarea,select,[contenteditable=true],dialog,[role=dialog],[role=menu]') || contextMenu || colorSelection || pending || autoLayout) return;
     if ((event.shiftKey && event.key === 'F10') || event.key === 'ContextMenu') { openContextMenu(event); return; }
     const ctrl = event.ctrlKey || event.metaKey, key = event.key.toLowerCase();
     if (ctrl && (key === 'z' || key === 'y')) {
@@ -474,34 +511,44 @@ function App() {
   };
   return <div className="editor" onKeyDown={keyDown} onKeyUp={event => { if (event.key.startsWith('Arrow')) finishKeys(); if (event.key === ' ') setSpacePan(false); }}>
     <header className="topbar">
-      <h1 className="brand">machi<span>.</span></h1><strong className="project-name">{design.title}</strong>
+      <h1 className="brand">machi<span>.</span></h1><label className="project-title-editor" data-value={titleDraft || ' '}><textarea aria-label="設計名" rows={1} value={titleDraft} onChange={event => setTitleDraft(event.target.value.replace(/[\r\n]/g, ''))} onFocus={() => { cancelTitle.current = false; }} onBlur={() => { const title = titleDraft.trim(); if (!cancelTitle.current && title && title !== design.title) commitDesign({ ...design, title }); else setTitleDraft(design.title); }} onKeyDown={event => { if (event.key === 'Enter') { event.preventDefault(); event.currentTarget.blur(); } if (event.key === 'Escape') { event.preventDefault(); event.stopPropagation(); cancelTitle.current = true; event.currentTarget.blur(); } }} /></label>
       <div className="save-state" aria-live="polite"><span className={saveStatus.includes('失敗') ? 'save-dot error' : 'save-dot'} />{saveStatus}</div>
+      {(step === 2 || step === 3) && savedReady && <WorkMenu step={step} onNavigate={navigateStage} />}
 
-      <div className="top-actions">{(mode === 'prompt' || mode === 'flow') && <IconButton icon="back" label="編集へ戻る" showLabel onClick={() => setMode('edit')} />}<IconButton icon="auto_awesome" label="プロンプト" hint="外部AIへ渡す実装指示を作成" className="prompt-primary" aria-pressed={mode === 'prompt'} onClick={() => setMode(mode === 'prompt' ? 'edit' : 'prompt')}><Icon name="auto_awesome" /><span>プロンプト</span></IconButton>
-      <IconButton icon="download" label="地図をダウンロード" onClick={() => void exportMap()} />
-      <IconButton icon="folder_open" label="プロジェクト" popoverTarget="project-actions"><Icon name="folder_open" /><span>プロジェクト</span></IconButton>
+      <div className="top-actions">{(mode === 'prompt' || mode === 'flow') && <IconButton icon="back" label="編集へ戻る" showLabel onClick={() => { if (navigateStage(2)) setMode('edit'); }} />}<IconButton icon="auto_awesome" label="プロンプト" disabled={!savedReady} hint="外部AIへ渡す実装指示を作成" className="prompt-primary" aria-pressed={step === 3} onClick={() => navigateStage(3)}><Icon name="auto_awesome" /><span>プロンプト</span></IconButton>
+      <IconButton icon="folder_open" label="プロジェクト" disabled={!savedReady} popoverTarget="project-actions"><Icon name="folder_open" /><span>プロジェクト</span></IconButton>
       <div id="project-actions" popover="auto" className="project-actions-menu" aria-label="プロジェクトの操作">
-        <button onClick={() => { commitDesign(initial); setEditorScreenId(initial.initialScreenId); setSelected([]); setMode('edit'); setNotice('地点データ0件の新しい地図を作成しました。元に戻す操作で前の設計へ戻れます。'); }}>新しい地図を作成</button>
-        <button onClick={() => { commitDesign(mapSample as Design); setEditorScreenId(mapSample.initialScreenId); setSelected([]); setMode('edit'); setNotice('架空のサンプル地点を読み込みました'); }}>地図サンプルを編集</button>
-        <button onClick={() => { commitDesign(genericDesign); setEditorScreenId(genericDesign.initialScreenId); setSelected([]); setMode('edit'); setNotice('地点データなしで試せる汎用画面サンプルを読み込みました'); }}>汎用画面サンプルを編集</button>
+        <button onClick={() => { if (step === 1 && importDirty.current && !window.confirm('未適用の表を破棄して新しい地図を作成しますか？')) return; importDirty.current = false; setImportKey(value => value + 1); commitDesign(initial); setStep(1); setEditorScreenId(initial.initialScreenId); setSelected([]); setMode('edit'); setNotice('地点データ0件の新しい地図を作成しました。元に戻す操作で前の設計へ戻れます。'); }}>新しい地図を作成</button>
+        <button onClick={() => { if (!navigateStage(2)) return; commitDesign(mapSample as Design); setEditorScreenId(mapSample.initialScreenId); setSelected([]); setMode('edit'); setNotice('架空のサンプル地点を読み込みました'); }}>地図サンプルを編集</button>
+        <button onClick={() => { if (!navigateStage(2)) return; commitDesign(genericDesign); setEditorScreenId(genericDesign.initialScreenId); setSelected([]); setMode('edit'); setNotice('地点データなしで試せる汎用画面サンプルを読み込みました'); }}>汎用画面サンプルを編集</button>
         <IconButton icon="save" label="保存" showLabel popoverTarget="project-actions" popoverTargetAction="hide" onClick={() => { setSaveBlocked(false); void writeSavedDesign(history.confirmed).then(() => setSaveStatus('保存済み')).catch(() => setSaveStatus('保存失敗')); }} />
         <IconButton icon="reset" label="移行前バックアップを書き出す" showLabel popoverTarget="project-actions" popoverTargetAction="hide" onClick={() => void readSavedDesign('pre-v2').then(value => { if (value) download(`${design.id}-before-v2.machi.json`, JSON.stringify(value, null, 2), 'application/json'); else setNotice('v1の移行前バックアップはありません'); }).catch(() => setNotice('バックアップを読み込めません'))} />
         <IconButton icon="download" label="設計JSONを書き出す" showLabel popoverTarget="project-actions" popoverTargetAction="hide" onClick={exportDesign} />
-        <IconButton icon="upload" label="JSONを読み戻す" showLabel popoverTarget="project-actions" popoverTargetAction="hide" onClick={() => designInput.current?.click()} />
+        <IconButton icon="upload" label="JSONを読み戻す" showLabel popoverTarget="project-actions" popoverTargetAction="hide" onClick={() => { if (step === 1 && importDirty.current && !window.confirm('未適用の表を破棄してJSONを読み戻しますか？')) return; designInput.current?.click(); }} />
         <input hidden ref={designInput} type="file" accept=".json,application/json" onChange={event => { void importFile(event.target.files?.[0]); event.target.value = ''; }} />
       </div></div>
     </header>
-    <div className={`editor-body mode-${mode}`} onContextMenu={openContextMenu}>
+    {step !== 2 && step !== 3 && savedReady && <div className="stage-layout"><StageNav step={step} onNavigate={navigateStage} /><main className="workflow-page">
+      {step === 1 && <React.Suspense fallback={<p role="status">取り込み画面を準備しています…</p>}><ImportDataDialog key={importKey} design={design} onDirtyChange={setImportDirty} onClose={() => navigateStage(2)} onSample={() => { if (importDirty.current && !window.confirm('未適用の表を破棄してサンプルを使いますか？')) return; importDirty.current = false; commitDesign(mapSample as Design); setEditorScreenId(mapSample.initialScreenId); setMode('edit'); setStep(2); }} onApply={next => {
+        const checked = validateDesign(next);
+        if (!checked.design) throw new Error(checked.errors.slice(0, 4).join(' / '));
+        importDirty.current = false; commitDesign(checked.design); setPreview(initialPreview(checked.design.screens.find(item => item.id === screen.id) || checked.design.screens[0], device));
+        setClipboard(null); setStep(2); setNotice('地点データを反映しました。Undoで取り込み前へ戻せます');
+      }} /></React.Suspense>}
+
+      {step === 4 && <div className="handoff-page"><h2>AIへ渡す・HTMLを取得</h2><p className="workflow-intro">{isConfirmed ? '確認した実装指示をコピー、またはファイルに保存できます。' : '内容が変わったため、もう一度確認してください。'}</p><div className="handoff-grid"><section className="workflow-card"><h3>実装指示</h3><pre className="handoff-text">{confirmed?.draft || draft}</pre></section><div><section className="workflow-card"><h3>実装指示をコピー</h3><p>確認した指示をクリップボードへコピーします。</p><button className="workflow-primary" disabled={!isConfirmed} onClick={() => void copyPrompt()}>実装指示をコピー</button><button disabled={!isConfirmed} onClick={exportPrompt}>Markdownを保存</button></section><section className="workflow-card"><h3>閲覧用HTML</h3><p>閲覧用の地図をファイルとして保存します。</p><button disabled={!isConfirmed} onClick={() => void exportMap()}>HTMLをダウンロード</button></section></div></div></div>}
+    </main></div>}
+    <div className={`editor-body mode-${mode}`} style={{ display: step === 2 || step === 3 ? undefined : 'none' }} onContextMenu={openContextMenu}>
       {mode === 'edit' && <nav className="tool-rail" aria-label="編集ツール">{([['parts','grid_view','部品'],['layers','layers','構造'],['data','database','データ'],['theme','palette','テーマ']] as const).map(([tab,icon,label]) => <IconButton key={tab} icon={icon} label={label} className={leftOpen && sideTab === tab ? 'active' : ''} aria-pressed={leftOpen && sideTab === tab} onClick={() => { setSideTab(tab); setLeftOpen(true); }} />)}<IconButton icon="account_tree" label="フロー" onClick={() => setMode('flow')} /></nav>}
       <Group key={`${leftOpen}-${rightOpen}-${mode}`} className="workspace" orientation="horizontal" groupRef={panelGroup} defaultLayout={leftOpen && rightOpen && mode === 'edit' ? panelLayout.current : undefined} onLayoutChanged={layout => { if (mode === 'edit' && leftOpen && rightOpen && ['library','canvas','inspector'].every(key => layout[key] > 0)) { panelLayout.current=layout; try { localStorage.setItem(storageKey, JSON.stringify(layout)); } catch {} } }}>
       {mode === 'edit' && leftOpen && <><Panel id="library" defaultSize="20%" minSize="220px" maxSize="400px" className="library-panel">
         <div className="panel-title"><strong>{sideTab === 'parts' ? '部品' : sideTab === 'layers' ? '構造' : sideTab === 'theme' ? 'テーマ' : '地点データ'}</strong><IconButton icon="chevron_left" label="左パネルを閉じる" onClick={() => setLeftOpen(false)} /></div>
-        {sideTab === 'theme' ? <ThemePanel design={design} onChange={commitDesign} /> : sideTab === 'data' ? <div className="library-content"><h2>{dataset.name}</h2><p>{dataset.rows.length}地点・{publicColumns(dataset).length}公開列</p><IconButton icon="upload" label="地点データを取り込む" className="primary-button" onClick={() => setShowDataImport(true)} /><p className="hint">掲載する列と不正な行を確認してから反映します。</p><ul className="column-summary">{dataset.columns.map(column => <li key={column.key}>{column.label}<small>{column.visibility === 'public' ? '掲載' : '内部'}</small></li>)}</ul></div> : <>
+        {sideTab === 'theme' ? <ThemePanel design={design} onChange={commitDesign} /> : sideTab === 'data' ? <div className="library-content"><h2>{dataset.name}</h2><p>{dataset.rows.length}地点・{publicColumns(dataset).length}公開列</p><IconButton icon="upload" label="地点データを取り込む" className="primary-button" onClick={() => navigateStage(1)} /><p className="hint">掲載する列と不正な行を確認してから反映します。</p><ul className="column-summary">{dataset.columns.map(column => <li key={column.key}>{column.label}<small>{column.visibility === 'public' ? '掲載' : '内部'}</small></li>)}</ul></div> : <>
         {sideTab === 'parts' ? <Group orientation="vertical" className="library-split" defaultLayout={librarySplit.current} onLayoutChanged={layout => { if (layout.catalog > 0 && layout.layers > 0) { librarySplit.current=layout; try {localStorage.setItem('machi-sketch-library-split-v1',JSON.stringify(layout));} catch {} } }}><Panel id="catalog" defaultSize="62%" minSize="140px"><PartCatalog query={partQuery} onQueryChange={setPartQuery} favorites={favorites} onFavoritesChange={setFavorites} onAdd={addComponent} dataAvailable={design.datasets.length > 0} /></Panel><Separator className="library-height-handle" aria-label="部品一覧と配置済みの高さを変更" /><Panel id="layers" minSize="120px"><section className="layers-panel"><h2>配置済み <small>{screenComponents.length}</small></h2><div className="layer-list">{layers()}</div></section></Panel></Group> : <section className="layers-panel"><h2>配置済み <small>{screenComponents.length}</small></h2><div className="layer-list">{layers()}</div></section>}</>}
         <div className="side-footer">{design.datasets.length ? `${dataset.rows.length}地点 · ${publicColumns(dataset).length}公開列` : '地点データ未接続'}</div>
       </Panel><Separator className="splitter" aria-label="部品パネルの幅を変更" /></>}
       <Panel id="canvas" minSize="360px" className="canvas-panel">
-        {mode === 'prompt' ? <PromptWorkspace design={design} screenId={editorScreenId} onCopy={text => void copyPrompt(text)} onSave={exportPrompt} /> : mode === 'flow' ? <FlowPanel design={design} onOpen={(id, componentId) => { setEditorScreenId(id); setSelected(componentId ? [componentId] : []); setSettingsTab('behavior'); setMode('edit'); setRightOpen(true); }} /> : <>
+        {mode === 'prompt' ? <PromptWorkspace design={design} screenId={editorScreenId} scope={scope} setScope={setScope} draft={draft} setDraft={setDraft} onConfirm={() => { if (validateDesign(design).errors.length) return; const customDraft = draft !== draftBase.current; if (draftBase.current !== generated && customDraft) { setNotice('設計または依頼範囲が更新されています。「生成文に戻す」で文面を更新してください。'); return; } const handoffDraft = draftBase.current !== generated ? generated : draft; if (handoffDraft !== draft) { draftBase.current = generated; setDraft(generated); } const snapshotSignature = JSON.stringify([design, scope, editorScreenId, handoffDraft]); setConfirmed({ signature: snapshotSignature, design: structuredClone(design), draft: handoffDraft }); setStep(4); }} /> : mode === 'flow' ? <FlowPanel design={design} onOpen={(id, componentId) => { setEditorScreenId(id); setSelected(componentId ? [componentId] : []); setSettingsTab('behavior'); setMode('edit'); setRightOpen(true); }} /> : <>
                     <div className="canvas-toolbar"><div className="canvas-controls">
             {mode === 'edit' && <div className="tool-pair"><IconButton icon="near_me" label="選択" hint="V" aria-pressed={!hand} onClick={() => setHand(false)} /><IconButton icon="pan_tool" label="手のひら" hint="H・Space＋ドラッグ" aria-pressed={hand} onClick={() => setHand(true)} /></div>}
             <label className="screen-select">画面<select value={screen.id} onChange={event => { setSelected([]); if (mode === 'preview') setPreview(current => ({ ...current, activeScreenId: event.target.value })); else setEditorScreenId(event.target.value); }}>{design.screens.map(item => <option key={item.id} value={item.id}>{item.name}</option>)}</select></label>
@@ -512,7 +559,7 @@ function App() {
             <IconButton icon={mode === 'preview' ? 'edit' : 'play_arrow'} label={mode === 'preview' ? '編集へ戻る' : '試す'} aria-pressed={mode === 'preview'} onClick={() => mode === 'preview' ? setMode('edit') : startPreview()} />
           </div></div>
           <div className="zoom-control"><IconButton icon="remove" label="縮小" onClick={() => setManualZoom(Math.max(.1, Math.round((zoom - .1) * 100) / 100))} /><output aria-live="polite">{Math.round(zoom * 100)}%</output><IconButton icon="add" label="拡大" onClick={() => setManualZoom(Math.min(2, Math.round((zoom + .1) * 100) / 100))} /><IconButton icon="fit" label="全体表示" hint="0" onClick={() => (setManualZoom(null), setPanOffset({ x: 0, y: 0 }))} /></div>          {mode === 'edit' && canvasToolsOpen && <div id="canvas-extra-tools" className="canvas-edit-tools"><IconButton icon="attractions" label="吸着" aria-pressed={snap} onClick={() => setSnap(value => !value)} /><IconButton icon="grid_on" label="グリッド表示" hint="4 px" aria-pressed={grid} onClick={() => setGrid(value => !value)} /><IconButton icon="auto_awesome_motion" label="自動配置" hint="配置案をプレビュー" onClick={() => { finishKeys(); setAutoLayout(true); }} /></div>}
-          <div className={`stage-scroll ${canvasToolsOpen && mode === 'edit' ? 'tools-open' : ''} ${hand || spacePan ? 'hand-tool' : ''}`} ref={stageScroll} tabIndex={0} onPointerDown={event => {
+          <div className={`stage-scroll ${canvasToolsOpen && mode === 'edit' ? 'tools-open' : ''} ${hand || spacePan ? 'hand-tool' : ''}`} ref={stageScroll} tabIndex={0} aria-describedby="canvas-keyboard-hints" onPointerDown={event => {
             if (event.button === 0) event.currentTarget.focus({ preventScroll: true });
             if (((hand || spacePan) && event.button === 0) || event.button === 1) { pan.current = { x: event.clientX, y: event.clientY, left: panOffset.x, top: panOffset.y }; event.currentTarget.setPointerCapture(event.pointerId); event.preventDefault(); }
           }} onPointerMove={event => { if (pan.current) { setPanOffset({ x: pan.current.left + event.clientX - pan.current.x, y: pan.current.top + event.clientY - pan.current.y }); } }} onPointerUp={event => { pan.current = null; if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId); }} onPointerCancel={() => { pan.current = null; }} aria-label="編集キャンバス" onDragOver={event => { if (mode === 'edit') event.preventDefault(); }} onDrop={event => { event.preventDefault(); const kind = event.dataTransfer.getData('application/x-machi-component'); if (mode === 'edit' && firstFlowKinds.includes(kind)) { const rect=event.currentTarget.querySelector('.frame')?.getBoundingClientRect(); if(rect) addComponent(kind,{x:Math.round((event.clientX-rect.left)/zoom),y:Math.round((event.clientY-rect.top)/zoom)}); } }}><div className={`stage ${mode === 'edit' ? `device-frame device-frame-${device}` : ''}`} style={{ width: frame.width * zoom, height: frame.height * zoom, translate: `${panOffset.x}px ${panOffset.y}px` }}><div key={mode === 'preview' ? transitionToken : 'edit'} className={`frame ${mode === 'edit' ? 'frame-edit' : 'preview-enter'} ${grid && mode === 'edit' ? 'show-grid' : ''}`} data-transition={mode === 'preview' ? transition.type : undefined} style={{ '--transition-duration': `${transition.durationMs}ms`, '--slide-x': transition.direction === 'left' ? '36px' : transition.direction === 'right' ? '-36px' : '0px', '--slide-y': transition.direction === 'up' ? '36px' : transition.direction === 'down' ? '-36px' : '0px', background: String(design.theme?.background || '#ffffff'), width: frame.width, height: frame.height, transform: `scale(${zoom})`, '--accent': String(design.theme?.accent || '#7952b3'), '--surface': String(design.theme?.background || '#ffffff'), '--foreground': String(design.theme?.foreground || '#332b43'), '--accent-contrast': design.theme?.mode === 'dark' ? '#201626' : '#ffffff' } as React.CSSProperties} onPointerDown={event => { if (event.button === 0 && event.target === event.currentTarget) setSelected([]); }}>
@@ -524,7 +571,7 @@ function App() {
             {mode === 'edit' && !inlineEditing && !hand && !spacePan && handleItems.length > 0 && <LayoutHandles key={`${handleItems.map(item => item.id).join('-')}-${device}-${zoom}`} items={handleItems} frame={parentFrame(screen, roots(screen, selected)[0], device)} snap={snap} commit={patches => execute({ type: 'layout', patches })} />}
           </div></div></div>
           {mode === 'edit' && !hand && !spacePan && <Selecto dragContainer=".stage-scroll" selectableTargets={['.canvas-component[data-selectable=true]']} selectByClick={false} selectFromInside={false} preventDragFromInside hitRate={5} onDragStart={event => { if (event.inputEvent?.button === 2 || (event.inputEvent?.target as Element)?.closest('.moveable-control-box, input, textarea, [contenteditable=true]')) event.stop(); }} onSelectEnd={event => { if (event.selected.length) setSelected(event.selected.map(element => element.getAttribute('data-component-id') || '').filter(Boolean)); }} />}
-          <div className="canvas-status"><span>{mode === 'edit' ? inlineEditing ? '文字を編集中 · 入力を終えると確定 · Escで取り消し' : '編集: 部品を選択・移動。手のひらまたはSpace＋ドラッグで視点移動' : '試す: 検索、絞り込み、地点選択を操作できます'}</span><span title={overflowWarnings(screen, device).join(' / ')}>{overflowWarnings(screen, device).length > 0 ? `⚠ はみ出し ${overflowWarnings(screen, device).length}件 · ` : ''}{frame.width} × {frame.height} · {device === 'desktop' ? 'PC' : 'スマホ'}</span></div>
+          <div className="canvas-status"><span id="canvas-keyboard-hints">{mode === 'edit' ? inlineEditing ? '文字を編集中 · 入力を終えると確定 · Escで取り消し' : '部品を選択 · Deleteで削除 · Ctrl+Dで複製 · Ctrl+C/Vでコピー・貼り付け · 矢印で移動 · 右クリックで操作' : '試す: 検索、絞り込み、地点選択を操作できます'}</span><span title={overflowWarnings(screen, device).join(' / ')}>{overflowWarnings(screen, device).length > 0 ? `⚠ はみ出し ${overflowWarnings(screen, device).length}件 · ` : ''}{frame.width} × {frame.height} · {device === 'desktop' ? 'PC' : 'スマホ'}</span></div>
         </>}
       </Panel>
       {mode === 'edit' && rightOpen && <><Separator className="splitter" aria-label="設定パネルの幅を変更" /><Panel id="inspector" defaultSize="23%" minSize="290px" maxSize="440px" className="inspector-panel"><span className="close-inspector"><IconButton icon="close" label="設定パネルを閉じる" onClick={() => setRightOpen(false)} /></span><div className="inspector-content" ref={inspectorScroll}>{selectedComponent ? <>
@@ -607,12 +654,6 @@ function App() {
             </>}
           </> : <div className="screen-settings"><span className="eyebrow">SCREEN</span><h2>画面全体</h2><NoteField key={screen.id} label="画面の実装仕様メモ" value={screen.implementationNote} onCommit={value => commitDesign({ ...design, screens: design.screens.map(item => item.id === screen.id ? { ...item, implementationNote: value } : item) })} /><label className="setting-field">画面名<input value={screen.name} onChange={event => commitDesign({ ...design, screens: design.screens.map(item => item.id === screen.id ? { ...item, name: event.target.value } : item) })} /></label><label className="checkbox-setting"><input type="checkbox" checked={design.initialScreenId === screen.id} onChange={event => { if (event.target.checked) commitDesign({ ...design, initialScreenId: screen.id }); }} />最初に開く画面</label><div className="fields"><label>幅<input type="number" value={frame.width} onChange={event => commitDesign({ ...design, screens: design.screens.map(item => item.id === screen.id ? { ...item, frames: { ...item.frames, [device]: { ...frame, width: Number(event.target.value) } } } : item) })} /></label><label>高さ<input type="number" value={frame.height} onChange={event => commitDesign({ ...design, screens: design.screens.map(item => item.id === screen.id ? { ...item, frames: { ...item.frames, [device]: { ...frame, height: Number(event.target.value) } } } : item) })} /></label></div><IconButton icon="map" label="地図を追加" className="primary-button" onClick={() => addComponent('map-view')} /></div>}</div></Panel></>}
     </Group></div>
-    {showDataImport && <React.Suspense fallback={<div className="notice" role="status">取り込み画面を準備しています…</div>}><ImportDataDialog design={design} onClose={() => setShowDataImport(false)} onApply={next => {
-      const checked = validateDesign(next);
-      if (!checked.design) throw new Error(checked.errors.slice(0, 4).join(' / '));
-      commitDesign(checked.design); setPreview(initialPreview(checked.design.screens.find(item => item.id === screen.id) || checked.design.screens[0], device));
-      setClipboard(null); setShowDataImport(false); setMode('edit'); setNotice('地点データを反映しました。Undoで取り込み前へ戻せます');
-    }} /></React.Suspense>}
     {notice && <div className="notice" role="status">{notice}<IconButton icon="close" label="通知を閉じる" onClick={() => setNotice('')} /></div>}
     {contextMenu && mode === 'edit' && <ContextMenu x={contextMenu.x} y={contextMenu.y} label={contextMenu.ids.length ? contextMenu.ids.length > 1 ? `${contextMenu.ids.length}部品を選択中` : contextComponents[0]?.name || '部品' : 'キャンバス'} items={menuItems} onAction={runContextAction} onClose={closeContextMenu} />}
     {colorSelection && colorComponents.length > 0 && <ColorDialog count={colorComponents.length} initial={componentColors(colorComponents[0])}
@@ -622,7 +663,7 @@ function App() {
         setColorSelection(null); setNotice(`${colorComponents.length}部品の色を変更しました`); restoreContextFocus();
       }} />}
     {autoLayout && <AutoLayoutDialog design={design} screenId={screen.id} device={device} onClose={() => setAutoLayout(false)} onApply={next => { commitDesign(next); setAutoLayout(false); setNotice('配置を適用しました。1回のUndoで戻せます'); }} />}
-    {pending && <div className="dialog-backdrop"><section className="diff-dialog" role="dialog" aria-modal="true" aria-labelledby="diff-title"><span className="eyebrow">IMPORT REVIEW</span><h2 id="diff-title">読み戻す変更を確認</h2><ul>{pending.diff.map((line, index) => <li key={index}>{line}</li>)}</ul><p>取り込むと現在の設計が置き換わります。Undoで戻せます。</p><div className="dialog-actions"><IconButton icon="close" label="取り消す" onClick={() => setPending(null)} /><IconButton icon="check" label="取り込む" className="primary-button" onClick={() => { setClipboard(null); setEditingGroupId(null); commitDesign(pending.design); setEditorScreenId(pending.design.initialScreenId); setSelected([]); setPending(null); setMode('edit'); setNotice('設計を取り込みました'); }} /></div></section></div>}
+    {pending && <div className="dialog-backdrop"><section className="diff-dialog" role="dialog" aria-modal="true" aria-labelledby="diff-title"><span className="eyebrow">IMPORT REVIEW</span><h2 id="diff-title">読み戻す変更を確認</h2><ul>{pending.diff.map((line, index) => <li key={index}>{line}</li>)}</ul><p>取り込むと現在の設計が置き換わります。Undoで戻せます。</p><div className="dialog-actions"><IconButton icon="close" label="取り消す" onClick={() => setPending(null)} /><IconButton icon="check" label="取り込む" className="primary-button" onClick={() => { importDirty.current = false; setStep(2); setClipboard(null); setEditingGroupId(null); commitDesign(pending.design); setEditorScreenId(pending.design.initialScreenId); setSelected([]); setPending(null); setMode('edit'); setNotice('設計を取り込みました'); }} /></div></section></div>}
   </div>;
 }
 

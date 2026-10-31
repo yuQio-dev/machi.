@@ -19,6 +19,7 @@ export function importTableDesign(design: Design, table: Table, mapping: Record<
   ];
   const nextDataset: Dataset = {
     ...target, name: source.label.slice(0, 160), columns, source: { ...source, label: source.label.slice(0, 160) },
+    importSummary: { valid: checked.valid.length, excluded: checked.invalid.length, blank: checked.blank },
     mapping: Object.fromEntries(Object.keys(target.mapping).map(role => [role, role])),
     rows: checked.valid.map(point => {
       const raw = table.rows[point.row - table.headerRow - 1];

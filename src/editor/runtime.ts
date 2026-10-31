@@ -277,6 +277,7 @@ export function createScreen(design: Design): Screen {
 export function publicDesign(design: Design): Design {
   const copy = structuredClone(design);
   for (const dataset of copy.datasets) {
+    delete dataset.importSummary;
     dataset.source = { kind: 'inline', label: '掲載用データ', url: '' };
     const allowed = new Set(publicColumns(dataset).map(column => column.key));
     dataset.columns = dataset.columns.filter(column => allowed.has(column.key));

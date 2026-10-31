@@ -27,6 +27,7 @@ export type Dataset = {
   rows: { id: string; values: Record<string, unknown> }[];
   searchMatch?: 'all' | 'any'; filterMatch?: 'all' | 'any';
   source?: { kind: string; label: string; url: string };
+  importSummary?: { valid: number; excluded: number; blank: number };
 };
 export type Screen = {
   id: string; name: string; frames: Record<Device, { width: number; height: number }>;

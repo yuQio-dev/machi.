@@ -6,6 +6,7 @@ export type MenuAction = 'copy' | 'paste' | 'lock' | 'group' | 'ungroup' | 'dupl
 export type MenuItem = { action: MenuAction; label: string; disabled?: boolean; danger?: boolean };
 export type ColorKey = 'background' | 'color' | 'borderColor';
 export type Colors = Record<ColorKey, string>;
+const menuShortcuts: Partial<Record<MenuAction, string>> = { copy: 'Ctrl C', paste: 'Ctrl V', duplicate: 'Ctrl D', group: 'Ctrl G', ungroup: 'Ctrl ⇧ G', delete: 'Del', 'select-all': 'Ctrl A', fit: '0', undo: 'Ctrl Z', redo: 'Ctrl Y' };
 
 export function ContextMenu({ x, y, label, items, onAction, onClose }: {
   x: number; y: number; label: string; items: MenuItem[];
@@ -34,11 +35,21 @@ export function ContextMenu({ x, y, label, items, onAction, onClose }: {
     };
   }, [onClose]);
   return createPortal(<div ref={menu} className="editor-context-menu" role="menu" aria-label={label}
-    style={{ left: x, top: y }} onWheel={event => event.stopPropagation()} onContextMenu={event => event.preventDefault()} onKeyDown={event => {
+    style={{ left: x, top: y }} onWheel={event => { event.preventDefault(); event.stopPropagation(); menu.current!.scrollTop += event.deltaY; }} onContextMenu={event => event.preventDefault()} onKeyDown={event => {
       const buttons = [...menu.current!.querySelectorAll<HTMLElement>('[role="menuitem"]')];
       const index = buttons.indexOf(document.activeElement as HTMLElement);
-      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'z') {
-        event.preventDefault(); event.stopPropagation(); onAction(event.shiftKey ? 'redo' : 'undo');
+      if (event.key === 'Delete' || event.key === 'Backspace') {
+        const deleteItem = menu.current!.querySelector<HTMLButtonElement>('[data-menu-action="delete"]:not([aria-disabled="true"])');
+        if (deleteItem) { event.preventDefault(); event.stopPropagation(); onAction('delete'); }
+      } else if ((event.ctrlKey || event.metaKey) && !event.altKey) {
+        const key = event.key.toLowerCase();
+        const shortcuts: Record<string, MenuAction> = key === 'z' ? { z: event.shiftKey ? 'redo' : 'undo' } : key === 'y' ? { y: 'redo' } : key === 'd' && !event.shiftKey ? { d: 'duplicate' } : key === 'c' ? { c: 'copy' } : key === 'v' ? { v: 'paste' } : key === 'a' ? { a: 'select-all' } : key === 'g' ? { g: event.shiftKey ? 'ungroup' : 'group' } : {};
+        const action = shortcuts[key];
+        const item = action && menu.current!.querySelector<HTMLButtonElement>(`[data-menu-action="${action}"]`);
+        if (item && item.getAttribute('aria-disabled') !== 'true') { event.preventDefault(); event.stopPropagation(); onAction(action); }
+      } else if (event.key === '0') {
+        const item = menu.current!.querySelector<HTMLButtonElement>('[data-menu-action="fit"]:not([aria-disabled="true"])');
+        if (item) { event.preventDefault(); event.stopPropagation(); onAction('fit'); }
       } else if (['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key)) {
         event.preventDefault();
         const next = event.key === 'Home' ? 0 : event.key === 'End' ? buttons.length - 1 : (index + (event.key === 'ArrowDown' ? 1 : -1) + buttons.length) % buttons.length;
@@ -48,9 +59,9 @@ export function ContextMenu({ x, y, label, items, onAction, onClose }: {
       }
     }}>
     <div className="context-menu-title" role="presentation">{label}</div>
-    {items.map(item => <button key={item.action} role="menuitem" tabIndex={-1} aria-disabled={item.disabled || undefined}
+    {items.map(item => <button key={item.action} role="menuitem" tabIndex={-1} data-menu-action={item.action} aria-disabled={item.disabled || undefined} aria-keyshortcuts={item.action === 'delete' ? 'Delete Backspace' : item.action === 'duplicate' ? 'Control+D Meta+D' : item.action === 'copy' ? 'Control+C Meta+C' : item.action === 'paste' ? 'Control+V Meta+V' : item.action === 'group' ? 'Control+G Meta+G' : item.action === 'ungroup' ? 'Control+Shift+G Meta+Shift+G' : item.action === 'select-all' ? 'Control+A Meta+A' : item.action === 'fit' ? '0' : item.action === 'undo' ? 'Control+Z Meta+Z' : item.action === 'redo' ? 'Control+Y Meta+Y' : undefined}
       className={item.danger ? 'danger' : undefined} onClick={() => { if (!item.disabled) onAction(item.action); }}>
-      {item.label}
+      <span>{item.label}</span>{menuShortcuts[item.action] && <kbd aria-hidden="true">{menuShortcuts[item.action]}</kbd>}
     </button>)}
   </div>, document.body);
 }

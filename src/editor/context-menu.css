@@ -19,3 +19,7 @@
 .component-color-dialog .dialog-actions>button{padding:9px 14px;border:1px solid #dcd0e7;border-radius:7px;background:#fff;color:#655176;font-size:13px}
 .canvas-component[data-custom-background]>:first-child,.canvas-component[data-custom-background] .place-card{background:inherit}
 .canvas-component[data-custom-color]>:first-child,.canvas-component[data-custom-color] :is(.panel-heading,.place-card,.place-card-copy small,.detail-field span,.detail-field small,.count-preview small,.app-header-preview small,.search-preview input,.empty-preview,.category-preview button){color:inherit}
+.editor-context-menu{overscroll-behavior-y:contain;scrollbar-width:thin;scrollbar-color:#aac8d3 transparent}
+.editor-context-menu button{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.editor-context-menu button kbd{flex:none;padding:2px 6px;border:1px solid #dce7eb;border-radius:5px;background:#f5f9fa;color:#6b8490;font:inherit;font-size:10px;line-height:1.5;white-space:nowrap}
+.editor-context-menu button[aria-disabled=true] kbd{opacity:.5}

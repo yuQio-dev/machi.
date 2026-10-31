@@ -92,10 +92,13 @@ test('editor: 取り込みは元行を保持し、非公開列と接続URLをAI�
   assert.equal(design.datasets[0].rows.length, 1);
   assert.equal(design.datasets[0].rows[0].values.sourceRow, 2);
   assert.equal(design.datasets[0].rows[0].values.extra_5, 'secret-memo');
+  assert.deepEqual(design.datasets[0].importSummary, { valid: 1, excluded: 1, blank: 0 });
+  assert.equal(runtime.publicDesign(design).datasets[0].importSummary, undefined);
+  assert.ok(model.describeDiff(sample, design).some(line => line.includes('取り込み結果')));
   assert.deepEqual(model.validateDesign(design).errors, []);
   const prompt = runtime.buildHandoffMarkdown(design);
   assert.match(prompt, /公開公園/);
-  assert.doesNotMatch(prompt, /private-address|secret-memo|private-source|sourceRow|originalId/);
+  assert.doesNotMatch(prompt, /private-address|secret-memo|private-source|sourceRow|originalId|importSummary/);
   assert.equal(sample.datasets[0].rows.length, 3);
 });
 test('editor: データセットがない設計にも地点を追加でき、元の設計は変えない', () => {

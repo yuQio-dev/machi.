@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import type { Design, Device, Screen } from './model';
+import { validateDesign, type Design, type Device, type Screen } from './model';
 import type { Alignment, EditorCommand } from './commands';
 import { groupingReason } from './commands';
-import { protectedSelection, roots } from './geometry';
+import { protectedSelection, roots, overflowWarnings } from './geometry';
 import { contrastRatio, palettes, themePreset } from './theme';
 import { screenFlow, type FlowEdge } from './flow';
 import { buildHandoffMarkdown, buildHandoffSections, initialPreview } from './runtime';
@@ -57,19 +57,27 @@ export function ThemePanel({ design, onChange }: { design: Design; onChange: (ne
   </div>;
 }
 
-export function PromptWorkspace({ design, screenId, onCopy, onSave }: { design: Design; screenId: string; onCopy: (text: string) => void; onSave: (text: string) => void }) {
-  const [scope, setScope] = useState('all');
-  const [active, setActive] = useState('overview');
+export function PromptWorkspace({ design, screenId, scope, setScope, draft, setDraft, onConfirm }: { design: Design; screenId: string; scope: string; setScope: (value: string) => void; draft: string; setDraft: (value: string) => void; onConfirm: () => void }) {
+  const [view, setView] = useState<'edit' | 'generated'>('edit');
+  const errors = validateDesign(design).errors;
+  const warnings = [...screenFlow(design).warnings, ...design.screens.flatMap(screen => (['desktop', 'mobile'] as const).flatMap(device => overflowWarnings(screen, device).map(message => `${screen.name}（${device === 'desktop' ? 'PC' : 'スマホ'}）: ${message}`)))];
+  for (const screen of design.screens) for (const component of screen.components) if (['map-view', 'place-search', 'category-chips', 'place-list', 'place-detail', 'result-count'].includes(component.kind) && !component.binding) warnings.push(`${screen.name} / ${component.name}: データが接続されていません。`);
+  if (design.datasets.every(dataset => !dataset.rows.length)) warnings.push('地点データがありません。データを使う部品の接続を確認してください。');
   const targetScreenId = scope === 'all' ? undefined : screenId;
   const sections = useMemo(() => buildHandoffSections(design, targetScreenId), [design, targetScreenId]);
   const generated = useMemo(() => buildHandoffMarkdown(design, targetScreenId), [design, targetScreenId]);
-  const [draft, setDraft] = useState(generated);
-  useEffect(() => { setDraft(generated); }, [generated]);
-  return <section className="prompt-workspace"><div className="prompt-heading"><div><span className="eyebrow">HANDOFF</span><h2>外部AIへ渡す実装指示</h2><p>設計・配置・操作・掲載データを同じ版から出力します。</p></div><div><IconButton icon="copy" label="コピー" showLabel onClick={() => onCopy(draft)} /><IconButton icon="download" label="Markdownを保存" className="primary-button" onClick={() => onSave(draft)} /></div></div>
-    <label className="setting-field">依頼する範囲<select value={scope} onChange={event => setScope(event.target.value)}><option value="all">全体</option><option value="screen">選択画面: {design.screens.find(screen => screen.id === screenId)?.name}</option></select></label>
-    {scope !== 'all' && <p className="hint">依頼文は選択画面に限定します。依存関係を保つため掲載用JSONは全体を添付します。</p>}
-    <div className="prompt-outline-layout"><nav aria-label="プロンプトの目次">{sections.map(section => <IconButton key={section.id} icon={({ overview: 'text_fields', screens: 'web_asset', layout: 'grid_view', behavior: 'bolt', appearance: 'palette', data: 'database', checks: 'checklist', json: 'code' } as Record<string,string>)[section.id]} label={section.title} aria-current={active === section.id ? 'true' : undefined} onClick={() => { setActive(section.id); document.getElementById(`prompt-${section.id}`)?.scrollIntoView({ block: 'start' }); }} />)}</nav>
-      <div className="prompt-sections">{sections.map(section => <details key={section.id} id={`prompt-${section.id}`} open={active === section.id || section.id === 'overview'}><summary onClick={() => setActive(section.id)}>{section.title}</summary><pre>{section.text}</pre></details>)}<details className="prompt-edit"><summary>AIに渡す文面を編集</summary><p className="hint">上の各節は生成元です。ここでの修正はコピー・保存する文面だけに反映され、設計JSONは変更しません。画面や依頼範囲を切り替えると修正は破棄されます。</p><textarea aria-label="外部AI向け実装指示を編集" value={draft} onChange={event => setDraft(event.target.value)} spellCheck={false} /><IconButton icon="reset" label="生成文に戻す" disabled={draft === generated} onClick={() => setDraft(generated)} /></details></div></div>
+  return <section className="prompt-workspace prompt-redesign">
+    <div className="prompt-page-inner">
+      <header className="prompt-page-header"><div><span className="eyebrow">AI HANDOFF · 3 / 4</span><h2>AIに渡す指示を整える</h2><p>設計から作成した文面を編集し、ChatGPTやClaude Codeへ渡す準備をします。</p></div></header>
+      <div className="prompt-scope-card"><div><strong>依頼する範囲</strong><p>AIに実装を依頼する画面を選びます。</p></div><label><span className="sr-only">依頼する範囲</span><select value={scope} onChange={event => setScope(event.target.value)}><option value="all">すべての画面</option><option value="screen">選択画面: {design.screens.find(screen => screen.id === screenId)?.name}</option></select></label></div>
+      {scope !== 'all' && <p className="prompt-scope-note">依頼文は選択画面に限定します。依存関係を保つため掲載用JSONは全体を添付します。</p>}
+      <div className="prompt-document"><div className="prompt-document-heading"><div><h3>実装指示</h3></div><span className="prompt-draft-status">{draft === generated ? '設計から生成' : '編集済み'}</span></div>
+        <div className="prompt-view-tabs" role="group" aria-label="実装指示の表示"><button aria-pressed={view === 'edit'} onClick={() => setView('edit')}>文面を編集</button><button aria-pressed={view === 'generated'} onClick={() => setView('generated')}>設計から生成した内容</button></div>
+        {view === 'edit' ? <div id="prompt-editor-panel" className="prompt-document-body"><label htmlFor="prompt-draft">AIに渡す文面</label><p>直接書き換えられます。変更は設計自体には反映されません。</p><textarea id="prompt-draft" value={draft} onChange={event => setDraft(event.target.value)} spellCheck={false} /><div className="prompt-editor-actions"><button type="button" disabled={draft === generated} onClick={() => { if (window.confirm('編集した文面を破棄し、現在の設計から生成した文面に戻しますか？')) setDraft(generated); }}>生成文に戻す</button></div></div> : <div id="prompt-generated-panel" className="prompt-document-body prompt-generated"><p>現在の設計から生成された内容です。編集した文面は「文面を編集」で確認できます。</p>{sections.map(section => <details key={section.id}><summary>{section.title}</summary><pre>{section.text}</pre></details>)}</div>}
+      </div>
+    </div>
+    {(errors.length > 0 || warnings.length > 0) && <section className="prompt-validation" aria-label="実装前の確認事項">{errors.length > 0 && <div className="prompt-confirm-errors" role="alert"><strong>修正が必要です</strong><ul>{errors.map((error, index) => <li key={index}>{error}</li>)}</ul></div>}{warnings.length > 0 && <div className="prompt-confirm-warnings"><strong>確認事項</strong><ul>{warnings.map((warning, index) => <li key={index}>{warning}</li>)}</ul></div>}</section>}
+    <footer className="prompt-next-bar"><span>確認後、実装指示とHTMLを取得できます</span><button type="button" disabled={errors.length > 0} onClick={onConfirm}>受け渡しへ進む <span aria-hidden="true">→</span></button></footer>
   </section>;
 }
 

@@ -165,6 +165,7 @@ export function describeDiff(before: Design, after: Design): string[] {
     if (!old) { add(`データセットを追加: ${dataset.name || dataset.id}`); continue; }
     const label = dataset.name || dataset.id;
     if (old.name !== dataset.name) add(`${label} データ名を変更`);
+    if (JSON.stringify(old.importSummary) !== JSON.stringify(dataset.importSummary)) add(`${label} 取り込み結果を変更`);
     if (JSON.stringify(old.mapping) !== JSON.stringify(dataset.mapping)) compareRecord(`${label} 列対応`, old.mapping, dataset.mapping);
     if (old.searchMatch !== dataset.searchMatch) add(`${label} 検索語の結合方法を変更`);
     if (old.filterMatch !== dataset.filterMatch) add(`${label} 絞り込みの結合方法を変更`);
