@@ -4,7 +4,7 @@
 
 Excel・CSV・TSV・公開Googleスプレッドシートを取り込み、地図・検索・カテゴリ・一覧・詳細などの部品を配置するブラウザーエディターです。PCとスマホの画面を編集し、その場で操作を試せます。
 
-**[machi.を開く](https://yuqio-dev.github.io/ushiku-map/)**
+**[machi.を開く](https://yuqio-dev.github.io/machi./)**
 
 ## 使い方
 
